@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowDown, ArrowRight, ArrowUpRight, Compass, FileCheck2, Globe2, Mail, Search, Send, Users } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUpRight, Compass, FileCheck2, Mail, MapPin, Search, Send } from "lucide-react";
 import { listFeaturedInternships, COUNTRY_NAMES } from "@/features/internships/service";
 import { ContactForm } from "@/components/contact/contact-form";
 import { InternshipCard } from "@/components/ui/internship-card";
@@ -21,24 +21,33 @@ export default async function LandingPage() {
   return (
     <div>
       <Reveal>
-        <section aria-labelledby="hero-heading" className="grid gap-10 pb-16 pt-4 lg:grid-cols-[1.1fr_.9fr] lg:items-center lg:gap-14 lg:pb-24">
-          <div data-reveal>
-            <p className="eyebrow flex items-center gap-2"><span className="size-2 rounded-full bg-primary" /> A new place. A new perspective.</p>
-            <h1 id="hero-heading" className="editorial-title mt-6">Internships across <span className="text-primary">Southeast Asia,</span> with personal guidance.</h1>
-            <p className="mt-7 max-w-md text-base leading-7 text-muted-foreground">Step beyond the classroom. Discover meaningful internship experiences, explore a different culture, and take your next step with a real person by your side.</p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link href="/opportunities" className="btn btn-primary min-h-12 px-6">Browse internships <ArrowUpRight size={18} aria-hidden="true" /></Link>
-              <Link href="/#how-it-works" className="btn btn-ghost">How it works <ArrowDown size={16} aria-hidden="true" /></Link>
-            </div>
-            <div className="mt-10 flex items-center gap-3 border-t border-border pt-5 text-sm text-muted-foreground"><Users size={20} aria-hidden="true" /><span>Every application reviewed by our team.<br /><span className="text-foreground">Personal from the very first step.</span></span></div>
+        <section aria-labelledby="hero-heading" className="journey-hero">
+          <div data-reveal className="journey-hero-intro">
+            <p className="journey-hero-kicker"><span className="journey-hero-kicker-rule" aria-hidden="true" /> A new place. A new perspective.</p>
+            <h1 id="hero-heading" className="journey-hero-title">Internships across <span className="text-primary">Southeast Asia,</span> with personal guidance.</h1>
           </div>
-          <div data-reveal className="relative">
-            <div className="hero-photo lg:min-h-[620px]">
-              <Image src="/images/singapore.jpg" alt="Singapore’s waterfront and skyline at dusk" fill priority sizes="(min-width: 1024px) 550px, 100vw" className="object-cover" />
-              <div className="absolute bottom-8 left-7 z-10 text-white"><p className="text-xs uppercase tracking-[.18em]">A world beyond your classroom</p><p className="mt-2 text-3xl font-medium tracking-tight">Go somewhere.<br />Grow everywhere.</p></div>
+
+          <div data-reveal className="journey-hero-story">
+            <p className="max-w-sm text-base leading-7 text-muted-foreground">Step beyond the classroom. Discover meaningful internship experiences, explore a different culture, and take your next step with a real person by your side.</p>
+            <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
+              <Link href="/opportunities" className="btn btn-primary min-h-12 gap-5 px-6">Browse internships <ArrowUpRight size={18} strokeWidth={1.6} aria-hidden="true" /></Link>
+              <Link href="/#how-it-works" className="journey-hero-secondary">How it works <ArrowDown size={16} strokeWidth={1.6} aria-hidden="true" /></Link>
             </div>
-            <div className="absolute -right-2 top-7 flex items-center gap-3 rounded-full border border-border bg-surface px-5 py-3 shadow-sm md:-right-4"><Globe2 size={22} className="text-primary" aria-hidden="true" /><span className="text-sm font-medium">Southeast Asia. Your next chapter.</span></div>
+            <p className="journey-hero-footnote">Your next chapter starts with a little curiosity.</p>
           </div>
+
+          <figure data-reveal className="journey-hero-destination">
+            <div className="journey-hero-image">
+              <Image src="/images/singapore.jpg" alt="Singapore’s waterfront and skyline at dusk" fill priority sizes="(min-width: 1280px) 560px, (min-width: 1024px) 48vw, (min-width: 768px) 58vw, 100vw" className="object-cover" />
+            </div>
+            <figcaption className="journey-hero-caption"><span className="inline-flex items-center gap-2"><MapPin size={14} strokeWidth={1.6} aria-hidden="true" /> Singapore, Southeast Asia</span><span className="text-muted-foreground">A view of what’s beyond.</span></figcaption>
+          </figure>
+
+          <aside data-reveal className="journey-hero-note" aria-label="Personal application guidance">
+            <div className="flex items-center justify-between gap-4"><Compass size={24} strokeWidth={1.5} aria-hidden="true" /><span className="text-xs text-jalanin-200">The Jalanin approach</span></div>
+            <p className="mt-7 text-2xl font-medium leading-tight tracking-[-.045em]">A new chapter.<br />A real person by your side.</p>
+            <p className="mt-4 text-sm leading-6 text-jalanin-100">Every application reviewed by our team. Personal from the very first step.</p>
+          </aside>
         </section>
       </Reveal>
 

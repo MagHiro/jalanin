@@ -28,3 +28,13 @@ GSAP (`gsap` + `@gsap/react`) is approved **selectively**. Everything ordinary
 - No command palette (unjustified scope; URL filters instead) — see `decision-log.md`.
 - No bulk-action menus (no bulk mutations in PRD).
 - `window.confirm` replaced by accessible `ConfirmDialog`.
+# Public header refresh — 12 Oct 2026
+
+Floating follow-up: selected tabs use CSS color/background transitions; expanded desktop Explore panel opens immediately, overlays content and dismisses on Escape, outside click, focus exit, selection or breakpoint change. No added animation dependency.
+
+Public navigation uses 160ms CSS color/underline transitions, disabled under reduced motion. Mobile navigation is an immediate disclosure (no GSAP dependency), with Escape focus restoration and link/outside/desktop-resize dismissal. Sticky-header scroll padding keeps anchor destinations visible.
+# Workspace motion — 2026-10-12
+
+`WorkspaceShell` scopes GSAP to its content container. Route changes use an 8px / 320ms content entrance; no individual operational row sequencing or ScrollTrigger. `useGSAP` reverts on route updates/unmount; `gsap.matchMedia` disables entrances for reduced motion and reacts to preference changes. Server content is visible without JavaScript. Hover/focus remain CSS. Mobile navigation uses a native modal dialog with browser focus containment and Escape/focus restoration.
+
+Chromium workspace tests exercise reduced-motion rendering, non-reduced route navigation, navigation away/back, mobile dialog dismissal and focus restoration.

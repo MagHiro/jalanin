@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSessionUser, isAdminUser } from "@/lib/auth/require";
-import { WorkspaceRail } from "@/components/layout/workspace-rail";
+import { WorkspaceShell } from "@/components/layout/workspace-shell";
 
 // Student shell: workspace rail shared by overview/applications/placements.
 // Server-verified session on every page (never UI-only).
@@ -14,12 +14,9 @@ export default async function DashboardLayout({
   const admin = await isAdminUser(user.id);
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[232px_minmax(0,1fr)] lg:gap-8">
-        <WorkspaceRail
-          variant="light"
-          eyebrow="Student"
-          title="My workspace"
+        <WorkspaceShell
+          role="student"
+          email={user.email ?? undefined}
           switchLink="/opportunities"
           switchLabel="Browse internships"
           items={[
@@ -30,10 +27,7 @@ export default async function DashboardLayout({
               ? [{ href: "/admin", label: "Admin", icon: "▤" }]
               : []),
           ]}
-        />
-        <div className="min-w-0">{children}</div>
-      </div>
-    </div>
+        >{children}</WorkspaceShell>
   );
 }
 

@@ -20,12 +20,12 @@ export function PageHeader({
   icon?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-7">
+    <div className="page-heading flex flex-wrap items-start justify-between gap-4 border-b border-border pb-7">
       <div className="flex min-w-0 items-start gap-3">
         {icon && (
           <span
             aria-hidden="true"
-            className="grid size-10 shrink-0 place-items-center rounded-xl border border-border bg-surface text-lg text-primary"
+            className="page-heading-icon grid size-10 shrink-0 place-items-center rounded-xl border border-border bg-surface text-lg text-primary"
           >
             {typeof icon === "string" ? <DomainIcon name={icon} /> : icon}
           </span>

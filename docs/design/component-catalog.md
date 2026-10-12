@@ -52,3 +52,19 @@ Primary brand: `oklch(0.27 0.09 265.54)` (`--jalanin-900`), ramp 50–950. Never
   `.rail-alert-card`, `.error-mark`) and verify with a compiled-CSS probe.
 - Tables: flat header, row separators, server pagination; mobile → card transformation.
 - Touch targets ≥44px where practical; visible `:focus-visible`; `prefers-reduced-motion` respected.
+# Public navigation refresh — 12 Oct 2026
+
+Floating variant: warm near-white rounded shell with outer canvas gutters, sticky top inset and restrained shadow; mobile menu expands inside its rounded shell.
+
+Current shell: borderless, 1600px maximum width, full-width inner navigation; desktop dropdown shares the borderless edge.
+
+Desktop Explore disclosure: grouped existing links and a destination-photo CTA inside an attached full-width rounded panel. Soft warm-secondary tabs replace underlines. Click toggles; Escape restores the trigger; focus leaving the header, outside click, selection and breakpoint change dismiss. Latest supplied logo uses static image metadata for correct aspect ratio.
+
+`SiteHeader` resolves session/admin on the server and passes boolean visibility to `PublicNavigation`. PublicNavigation renders the supplied optimized logo, route/hash-aware links, account actions and a mobile disclosure with Lucide icons. Desktop links use underline hover/active states; mobile links include descriptions. Menu supports Escape/focus restoration, outside dismissal and desktop-breakpoint closure. Existing sign-out behavior is reused. Favicon artwork is synchronized from `public/favicon.ico` into the App Router icon.
+# Editorial workspace components — 2026-10-12
+
+- `RouteFrame`: public frame omitted for `/admin/*` and `/dashboard/*`.
+- `WorkspaceShell`: role-specific full-height rail, active route, server-resolved identity and nav items, utility header, native mobile navigation dialog and workspace footer.
+- Overview vocabulary: welcome, rule-separated stat strip, priority band, pipeline, activity list, application/draft/placement rows, helpful zero states and deep-indigo note.
+- Scoped controls in `globals.css`: fields, selects, textareas, date inputs, checkbox/radio, file input, labels/hints/errors, focus, invalid/read-only/disabled states; pills, badges, toolbar, table, cards, alerts, quotation/revision panels and inherited confirmation actions. Google Sans Flex throughout, including operational identifiers previously rendered monospace.
+- Existing nested CRUD/review forms use this shared vocabulary; input values, validation and server workflow handlers retain their existing contracts.

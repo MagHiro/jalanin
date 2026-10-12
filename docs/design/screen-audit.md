@@ -1,5 +1,12 @@
 # Screen Audit — route × state × viewport QA matrix
 
+## Hero-only editorial collage verification (2026-10-12)
+
+- Chromium: hero fits at 320/375/768/1024/1440px with reduced motion; guidance note does not intersect the destination caption. Screenshots captured under `/tmp/opencode/jalanin-hero-{width}.png`; 320px and 1024px images visually inspected (1440px initial image inspected and caption overlap corrected).
+- Computed heading font resolves to the locally loaded Google Sans Flex. Original heading and both CTA destinations retained. Browser navigation verified to `/opportunities` and `#how-it-works`.
+- `pnpm typecheck` and `pnpm lint` pass. This is a presentation-only change; existing backend/DB/authz/validation/state behavior is reused.
+- Full-page 320px overflow observed outside the hero: contact section grid/form minimum width reaches 370px. Hero has no internal overflow; page-wide overflow absent at 375/768/1024/1440px. The earlier blanket zero-overflow entry below does not describe this current 320px result.
+
 Legend: `✓` rendered + checked · `○` pending · `—` not applicable.
 Viewports: 320 / 375 / 430 / 768 / 1024 / 1280 / 1440.
 States per screen: normal · loading/skeleton · empty · filtered-zero · validation-error ·
@@ -75,3 +82,20 @@ Current source of truth: `design.md` v2 (user selected Editorial & refined).
 - GET directory filter submission and password visibility toggle passed. Font loading confirmed in computed styles; mobile landing screenshot visually inspected with reduced motion enabled.
 - Review screenshots: `/tmp/opencode/jalanin-final-{375,768,1440}.png` (session-local artifacts).
 - Typecheck, lint, production build pass. Vitest reports 42 passing; database suite follows its skip path when `DATABASE_URL` is unset. Full authenticated E2E and full interaction/accessibility audits remain unverified for this refresh.
+# Public header QA — 12 Oct 2026
+
+Borderless/wider refinement: browser geometry passed at 375, 1024, 1440 and 1920px; shell has a 0px border, retains outer gutters, reaches 1600px maximum and introduces no horizontal overflow.
+
+Floating/dropdown follow-up verified at 320, 375, 430, 768, 1024, 1280 and 1440px. Browser checks passed for floating inset, no overflow or brand/navigation overlap, desktop Explore/mobile disclosure opening, Escape and link dismissal. Screenshots: `/tmp/opencode/floating-final-{width}.png`; 1024px expanded panel visually reviewed. Latest wide supplied logo uses intrinsic image metadata. Lint, typecheck and production build passed.
+
+Production verification: `pnpm build` passed, including compilation, type/lint validation and generation of all 39 static pages.
+
+Public-header-only redesign using supplied logo/favicon and existing local Google Sans Flex. Browser automation passed at 320, 375, 430, 768, 1024, 1280 and 1440px: no horizontal overflow; mobile disclosure opens, Escape closes, selecting About closes; directory link has `aria-current=page`. Desktop 1280px and mobile 375px screenshots reviewed (`/tmp/opencode/header-1280.png`, `/tmp/opencode/header-375.png`, temporary local evidence). Typecheck and lint passed. Authenticated role visibility retains server-resolved booleans; authenticated sessions were not re-exercised in this targeted QA.
+# Standalone workspace QA — 2026-10-12
+
+- Final static checks: `pnpm lint`, `pnpm typecheck`, and `pnpm build` pass; production build generated 39/39 static pages.
+- New authenticated `tests/e2e/workspaces.spec.ts`: **2/2 pass** against isolated local E2E server and existing local PostgreSQL, without truncating user data. Admin identity selected from existing active local admin; student uses test-only session.
+- Both overview routes: 320/375/430/768/1024/1280/1440px, exactly one main landmark, no public header, no document overflow, reduced-motion rendering, mobile dialog open/Escape/focus restoration. Non-reduced navigation and active application link also verified; no page errors.
+- Nested route smoke at 375/1440px: student applications/placements; admin internships/new, students, placements/new, contacts and notifications. No public chrome or document overflow. Admin student toolbar additionally checked at 320px.
+- Admin form text entry, textarea entry, select changes and checkbox operation pass. Screenshots `/tmp/opencode/workspace-{admin,student}-{width}.png` and `workspace-admin-form.png`; desktop admin overview, desktop form, and mobile student overview visually reviewed.
+- The local data slice is empty for applications/placements/audit. Populated details, quotation/CV states, destructive confirmation and complete mutation workflows are not newly browser-audited in this presentation pass; they inherit scoped components and existing backend coverage. Exhaustive state certification is pending.

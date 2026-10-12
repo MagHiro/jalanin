@@ -1,6 +1,8 @@
 # Requirements Matrix — Jalanin Internship Platform (PRD v0.4)
 
 Status values: `Pending` | `In Progress` | `Implemented` | `Verified` | `Blocked`.
+
+Hero-only editorial collage (WEB-02 / responsive hero, 2026-10-12): **Verified**. User-approved editorial collage implemented in `src/app/page.tsx` with landing-scoped styles in `src/app/globals.css`; Google Sans Flex and exact primary retained. Typecheck/lint pass; Chromium confirms hero fits at 320/375/768/1024/1440px with reduced motion, clear destination caption, and working directory/How-It-Works CTAs. Existing backend, database, authorization, validation and state coverage applies unchanged. See `docs/design/decision-log.md` for observed Mobbin sources and `docs/design/screen-audit.md` for the separate contact-section overflow at 320px. No new unit/integration behavior introduced.
 Verification: U=unit, I=integration, E=e2e, M=manual. Updated as work lands.
 
 ## Decisions D01–D20 (all Confirmed)
@@ -32,6 +34,9 @@ Verification: U=unit, I=integration, E=e2e, M=manual. Updated as work lands.
 | ID | Requirement | Implementation | Verify | Status |
 |---|---|---|---|---|
 | WEB-01…08 | Landing, hero CTA, How-It-Works, featured, about+contact, responsive, legal+SEO, states | `src/app/(public)/...`, layouts | E/M | Verified |
+| WEB-NAV (WEB-06/07 refinement) | Editorial public navigation with supplied logo/favicon, responsive menu and existing account links | `SiteHeader`, `PublicNavigation`, root metadata and App Router favicon; existing server session/admin checks | Browser automation: seven widths 320–1440px, menu open/Escape/link dismissal, active directory route; lint/typecheck | Verified |
+| WEB-NAV-FLOAT | User-requested floating rounded header and grouped dropdown pattern | Shared public-header CSS and Explore disclosure: bounded surface, sticky inset, grouped links, photo CTA, mobile expansion; Google Sans Flex/theme retained | Browser checks at seven widths: inset, overflow/overlap, opening, Escape, selection; lint/typecheck/build | Verified |
+| WEB-NAV-WIDTH | Borderless, wider floating header refinement | 1600px maximum shell, full-width inner navigation, no shell/dropdown outline | Browser geometry at 375/1024/1440/1920px: border, width, overflow | Verified |
 | JOB-01…11 | Directory search/filter/sort/page; cards; detail; quote messaging; 404; publish+deadline; SEO | `features/internships`, `app/(public)/opportunities` | E | Verified |
 | AUTH-01…08 | Register/login/logout/forgot/reset; apply gate; role isolation; rate limits; safe sessions | `app/(auth)`, `lib/auth` | E | Verified |
 | APP-01…16 | Form fields, CV upload, draft/resume, validation, consent, atomic submit, idempotency, uniqueness, unpublished-guard, post-submit edit+lock | `features/applications`, `app/(student)/apply` | U/I/E | Verified |
@@ -45,6 +50,8 @@ Verification: U=unit, I=integration, E=e2e, M=manual. Updated as work lands.
 
 | Scope | Implementation | Verification | Status |
 |---|---|---|---|
+| Standalone editorial workspaces (D04/D06, 2026-10-12) | `RouteFrame`, `WorkspaceShell`, bespoke spacious admin/student overviews, local Google Sans Flex, scoped nested input/UI styling and reduced-motion-aware GSAP route reveal; existing DB/authz/validation/state services | Authenticated Chromium 2/2 targeted tests: seven overview widths, mobile keyboard dismissal/focus restoration, nested route mobile/desktop smoke, text/textarea/select/checkbox interaction. Screenshots reviewed. Existing unit/integration workflow coverage applies; populated detail and full mutation visual-state audit remains pending. | Implemented |
+| Workspace build gate | Standalone layouts and scoped component styling | `pnpm lint`, `pnpm typecheck`, `pnpm build` pass (39/39 static pages generated). | Verified |
 | Editorial & refined visual refresh (2026-10-12) | `design.md` v2; locally hosted Google Sans Flex; warm semantic tokens; new landing composition, public header/footer, directory/detail and opportunity cards; split auth layout; Lucide workspace/header/empty-state icons | Typecheck and lint pass; Vitest 42 reported passing (DB suite takes its no-DATABASE_URL skip path); production build pass; Chromium 30 route/viewport checks at 375/768/1440px without overflow, directory GET filters and password visibility interaction pass. Authenticated browser workflows not re-run in this pass. | Implemented |
 | Mobbin-informed direction and system | `docs/design/mobbin-research.md` (two live passes), `incident-io-reference-audit.md` (incident.io collection, observed vs inferred), `design-directions.md` (Clear Horizons finalized, superseded Oct 2026 by indigo system), `design-system.md` v2.0; OKLCH semantic CSS/Tailwind tokens + `ui/` primitives + dark admin rail; gsap motion; all routes redesigned | Typecheck, lint, 37 unit tests, 20/20 E2E + 28/28 viewport sweep, production build green | Verified |
 | Responsive/accessibility foundation | Responsive layouts (table→card collapse, sticky→fixed CTA), 44px targets, visible focus, reduced motion/transparency fallbacks, computed AA contrast (text 5.7–15.5, badges 7.9–11.9) | 9/9 API E2E pass; 11 browser tests blocked by missing container libs (no sudo); SSR assertion sweep passes instead | Verified* |

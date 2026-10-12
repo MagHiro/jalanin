@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireAdmin, AuthError } from "@/lib/auth/require";
 import { getAdminOverview } from "@/features/admin/service";
-import { WorkspaceRail } from "@/components/layout/workspace-rail";
+import { WorkspaceShell } from "@/components/layout/workspace-shell";
 
 // Admin shell: every page under /admin re-verifies the admin role
 // server-side (never middleware/UI-only). Private: noindex.
@@ -12,8 +11,10 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  let email: string | undefined;
   try {
-    await requireAdmin();
+    const user = await requireAdmin();
+    email = user.email ?? undefined;
   } catch (err) {
     if (err instanceof AuthError && err.status === 401) redirect("/auth/login?next=/admin");
     redirect("/");
@@ -22,10 +23,9 @@ export default async function AdminLayout({
   const unread = overview.unreadNotifications;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[232px_minmax(0,1fr)] lg:gap-8">
-      <WorkspaceRail
-        eyebrow="Workspace"
-        title="Jalanin Admin"
+      <WorkspaceShell
+        role="admin"
+        email={email}
         switchLink="/dashboard"
         switchLabel="Student view"
         items={[
@@ -37,17 +37,7 @@ export default async function AdminLayout({
           { href: "/admin/contacts", label: "Contact inbox", icon: "✉" },
           { href: "/admin/notifications", label: "Notifications", icon: "●", badge: unread },
         ]}
-        footer={
-          unread > 0 ? (
-            <p className="rail-alert-card">
-              <b>{unread} unread alert{unread === 1 ? "" : "s"}</b> — see{" "}
-              <Link href="/admin/notifications" className="font-semibold underline">Notifications</Link>.
-            </p>
-          ) : undefined
-        }
-      />
-      <div className="min-w-0">{children}</div>
-    </div>
+      >{children}</WorkspaceShell>
   );
 }
 

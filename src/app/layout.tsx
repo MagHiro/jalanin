@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { RouteFrame } from "@/components/layout/route-frame";
 
 const googleSansFlex = localFont({
   src: "./fonts/google-sans-flex-latin.woff2",
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
   },
   description:
     "Browse internship placements across Southeast Asia, apply with guidance, and receive a custom quotation.",
+  icons: { icon: "/favicon.ico", shortcut: "/favicon.ico" },
 };
 
 export default function RootLayout({
@@ -35,11 +37,9 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <SiteHeader />
-        <main id="main" className="mx-auto w-full max-w-[1280px] px-5 py-8 md:px-10 md:py-12">
+        <RouteFrame header={<SiteHeader />} footer={<SiteFooter />}>
           {children}
-        </main>
-        <SiteFooter />
+        </RouteFrame>
       </body>
     </html>
   );

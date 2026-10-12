@@ -120,3 +120,13 @@ Adapted: Jalanin tokenizes these exact roles under its own indigo ramp (see `des
 | Declare dialog + confirms + drawers | Internship/placement editors (pages), delete/reopen confirms, notifications | Dialog geometry reused |
 | Badges + chains + timelines | StatusBadge + StatusTimeline + revision/audit history | Distinct accessible pairs |
 | Toasts + notification feed | Notification center (durable) + transient form feedback | Queue vs delivery distinguished |
+# Public header supplement — 12 Oct 2026
+
+Follow-up evidence: user-supplied Coda expanded-navigation screenshot shows one floating rounded surface, soft selected tabs, grouped links in two columns and a right-side artwork CTA. Jalanin adapts those relationships using existing links, Google Sans Flex, theme tokens and Singapore photography. Screenshot dimensions/colors/artwork are not reproduced.
+
+Actual Mobbin MCP previews reviewed for the public-only redesign: [Coda](https://mobbin.com/sites/sections/5267d6c6-eeca-4050-bbae-119af1bb9106), [Bird](https://mobbin.com/sites/sections/3369b81d-787c-4970-b49e-165e0393bc43), and [Mixpanel](https://mobbin.com/sites/sections/0dd0987b-88f6-4fb0-889b-722b81b92847). Observed: separated brand/link/action zones, restrained link typography, quiet rules, and differentiated account CTAs. Header dimensions, mobile disclosure, warm palette and active underline are Jalanin-specific adaptations. No assets copied; supplied Jalanin logo and favicon used.
+# Workspace research pass — 2026-10-12
+
+MCP actual images reviewed: [incidents list](https://mobbin.com/screens/f9757c15-2aaf-4031-9a47-8344c0f81fed) shows dark compact navigation, a quiet white header, toolbar and separated record rows; [home/command overlay](https://mobbin.com/screens/f7b1d160-79fc-4a70-a1f7-e553896d3ce6) shows the same shell and grouped overlay actions; [notifications](https://mobbin.com/screens/f479153e-9b68-47ad-bd5f-242132562e49) shows a left notification panel with timestamped activity over the workspace.
+
+Adaptations: shell separation, icon/label navigation, contextual utility header, scannable application records. User-selected spacious editorial rhythm, ivory student rail, indigo admin rail, font, metrics and next-step bands are Jalanin-specific. Command search, export, and reference app features are not inferred product requirements. MCP search does not provide exhaustive enumeration of the supplied collection. A secondary Notion search failed and supplied no evidence.
