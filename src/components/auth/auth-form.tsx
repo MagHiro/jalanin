@@ -14,7 +14,15 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const next = params.get("next") ?? "/dashboard";
+  const requestedNext = params.get("next") ?? "/dashboard";
+  // Reject protocol-relative or backslash redirects. This value is used by
+  // both the browser router and the email verification callback.
+  const next =
+    requestedNext.startsWith("/") &&
+    !requestedNext.startsWith("//") &&
+    !requestedNext.includes("\\")
+      ? requestedNext
+      : "/dashboard";
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

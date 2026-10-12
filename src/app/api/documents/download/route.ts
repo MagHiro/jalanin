@@ -16,6 +16,9 @@ export async function GET(request: Request) {
   }
   const { searchParams } = new URL(request.url);
   const documentId = searchParams.get("documentId") ?? "";
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(documentId)) {
+    return NextResponse.json({ ok: false }, { status: 404 });
+  }
   const rows = await db
     .select({ document: applicationDocuments, application: applications })
     .from(applicationDocuments)

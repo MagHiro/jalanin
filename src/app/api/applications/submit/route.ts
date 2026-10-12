@@ -35,6 +35,9 @@ export async function POST(request: Request) {
       request.headers.get("Idempotency-Key") ??
       body.idempotencyKey ??
       `${user.id}:${body.internshipId}`;
+    if (typeof idempotencyKey !== "string" || idempotencyKey.length > 160) {
+      return NextResponse.json({ ok: false, error: "Invalid idempotency key." }, { status: 400 });
+    }
 
     // If the single row is already submitted, treat as a revision attempt
     // (post-submit edit path with re-review) rather than a duplicate submit.

@@ -20,6 +20,11 @@ import { appUrl, applicationRef, audit } from "@/lib/utils";
 export async function POST(request: Request) {
   try {
     const user = await requireStudent();
+    // Reject obviously oversized bodies before multipart parsing allocates bytes.
+    const declaredBytes = Number(request.headers.get("content-length") ?? 0);
+    if (declaredBytes > cvPolicy().maxBytes + 1024 * 1024) {
+      return NextResponse.json({ ok: false, error: "Upload is too large." }, { status: 413 });
+    }
     const form = await request.formData();
     const applicationId = String(form.get("applicationId") ?? "");
     const file = form.get("file");

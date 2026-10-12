@@ -45,10 +45,10 @@ export async function verifyTurnstile(
   remoteIp?: string,
 ): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
-  if (!secret) {
-    // Fail closed in production; local dev provides test keys via .env.example.
-    if (process.env.NODE_ENV === "production") return false;
-    return token.length > 0;
+  // Cloudflare's always-pass testing secrets MUST NOT be deployable as a
+  // production anti-bot control. Missing secrets fail closed everywhere.
+  if (!secret || (process.env.NODE_ENV === "production" && /^[123]x0{10,}/.test(secret))) {
+    return false;
   }
   try {
     const res = await fetch(

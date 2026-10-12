@@ -42,29 +42,28 @@ export async function POST(request: Request) {
     );
   }
 
-  const inserted = await db
-    .insert(contactSubmissions)
-    .values({
+  // Submission and notification must commit together.
+  await db.transaction(async (tx) => {
+    const [inserted] = await tx.insert(contactSubmissions).values({
       name: parsed.data.name,
       email: parsed.data.email,
       subject: parsed.data.subject || null,
       message: parsed.data.message,
-    })
-    .returning({ id: contactSubmissions.id });
-
-  for (const recipient of adminAlertRecipients()) {
-    await enqueueEmail({
-      eventKey: `contact-notify:${inserted[0].id}:${recipient}`,
-      recipient,
-      templateKey: "contact-notify",
-      payload: {
-        name: parsed.data.name,
-        email: parsed.data.email,
-        subject: parsed.data.subject,
-        message: parsed.data.message,
-      },
-    });
-  }
+    }).returning({ id: contactSubmissions.id });
+    for (const recipient of adminAlertRecipients()) {
+      await enqueueEmail({
+        eventKey: `contact-notify:${inserted.id}:${recipient}`,
+        recipient,
+        templateKey: "contact-notify",
+        payload: {
+          name: parsed.data.name,
+          email: parsed.data.email,
+          subject: parsed.data.subject,
+          message: parsed.data.message,
+        },
+      }, tx);
+    }
+  });
 
   return NextResponse.json({ ok: true });
 }

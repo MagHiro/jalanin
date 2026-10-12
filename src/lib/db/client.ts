@@ -1,3 +1,4 @@
+import "server-only";
 import { drizzle as drizzlePg } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as schema from "./schema";

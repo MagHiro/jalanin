@@ -253,6 +253,17 @@ export async function submitApplication(input: {
           )[0]?.id;
     if (!appId) throw new Error("Could not create application.");
 
+    // Serialize concurrent submissions of this exact application. A retry
+    // arriving after the first commit is a no-op, not another status event.
+    const [locked] = await tx.select().from(applications)
+      .where(eq(applications.id, appId)).limit(1).for("update");
+    if (!locked || locked.applicantUserId !== input.userId) {
+      throw new Error("Application not found.");
+    }
+    if (!locked.isDraft) {
+      return { applicationId: appId, ref: applicationRef(appId), duplicate: true };
+    }
+
     const cv = await docsFor(appId);
     if (cv.length === 0) {
       throw new Error("A CV upload is required before submitting.");
