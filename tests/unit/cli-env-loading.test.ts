@@ -11,7 +11,7 @@ const fixture = mkdtempSync(join(tmpdir(), "jalanin-env-test-"));
 const moduleUrl = pathToFileURL(resolve(process.cwd(), "scripts/load-env.ts")).href;
 
 function readFromCli(exportedValue?: string): string {
-  const env = { ...process.env, NODE_ENV: "development" };
+  const env: NodeJS.ProcessEnv = { ...process.env, NODE_ENV: "development" };
   delete env.JALANIN_ENV_TEST_VALUE;
   delete env.__NEXT_PROCESSED_ENV;
   if (exportedValue !== undefined) {
