@@ -11,12 +11,12 @@ DROP POLICY IF EXISTS profiles_owner_update ON profiles;
 -- Prevent SECURITY DEFINER function lookup through attacker-controlled schemas.
 CREATE OR REPLACE FUNCTION public.is_admin() RETURNS BOOLEAN
 LANGUAGE sql STABLE SECURITY DEFINER SET search_path = ''
-AS $
+AS $jalanin_fn$
   SELECT EXISTS (
     SELECT 1 FROM public.admin_users
     WHERE user_id = auth.uid() AND active IS TRUE
   );
-$;
+$jalanin_fn$;
 
 -- A CV is a single active attachment per application. The server atomically
 -- swaps the metadata and queues re-review before deleting the old object.
