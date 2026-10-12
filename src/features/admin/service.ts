@@ -83,6 +83,7 @@ export async function getAdminOverview() {
 export async function listAdminInternships(input: {
   q?: string;
   status?: string;
+  sort?: "updated" | "title" | "start";
   page: number;
   pageSize: number;
 }) {
@@ -101,7 +102,12 @@ export async function listAdminInternships(input: {
     .select()
     .from(internships)
     .where(where)
-    .orderBy(desc(internships.updatedAt))
+    .orderBy(
+      input.sort === "title" ? asc(internships.title)
+        : input.sort === "start" ? asc(internships.startDate)
+        : desc(internships.updatedAt),
+      asc(internships.id),
+    )
     .limit(input.pageSize)
     .offset((input.page - 1) * input.pageSize);
   const totalRows = await db
@@ -184,6 +190,7 @@ export async function saveInternship(
 export async function listAdminApplications(input: {
   q?: string;
   status?: string;
+  sort?: "newest" | "oldest" | "name";
   needsReReview?: boolean;
   page: number;
   pageSize: number;
@@ -213,7 +220,12 @@ export async function listAdminApplications(input: {
     .from(applications)
     .innerJoin(internships, eq(applications.internshipId, internships.id))
     .where(where)
-    .orderBy(desc(applications.submittedAt))
+    .orderBy(
+      input.sort === "oldest" ? asc(applications.submittedAt)
+        : input.sort === "name" ? asc(applications.lastName)
+        : desc(applications.submittedAt),
+      asc(applications.id),
+    )
     .limit(input.pageSize)
     .offset((input.page - 1) * input.pageSize);
   const totalRows = await db
@@ -528,6 +540,7 @@ export function allowedTransitionsFor(
 // ----------------------------------------------------------------- students
 export async function listAdminStudents(input: {
   q?: string;
+  sort?: "name" | "newest";
   page: number;
   pageSize: number;
 }) {
@@ -540,7 +553,10 @@ export async function listAdminStudents(input: {
     .select()
     .from(profiles)
     .where(where)
-    .orderBy(asc(profiles.displayName))
+    .orderBy(
+      input.sort === "newest" ? desc(profiles.createdAt) : asc(profiles.displayName),
+      asc(profiles.userId),
+    )
     .limit(input.pageSize)
     .offset((input.page - 1) * input.pageSize);
   const totalStudentRows = await db.select({ n: count() }).from(profiles).where(where);

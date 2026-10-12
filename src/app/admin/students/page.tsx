@@ -12,17 +12,26 @@ export const dynamic = "force-dynamic";
 export default async function AdminStudentsPage({
   searchParams,
 }: {
-  searchParams: { q?: string; page?: string };
+  searchParams: { q?: string; sort?: string; page?: string };
 }) {
   await requireAdmin();
-  const page = Math.max(1, Number(searchParams.page ?? 1) || 1);
+  const rawPage = Number(searchParams.page ?? 1);
+  const page = Number.isSafeInteger(rawPage) ? Math.max(1, Math.min(100000, rawPage)) : 1;
   const pageSize = 20;
   const { rows, total } = await listAdminStudents({
     q: searchParams.q,
+    sort: searchParams.sort === "newest" ? "newest" : "name",
     page,
     pageSize,
   });
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const pageHref = (p: number) => {
+    const params = new URLSearchParams();
+    if (searchParams.q) params.set("q", searchParams.q);
+    if (searchParams.sort) params.set("sort", searchParams.sort);
+    params.set("page", String(p));
+    return `/admin/students?${params}`;
+  };
 
   return (
     <div className="space-y-5">
@@ -31,6 +40,13 @@ export default async function AdminStudentsPage({
         <label className="min-w-0 flex-1">
           <span className="sr-only">Search display name</span>
           <input name="q" defaultValue={searchParams.q ?? ""} placeholder="Search display name" className="field !mt-0 !min-h-11 max-w-md" />
+        </label>
+        <label>
+          <span className="sr-only">Sort students</span>
+          <select name="sort" className="field !mt-0 !min-h-11" defaultValue={searchParams.sort ?? "name"}>
+            <option value="name">Name A–Z</option>
+            <option value="newest">Newest</option>
+          </select>
         </label>
         <button className="btn btn-primary btn-sm min-h-11 shrink-0">Search</button>
       </form>
@@ -47,7 +63,11 @@ export default async function AdminStudentsPage({
         <EmptyState icon="○" title="No students found." body="Student profiles appear here once accounts are created." />
       )}
       {totalPages > 1 && (
-        <p className="tnum text-center text-sm text-muted-foreground" role="status">Page {page} of {totalPages} — {total} total.</p>
+        <nav aria-label="Student pagination" className="flex items-center justify-center gap-3 text-sm">
+          {page > 1 && <Link href={pageHref(page - 1)} className="btn btn-outline btn-sm">← Previous</Link>}
+          <span className="tnum text-muted-foreground" aria-current="page">Page {page} of {totalPages}</span>
+          {page < totalPages && <Link href={pageHref(page + 1)} className="btn btn-outline btn-sm">Next →</Link>}
+        </nav>
       )}
     </div>
   );

@@ -10,18 +10,28 @@ export const dynamic = "force-dynamic";
 export default async function AdminInternshipsPage({
   searchParams,
 }: {
-  searchParams: { q?: string; status?: string; page?: string };
+  searchParams: { q?: string; status?: string; sort?: string; page?: string };
 }) {
   await requireAdmin();
-  const page = Math.max(1, Number(searchParams.page ?? 1) || 1);
+  const rawPage = Number(searchParams.page ?? 1);
+  const page = Number.isSafeInteger(rawPage) ? Math.max(1, Math.min(100000, rawPage)) : 1;
   const pageSize = 20;
   const { rows, total } = await listAdminInternships({
     q: searchParams.q,
     status: searchParams.status,
+    sort: searchParams.sort === "title" ? "title" : searchParams.sort === "start" ? "start" : "updated",
     page,
     pageSize,
   });
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const pageHref = (p: number) => {
+    const params = new URLSearchParams();
+    if (searchParams.q) params.set("q", searchParams.q);
+    if (searchParams.status) params.set("status", searchParams.status);
+    if (searchParams.sort) params.set("sort", searchParams.sort);
+    params.set("page", String(p));
+    return `/admin/internships?${params}`;
+  };
   const pubBadge = (s: string) =>
     s === "Published"
       ? "badge-published"
@@ -37,7 +47,7 @@ export default async function AdminInternshipsPage({
         title={`Internships (${total})`}
         actions={<Link href="/admin/internships/new" className="btn btn-primary btn-sm">+ New internship</Link>}
       />
-      <form method="get" aria-label="Filter internships" className="toolbar grid gap-3 text-sm sm:grid-cols-[1.4fr_1fr_auto]">
+      <form method="get" aria-label="Filter internships" className="toolbar grid gap-3 text-sm sm:grid-cols-[1.4fr_1fr_1fr_auto]">
         <label className="field-label">
           <span className="sr-only">Search title or city</span>
           <input name="q" defaultValue={searchParams.q ?? ""} placeholder="Search title or city" className="field !min-h-11" />
@@ -49,6 +59,14 @@ export default async function AdminInternshipsPage({
             <option>Draft</option>
             <option>Published</option>
             <option>Unpublished</option>
+          </select>
+        </label>
+        <label className="field-label">
+          <span className="sr-only">Sort internships</span>
+          <select name="sort" defaultValue={searchParams.sort ?? "updated"} className="field !min-h-11">
+            <option value="updated">Recently updated</option>
+            <option value="title">Title A–Z</option>
+            <option value="start">Start date</option>
           </select>
         </label>
         <div className="flex items-end">
@@ -108,7 +126,11 @@ export default async function AdminInternshipsPage({
       )}
 
       {totalPages > 1 && (
-        <p className="tnum text-center text-sm text-muted-foreground" role="status">Page {page} of {totalPages} — {total} total. Use filters to narrow results.</p>
+        <nav aria-label="Internship pagination" className="flex items-center justify-center gap-3 text-sm">
+          {page > 1 && <Link href={pageHref(page - 1)} className="btn btn-outline btn-sm">← Previous</Link>}
+          <span className="tnum text-muted-foreground" aria-current="page">Page {page} of {totalPages}</span>
+          {page < totalPages && <Link href={pageHref(page + 1)} className="btn btn-outline btn-sm">Next →</Link>}
+        </nav>
       )}
     </div>
   );

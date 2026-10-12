@@ -13,19 +13,30 @@ const STATUSES = ["New", "In Review", "Quotation Sent", "Accepted", "Rejected", 
 export default async function AdminApplicationsPage({
   searchParams,
 }: {
-  searchParams: { q?: string; status?: string; rereview?: string; page?: string };
+  searchParams: { q?: string; status?: string; rereview?: string; sort?: string; page?: string };
 }) {
   await requireAdmin();
-  const page = Math.max(1, Number(searchParams.page ?? 1) || 1);
+  const rawPage = Number(searchParams.page ?? 1);
+  const page = Number.isSafeInteger(rawPage) ? Math.max(1, Math.min(100000, rawPage)) : 1;
   const pageSize = 20;
   const { rows, total } = await listAdminApplications({
     q: searchParams.q,
     status: searchParams.status,
+    sort: searchParams.sort === "oldest" ? "oldest" : searchParams.sort === "name" ? "name" : "newest",
     needsReReview: searchParams.rereview === "1" ? true : undefined,
     page,
     pageSize,
   });
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const pageHref = (p: number) => {
+    const params = new URLSearchParams();
+    if (searchParams.q) params.set("q", searchParams.q);
+    if (searchParams.status) params.set("status", searchParams.status);
+    if (searchParams.rereview === "1") params.set("rereview", "1");
+    if (searchParams.sort) params.set("sort", searchParams.sort);
+    params.set("page", String(p));
+    return `/admin/applications?${params}`;
+  };
 
   return (
     <div className="space-y-5">
@@ -46,7 +57,7 @@ export default async function AdminApplicationsPage({
           )
         }
       />
-      <form method="get" aria-label="Filter applications" className="toolbar grid gap-3 text-sm md:grid-cols-[1.4fr_1fr_auto]">
+      <form method="get" aria-label="Filter applications" className="toolbar grid gap-3 text-sm md:grid-cols-[1.4fr_1fr_1fr_auto]">
         <label className="field-label">
           <span className="sr-only">Search name, email, university</span>
           <input name="q" defaultValue={searchParams.q ?? ""} placeholder="Search name, email, university" className="field !min-h-11" />
@@ -58,6 +69,14 @@ export default async function AdminApplicationsPage({
             {STATUSES.map((s) => (
               <option key={s}>{s}</option>
             ))}
+          </select>
+        </label>
+        <label className="field-label">
+          <span className="sr-only">Sort applications</span>
+          <select name="sort" defaultValue={searchParams.sort ?? "newest"} className="field !min-h-11">
+            <option value="newest">Newest submitted</option>
+            <option value="oldest">Oldest submitted</option>
+            <option value="name">Applicant surname</option>
           </select>
         </label>
         <div className="flex items-end gap-2">
@@ -141,13 +160,9 @@ export default async function AdminApplicationsPage({
 
       {totalPages > 1 && (
         <nav aria-label="Pagination" className="flex items-center justify-center gap-3 text-sm">
-          {page > 1 ? (
-            <Link href={`/admin/applications?page=${page - 1}${searchParams.status ? `&status=${encodeURIComponent(searchParams.status)}` : ""}${searchParams.q ? `&q=${encodeURIComponent(searchParams.q)}` : ""}`} className="btn btn-outline btn-sm">← Previous</Link>
-          ) : null}
+          {page > 1 && <Link href={pageHref(page - 1)} className="btn btn-outline btn-sm">← Previous</Link>}
           <span className="tnum text-muted-foreground" aria-current="page">Page {page} of {totalPages} · {total} total</span>
-          {page < totalPages ? (
-            <Link href={`/admin/applications?page=${page + 1}${searchParams.status ? `&status=${encodeURIComponent(searchParams.status)}` : ""}${searchParams.q ? `&q=${encodeURIComponent(searchParams.q)}` : ""}`} className="btn btn-outline btn-sm">Next →</Link>
-          ) : null}
+          {page < totalPages && <Link href={pageHref(page + 1)} className="btn btn-outline btn-sm">Next →</Link>}
         </nav>
       )}
     </div>
