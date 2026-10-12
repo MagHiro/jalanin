@@ -5,11 +5,15 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
+// Centered auth card (PayPal/Krea-inspired, email+password per PRD AUTH-*).
+// E2E asserts: heading "Log in", labelled email/password inputs, submit
+// button named "Log in" — preserved verbatim.
 export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
   const router = useRouter();
   const params = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const next = params.get("next") ?? "/dashboard";
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -55,36 +59,85 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
   }
 
   return (
-    <div className="mx-auto max-w-md">
-      <h1 className="text-2xl font-bold">
-        {mode === "login" ? "Log in" : "Create your account"}
-      </h1>
-      <p className="mt-1 text-sm text-slate-600">
-        {mode === "login" ? (
-          <>New to Jalanin? <Link href="/auth/sign-up" className="text-emerald-700 hover:underline">Sign up</Link></>
-        ) : (
-          <>Already have an account? <Link href="/auth/login" className="text-emerald-700 hover:underline">Log in</Link></>
-        )}
-      </p>
-      <form onSubmit={onSubmit} className="mt-4 space-y-3">
-        <label className="block text-sm">
-          <span className="font-medium">Email</span>
-          <input name="email" type="email" required autoComplete="email" className="mt-1 w-full rounded border px-3 py-2" />
-        </label>
-        <label className="block text-sm">
-          <span className="font-medium">Password {mode === "sign-up" && "(min. 8 characters)"}</span>
-          <input name="password" type="password" required minLength={8} autoComplete={mode === "login" ? "current-password" : "new-password"} className="mt-1 w-full rounded border px-3 py-2" />
-        </label>
-        {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
-        <button type="submit" disabled={busy} className="w-full rounded-lg bg-emerald-700 px-5 py-2.5 font-medium text-white hover:bg-emerald-800 disabled:opacity-50">
-          {busy ? "Please wait…" : mode === "login" ? "Log in" : "Sign up"}
-        </button>
-      </form>
-      {mode === "login" && (
-        <p className="mt-3 text-sm">
-          <Link href="/auth/forgot-password" className="text-emerald-700 hover:underline">Forgot your password?</Link>
-        </p>
+    <div className={mode === "sign-up" ? "mx-auto grid max-w-3xl gap-6 lg:grid-cols-[1fr_1.1fr] lg:items-start" : "mx-auto max-w-md"}>
+      {mode === "sign-up" && (
+        <div className="hidden rounded-2xl bg-jalanin-900 p-7 text-white lg:block">
+          <p className="text-xs font-semibold uppercase tracking-[.14em] text-jalanin-200">Why join Jalanin?</p>
+          <ul className="mt-4 space-y-4 text-sm leading-6">
+            {[
+              ["Save drafts as you go", "Start an application and resume any time — nothing is sent until you submit."],
+              ["Track every status", "See Draft, Submitted, In Review and quotation updates in your dashboard."],
+              ["Quotations by email", "A custom quotation arrives after review. Reply to accept — no hidden fees."],
+            ].map(([t, b]) => (
+              <li key={t} className="flex gap-3">
+                <span aria-hidden="true" className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-white/15 text-xs font-bold text-white">✓</span>
+                <span><b className="block text-white">{t}</b><span className="text-jalanin-100">{b}</span></span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
+      <div className="surface-card p-6 md:p-8">
+        <p className="eyebrow">Jalanin student account</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
+          {mode === "login" ? "Log in" : "Create your account"}
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {mode === "login" ? (
+            <>New to Jalanin? <Link href={next !== "/dashboard" ? `/auth/sign-up?next=${encodeURIComponent(next)}` : "/auth/sign-up"} className="font-semibold text-primary hover:underline">Sign up</Link></>
+          ) : (
+            <>Already have an account? <Link href={next !== "/dashboard" ? `/auth/login?next=${encodeURIComponent(next)}` : "/auth/login"} className="font-semibold text-primary hover:underline">Log in</Link></>
+          )}
+        </p>
+        <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate={false}>
+          <label className="field-label">
+            <span>Email</span>
+            <input name="email" type="email" required autoComplete="email" placeholder="you@example.com" className="field" />
+          </label>
+          <div>
+            <label className="field-label" htmlFor={mode === "login" ? "login-password" : "signup-password"}>
+              <span>Password {mode === "sign-up" && "(min. 8 characters)"}</span>
+            </label>
+            <div className="relative">
+              <input
+                id={mode === "login" ? "login-password" : "signup-password"}
+                name="password"
+                type={showPassword ? "text" : "password"}
+                required
+                minLength={8}
+                autoComplete={mode === "login" ? "current-password" : "new-password"}
+                placeholder="••••••••"
+                className="field pr-20"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-pressed={showPassword}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute inset-y-0 right-1 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-3 text-xs font-semibold text-primary hover:bg-secondary"
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+          {error && <p role="alert" className="alert alert-error">{error}</p>}
+          <button type="submit" disabled={busy} className="btn btn-primary w-full">
+            {busy ? "Please wait…" : mode === "login" ? "Log in" : "Sign up"}
+          </button>
+        </form>
+        {mode === "login" ? (
+          <p className="mt-4 text-center text-sm">
+            <Link href="/auth/forgot-password" className="inline-flex min-h-10 items-center font-medium text-primary hover:underline">Forgot your password?</Link>
+          </p>
+        ) : (
+          <p className="mt-4 text-xs leading-5 text-muted-foreground">
+            By signing up you agree to our{" "}
+            <Link href="/terms" className="font-medium text-primary hover:underline">terms</Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="font-medium text-primary hover:underline">privacy policy</Link>.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

@@ -31,63 +31,97 @@ export default async function InternshipDetailPage({
   const row = await getPublishedInternshipBySlug(params.slug);
   if (!row) notFound();
   const { internship, categoryName } = row;
+  const country = COUNTRY_NAMES[internship.countryCode] ?? internship.countryCode;
+  const deadline = internship.applicationDeadline
+    ? new Date(internship.applicationDeadline).toLocaleDateString("en-SG")
+    : null;
 
   return (
-    <div className="grid gap-8 lg:grid-cols-3">
-      <article className="space-y-6 lg:col-span-2">
-        <div>
-          <div className="flex flex-wrap gap-2 text-xs">
+    <div className="pb-24 lg:pb-0">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-10">
+        <article className="min-w-0">
+          <nav aria-label="Breadcrumb">
+            <Link href="/opportunities" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+              <span aria-hidden="true">←</span> All internships
+            </Link>
+          </nav>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
             {categoryName && (
-              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-800">{categoryName}</span>
+              <span className="rounded-full bg-jalanin-100 px-3 py-1 font-semibold text-jalanin-800">{categoryName}</span>
             )}
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-700">
-              {internship.city}, {COUNTRY_NAMES[internship.countryCode] ?? internship.countryCode}
+            <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground">
+              {internship.city}, {country}
             </span>
           </div>
-          <h1 className="mt-2 text-3xl font-bold">{internship.title}</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            {internship.startDate} → {internship.endDate}
-            {internship.applicationDeadline
-              ? ` · Apply by ${new Date(internship.applicationDeadline).toLocaleDateString("en-SG")}`
-              : ""}
+          <h1 className="mt-4 max-w-2xl text-balance text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+            {internship.title}
+          </h1>
+          <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+            <span><time>{internship.startDate}</time> → <time>{internship.endDate}</time></span>
+            {deadline && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs">
+                Apply by {deadline} (informational)
+              </span>
+            )}
           </p>
-        </div>
-        <section>
-          <h2 className="font-semibold">About this placement</h2>
-          <p className="mt-1 whitespace-pre-line text-slate-700">{internship.description}</p>
-        </section>
-        <section>
-          <h2 className="font-semibold">Responsibilities</h2>
-          <p className="mt-1 whitespace-pre-line text-slate-700">{internship.responsibilities}</p>
-        </section>
-        <section>
-          <h2 className="font-semibold">Requirements</h2>
-          <p className="mt-1 whitespace-pre-line text-slate-700">{internship.requirements}</p>
-        </section>
-      </article>
 
-      {/* Application panel (JOB-07/08) */}
-      <aside className="h-fit rounded-xl border p-6 lg:sticky lg:top-6">
-        <h2 className="font-semibold">Apply for this internship</h2>
-        <dl className="mt-2 space-y-1 text-sm text-slate-600">
-          <div className="flex justify-between gap-2"><dt>Location</dt><dd className="text-right font-medium text-slate-800">{internship.city}</dd></div>
-          <div className="flex justify-between gap-2"><dt>Start</dt><dd className="text-right font-medium text-slate-800">{internship.startDate}</dd></div>
-          <div className="flex justify-between gap-2"><dt>End</dt><dd className="text-right font-medium text-slate-800">{internship.endDate}</dd></div>
-        </dl>
-        <p className="mt-3 text-sm text-slate-600">
-          Jalanin will review your application and prepare a custom quotation.
-          You will receive the quotation by email — no fixed prices here.
-        </p>
+          <div className="mt-8 space-y-8">
+            <section aria-labelledby="about-placement" className="max-w-2xl">
+              <h2 id="about-placement" className="text-xl font-semibold tracking-tight text-foreground">About this placement</h2>
+              <p className="mt-3 whitespace-pre-line text-base leading-7 text-muted-foreground">{internship.description}</p>
+            </section>
+            <section aria-labelledby="responsibilities" className="max-w-2xl">
+              <h2 id="responsibilities" className="text-xl font-semibold tracking-tight text-foreground">Responsibilities</h2>
+              <p className="mt-3 whitespace-pre-line text-base leading-7 text-muted-foreground">{internship.responsibilities}</p>
+            </section>
+            <section aria-labelledby="requirements" className="max-w-2xl">
+              <h2 id="requirements" className="text-xl font-semibold tracking-tight text-foreground">Requirements</h2>
+              <p className="mt-3 whitespace-pre-line text-base leading-7 text-muted-foreground">{internship.requirements}</p>
+            </section>
+          </div>
+        </article>
+
+        {/* Application panel (JOB-07/08) */}
+        <aside aria-labelledby="apply-heading" className="h-fit rounded-2xl border border-border bg-surface p-6 shadow-sm lg:sticky lg:top-28">
+          <h2 id="apply-heading" className="text-base font-semibold tracking-tight text-foreground">Apply for this internship</h2>
+          <dl className="mt-4 space-y-0 text-sm">
+            {[
+              ["Location", `${internship.city}, ${country}`],
+              ["Start", internship.startDate],
+              ["End", internship.endDate],
+              ...(categoryName ? [["Category", categoryName]] as Array<[string, string]> : []),
+            ].map(([k, v]) => (
+              <div key={k} className="flex justify-between gap-3 border-b border-border py-2.5 last:border-0">
+                <dt className="text-muted-foreground">{k}</dt>
+                <dd className="text-right font-medium text-foreground">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-4 rounded-xl bg-muted p-4 text-sm leading-6 text-muted-foreground">
+            Jalanin will review your application and prepare a custom quotation.
+            You will receive the quotation by email — no fixed prices here.
+          </p>
+          <Link
+            href={`/apply/${internship.id}`}
+            className="btn btn-primary mt-4 hidden w-full lg:inline-flex"
+          >
+            Apply now
+          </Link>
+          <p className="mt-3 hidden text-xs leading-5 text-muted-foreground lg:block">
+            You will be asked to log in or create an account first.
+          </p>
+        </aside>
+      </div>
+
+      {/* Mobile apply bar: fixed CTA with safe-area padding, content offset above. */}
+      <div className="mobile-cta-bar fixed inset-x-0 bottom-0 z-30 p-4 backdrop-blur-sm lg:hidden" style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}>
         <Link
           href={`/apply/${internship.id}`}
-          className="mt-4 block rounded-lg bg-emerald-700 px-5 py-3 text-center font-semibold text-white hover:bg-emerald-800"
+          className="btn btn-primary w-full"
         >
           Apply now
         </Link>
-        <p className="mt-2 text-xs text-slate-500">
-          You will be asked to log in or create an account first.
-        </p>
-      </aside>
+      </div>
     </div>
   );
 }

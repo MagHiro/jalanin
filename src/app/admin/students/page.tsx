@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/require";
 import { listAdminStudents } from "@/features/admin/service";
+import { PageHeader } from "@/components/ui/page-header";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const metadata = { title: "Students", robots: "noindex" };
 export const dynamic = "force-dynamic";
 
-// Searchable student directory (Additional Scope): basic profile +
-// application relationship only, never a full CRM.
+// Searchable student directory: basic profile + application relationship
+// only, never a full CRM.
 export default async function AdminStudentsPage({
   searchParams,
 }: {
@@ -14,28 +16,39 @@ export default async function AdminStudentsPage({
 }) {
   await requireAdmin();
   const page = Math.max(1, Number(searchParams.page ?? 1) || 1);
+  const pageSize = 20;
   const { rows, total } = await listAdminStudents({
     q: searchParams.q,
     page,
-    pageSize: 20,
+    pageSize,
   });
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Students ({total})</h1>
-      <form method="get" className="flex gap-2 text-sm">
-        <input name="q" defaultValue={searchParams.q ?? ""} placeholder="Search display name" className="rounded border px-3 py-1.5" />
-        <button className="rounded border px-3 py-1.5 hover:bg-slate-50">Search</button>
+    <div className="space-y-5">
+      <PageHeader icon="○" eyebrow="People" title={`Students (${total})`} />
+      <form method="get" aria-label="Search students" className="toolbar !flex-nowrap">
+        <label className="min-w-0 flex-1">
+          <span className="sr-only">Search display name</span>
+          <input name="q" defaultValue={searchParams.q ?? ""} placeholder="Search display name" className="field !mt-0 !min-h-11 max-w-md" />
+        </label>
+        <button className="btn btn-primary btn-sm min-h-11 shrink-0">Search</button>
       </form>
-      <ul className="space-y-2">
-        {rows.map((r) => (
-          <li key={r.userId} className="flex items-center justify-between gap-2 rounded-xl border p-3 text-sm">
-            <span className="font-medium">{r.displayName ?? "(no name)"}</span>
-            <Link href={`/admin/students/${r.userId}`} className="rounded-lg border px-3 py-1.5 hover:bg-slate-50">View record</Link>
-          </li>
-        ))}
-        {rows.length === 0 && <li className="rounded-xl border border-dashed p-6 text-center text-sm text-slate-500">No students found.</li>}
-      </ul>
+      {rows.length > 0 ? (
+        <ul className="grid gap-2 md:grid-cols-2">
+          {rows.map((r) => (
+            <li key={r.userId} className="surface-card surface-card-hover flex items-center justify-between gap-3 p-4 text-sm">
+              <span className="min-w-0 truncate font-medium text-foreground">{r.displayName ?? "(no name)"}</span>
+              <Link href={`/admin/students/${r.userId}`} className="btn btn-outline btn-sm shrink-0">View record</Link>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <EmptyState icon="○" title="No students found." body="Student profiles appear here once accounts are created." />
+      )}
+      {totalPages > 1 && (
+        <p className="tnum text-center text-sm text-muted-foreground" role="status">Page {page} of {totalPages} — {total} total.</p>
+      )}
     </div>
   );
 }

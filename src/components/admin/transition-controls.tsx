@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function TransitionControls({
   applicationId,
@@ -19,6 +20,7 @@ export function TransitionControls({
   const [error, setError] = useState<string | null>(null);
   const [quote, setQuote] = useState({ amount: "", notesStudent: "", notesInternal: "" });
   const [reason, setReason] = useState("");
+  const [pendingTarget, setPendingTarget] = useState<string | null>(null);
   const needsQuote = (target: string) => target === "Quotation Sent";
 
   async function act(target: string, extra: Record<string, unknown> = {}) {
@@ -38,6 +40,7 @@ export function TransitionControls({
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) throw new Error(data.error ?? "Transition failed.");
+      setPendingTarget(null);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Transition failed.");
@@ -62,27 +65,27 @@ export function TransitionControls({
   }
 
   if (allowed.length === 0) {
-    return <p className="text-sm text-slate-500">No further transitions from {currentStatus} under the approved workflow.</p>;
+    return <p className="text-sm text-muted-foreground">No further transitions from {currentStatus} under the approved workflow.</p>;
   }
 
   return (
-    <div className="space-y-3">
-      <label className="block text-sm">
-        <span className="font-medium">Reason / note (audited)</span>
-        <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Optional reason recorded in audit" className="mt-1 w-full rounded border px-3 py-2" />
+    <div className="space-y-4">
+      <label className="field-label">
+        <span>Reason / note <span className="font-normal text-muted-foreground">(audited)</span></span>
+        <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Optional reason recorded in audit" className="field" />
       </label>
       {allowed.some(needsQuote) && (
-        <fieldset className="rounded-xl border p-3 text-sm">
-          <legend className="px-1 font-semibold">Quotation (SGD only)</legend>
-          <label className="block"><span className="font-medium">Amount (SGD) *</span>
-            <input value={quote.amount} onChange={(e) => setQuote({ ...quote, amount: e.target.value })} placeholder="e.g. 1250.50" inputMode="decimal" className="mt-1 w-full rounded border px-3 py-2" /></label>
-          <label className="mt-2 block"><span className="font-medium">Student-facing terms * (sent by email)</span>
-            <textarea value={quote.notesStudent} onChange={(e) => setQuote({ ...quote, notesStudent: e.target.value })} rows={3} className="mt-1 w-full rounded border px-3 py-2" /></label>
-          <label className="mt-2 block"><span className="font-medium">Internal notes (never emailed)</span>
-            <textarea value={quote.notesInternal} onChange={(e) => setQuote({ ...quote, notesInternal: e.target.value })} rows={2} className="mt-1 w-full rounded border px-3 py-2" /></label>
+        <fieldset className="rounded-xl border border-border bg-muted p-4 text-sm">
+          <legend className="rounded-md bg-surface px-2 font-semibold text-foreground">Quotation (SGD only)</legend>
+          <label className="field-label"><span>Amount (SGD) *</span>
+            <input value={quote.amount} onChange={(e) => setQuote({ ...quote, amount: e.target.value })} placeholder="e.g. 1250.50" inputMode="decimal" className="field !bg-surface" /></label>
+          <label className="field-label mt-3"><span>Student-facing terms * <span className="font-normal text-muted-foreground">(sent by email)</span></span>
+            <textarea value={quote.notesStudent} onChange={(e) => setQuote({ ...quote, notesStudent: e.target.value })} rows={3} className="field !bg-surface" /></label>
+          <label className="field-label mt-3"><span>Internal notes <span className="font-normal text-muted-foreground">(never emailed)</span></span>
+            <textarea value={quote.notesInternal} onChange={(e) => setQuote({ ...quote, notesInternal: e.target.value })} rows={2} className="field !bg-surface" /></label>
         </fieldset>
       )}
-      {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
+      {error && <p role="alert" className="alert alert-error">{error}</p>}
       <div className="flex flex-wrap gap-2">
         {allowed.map((target) => (
           <button
@@ -90,19 +93,30 @@ export function TransitionControls({
             disabled={busy !== null}
             onClick={() => {
               if (["Rejected", "Completed"].includes(target)) {
-                if (!window.confirm(`Move application to ${target}? This is recorded and emailed.`)) return;
+                setPendingTarget(target);
+                return;
               }
               act(target);
             }}
-            className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-50"
+            className="btn btn-primary btn-sm"
           >
             {busy === target ? "Working…" : `Move to ${target}`}
           </button>
         ))}
-        <button disabled={busy !== null} onClick={acknowledge} className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-slate-50 disabled:opacity-50">
+        <button disabled={busy !== null} onClick={acknowledge} className="btn btn-outline btn-sm">
           {busy === "ack" ? "Working…" : "Acknowledge latest revision"}
         </button>
       </div>
+      <ConfirmDialog
+        open={pendingTarget !== null}
+        title={`Move application to ${pendingTarget ?? ""}?`}
+        body="This is recorded in the audit trail and emailed to the student."
+        confirmLabel={`Move to ${pendingTarget ?? ""}`}
+        tone="danger"
+        busy={busy !== null}
+        onClose={() => setPendingTarget(null)}
+        onConfirm={() => pendingTarget && act(pendingTarget)}
+      />
     </div>
   );
 }

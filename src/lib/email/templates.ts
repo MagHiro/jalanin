@@ -5,8 +5,8 @@ import { formatSgd } from "@/lib/workflow/transitions";
 
 function layout(title: string, bodyHtml: string, bodyText: string): { html: string; text: string } {
   const html = `<!doctype html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#1a1a1a;">
-<header style="border-bottom:3px solid #0e7c5a;padding-bottom:12px;margin-bottom:20px;">
-<strong style="font-size:20px;color:#0e7c5a;">Jalanin Internships</strong></header>
+<header style="border-bottom:3px solid #112252;padding-bottom:12px;margin-bottom:20px;">
+<strong style="font-size:20px;color:#112252;">Jalanin Internships</strong></header>
 <h2>${title}</h2>${bodyHtml}
 <footer style="margin-top:28px;border-top:1px solid #ddd;padding-top:12px;font-size:12px;color:#666;">
 <p>Jalanin Internship Platform · reply to this email if you have questions.</p></footer>

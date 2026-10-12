@@ -9,7 +9,7 @@ export function SignOutButton() {
     <button
       type="button"
       disabled={busy}
-      className="px-2 py-1.5 text-slate-600 hover:text-rose-700 disabled:opacity-50"
+      className="inline-flex min-h-10 items-center rounded-lg px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
       onClick={async () => {
         setBusy(true);
         try {
@@ -20,7 +20,7 @@ export function SignOutButton() {
         window.location.href = "/";
       }}
     >
-      Log out
+      {busy ? "Logging out…" : "Log out"}
     </button>
   );
 }

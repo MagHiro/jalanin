@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -29,18 +31,45 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md">
-      <h1 className="text-2xl font-bold">Set a new password</h1>
-      <form onSubmit={onSubmit} className="mt-4 space-y-3">
-        <label className="block text-sm">
-          <span className="font-medium">New password (min. 8 characters)</span>
-          <input name="password" type="password" required minLength={8} autoComplete="new-password" className="mt-1 w-full rounded border px-3 py-2" />
-        </label>
-        {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
-        <button type="submit" disabled={busy} className="w-full rounded-lg bg-emerald-700 px-5 py-2.5 font-medium text-white hover:bg-emerald-800 disabled:opacity-50">
+    <div className="surface-card mx-auto max-w-md p-6 md:p-8">
+      <p className="eyebrow">Account recovery</p>
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">Set a new password</h1>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">Choose a password of at least 8 characters.</p>
+      <form onSubmit={onSubmit} className="mt-5 space-y-4">
+        <div>
+          <label className="field-label" htmlFor="reset-password">
+            <span>New password (min. 8 characters)</span>
+          </label>
+          <div className="relative">
+            <input
+              id="reset-password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={8}
+              autoComplete="new-password"
+              placeholder="••••••••"
+              className="field pr-20"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-pressed={showPassword}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute inset-y-0 right-1 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-3 text-xs font-semibold text-primary hover:bg-secondary"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
+        </div>
+        {error && <p role="alert" className="alert alert-error">{error}</p>}
+        <button type="submit" disabled={busy} className="btn btn-primary w-full">
           {busy ? "Saving…" : "Save new password"}
         </button>
       </form>
+      <p className="mt-4 text-center text-sm">
+        <Link href="/auth/forgot-password" className="inline-flex min-h-10 items-center font-medium text-primary hover:underline">Request a new link</Link>
+      </p>
     </div>
   );
 }

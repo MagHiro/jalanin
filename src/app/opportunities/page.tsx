@@ -5,6 +5,11 @@ import {
   listPublishedInternships,
   COUNTRY_NAMES,
 } from "@/features/internships/service";
+import { PageHeader } from "@/components/ui/page-header";
+import { InternshipCard } from "@/components/ui/internship-card";
+import { ActiveFilterChips } from "@/components/ui/active-filter-chips";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Reveal } from "@/components/motion/reveal";
 
 export const metadata: Metadata = {
   title: "Browse internships",
@@ -48,114 +53,162 @@ export default async function OpportunitiesPage({
     for (const [k, v] of Object.entries(merged)) {
       if (v) params.set(k, v);
     }
-    return `/opportunities?${params.toString()}`;
+    const qs = params.toString();
+    return qs ? `/opportunities?${qs}` : "/opportunities";
+  };
+  const hrefWithout = (key: keyof SearchParams): string => {
+    const rest: SearchParams = { ...searchParams };
+    delete rest[key];
+    const params = new URLSearchParams();
+    for (const [k, v] of Object.entries({ ...rest, page: "1" })) {
+      if (v && k !== "page") params.set(k, v);
+    }
+    const qs = params.toString();
+    return qs ? `/opportunities?${qs}` : "/opportunities";
   };
 
+  const categoryNameFor = (slug?: string) =>
+    categories.find((c) => c.slug === slug)?.name;
+
+  const chips: Array<{ label: string; href: string }> = [];
+  if (searchParams.q) chips.push({ label: `“${searchParams.q}”`, href: hrefWithout("q") });
+  if (searchParams.country)
+    chips.push({
+      label: COUNTRY_NAMES[searchParams.country] ?? searchParams.country,
+      href: hrefWithout("country"),
+    });
+  if (searchParams.category)
+    chips.push({
+      label: categoryNameFor(searchParams.category) ?? searchParams.category,
+      href: hrefWithout("category"),
+    });
+
+  const sortLabel =
+    sort === "title" ? "Title A–Z" : sort === "start" ? "Soonest start" : "Newest published";
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Browse internships</h1>
-        <p className="mt-1 text-sm text-slate-600" role="status">
-          {total} published {total === 1 ? "placement" : "placements"}
-        </p>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        icon="▤"
+        eyebrow="Explore opportunities"
+        title="Find an experience that moves you forward."
+        description={
+          <span role="status" className="tnum">
+            {total} published {total === 1 ? "placement" : "placements"}
+            {total > 0 && <> · sorted by {sortLabel}</>}
+          </span>
+        }
+      />
 
       {/* Filters — GET form keeps state in shareable URL params (JOB-*) */}
-      <form method="get" action="/opportunities" className="grid gap-3 rounded-xl border p-4 md:grid-cols-5">
-        <label className="text-sm md:col-span-2">
-          <span className="font-medium">Search role or location</span>
+      <form
+        method="get"
+        action="/opportunities"
+        aria-label="Search and filter internships"
+        className="toolbar grid gap-4 !p-4 md:grid-cols-6 md:!p-5"
+      >
+        <label className="field-label md:col-span-2">
+          <span>Search role or location</span>
           <input
             name="q"
             defaultValue={searchParams.q ?? ""}
             placeholder="e.g. hotel, Singapore"
-            className="mt-1 w-full rounded border px-3 py-2"
+            autoComplete="off"
+            className="field"
           />
         </label>
-        <label className="text-sm">
-          <span className="font-medium">Country</span>
-          <select name="country" defaultValue={searchParams.country ?? ""} className="mt-1 w-full rounded border px-3 py-2">
+        <label className="field-label">
+          <span>Country</span>
+          <select name="country" defaultValue={searchParams.country ?? ""} className="field">
             <option value="">All countries</option>
             {countries.map((c) => (
               <option key={c} value={c}>{COUNTRY_NAMES[c] ?? c}</option>
             ))}
           </select>
         </label>
-        <label className="text-sm">
-          <span className="font-medium">Category</span>
-          <select name="category" defaultValue={searchParams.category ?? ""} className="mt-1 w-full rounded border px-3 py-2">
+        <label className="field-label">
+          <span>Category</span>
+          <select name="category" defaultValue={searchParams.category ?? ""} className="field">
             <option value="">All categories</option>
             {categories.map((c) => (
               <option key={c.id} value={c.slug}>{c.name}</option>
             ))}
           </select>
         </label>
-        <label className="text-sm">
-          <span className="font-medium">Sort</span>
-          <select name="sort" defaultValue={sort} className="mt-1 w-full rounded border px-3 py-2">
-            <option value="newest">Newest published</option>
-            <option value="title">Title A–Z</option>
-            <option value="start">Soonest start</option>
-          </select>
-        </label>
-        <div className="flex items-end gap-2 md:col-span-5">
-          <button type="submit" className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800">
-            Apply filters
-          </button>
-          <Link href="/opportunities" className="rounded-lg border px-4 py-2 text-sm hover:bg-slate-50">
-            Reset
-          </Link>
+        <div className="grid grid-cols-[1fr_auto] items-end gap-2 md:col-span-2">
+          <label className="field-label">
+            <span>Sort</span>
+            <select name="sort" defaultValue={sort} className="field">
+              <option value="newest">Newest published</option>
+              <option value="title">Title A–Z</option>
+              <option value="start">Soonest start</option>
+            </select>
+          </label>
+          <div className="flex gap-2 pb-0.5">
+            <button type="submit" className="btn btn-primary btn-sm min-h-11">
+              Apply filters
+            </button>
+            <Link href="/opportunities" className="btn btn-outline btn-sm min-h-11">
+              Reset
+            </Link>
+          </div>
         </div>
       </form>
 
-      {rows.length === 0 ? (
-        <div className="rounded-xl border border-dashed p-10 text-center">
-          <p className="font-semibold">No internships match your filters.</p>
-          <p className="mt-1 text-sm text-slate-600">Try widening the search or clearing a filter.</p>
-          <Link href="/opportunities" className="mt-3 inline-block text-sm font-medium text-emerald-700 hover:underline">
-            Clear all filters
+      {chips.length > 0 && (
+        <div className="flex flex-wrap items-center gap-3">
+          <ActiveFilterChips chips={chips} />
+          <Link href="/opportunities" className="text-xs font-semibold text-muted-foreground hover:text-primary hover:underline">
+            Clear all
           </Link>
         </div>
+      )}
+
+      {rows.length === 0 ? (
+        <EmptyState
+          icon="○"
+          title="No internships match your filters."
+          body="Try widening the search or clearing a filter — new placements are added regularly."
+          actionHref="/opportunities"
+          actionLabel="Clear all filters"
+        />
       ) : (
-        <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {rows.map(({ internship, categoryName }) => (
-            <li key={internship.id} className="flex flex-col rounded-xl border p-5">
-              <div className="flex flex-wrap gap-2 text-xs">
-                {categoryName && (
-                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-800">{categoryName}</span>
-                )}
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-700">
-                  {internship.city}, {COUNTRY_NAMES[internship.countryCode] ?? internship.countryCode}
-                </span>
-              </div>
-              <p className="mt-2 font-semibold">{internship.title}</p>
-              <p className="mt-1 text-sm text-slate-600">
-                {internship.startDate} → {internship.endDate}
-              </p>
-              <Link
+        <Reveal>
+          <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {rows.map(({ internship, categoryName }) => (
+              <InternshipCard
+                key={internship.id}
+                title={internship.title}
+                city={internship.city}
+                country={COUNTRY_NAMES[internship.countryCode] ?? internship.countryCode}
+                categoryName={categoryName}
+                startDate={internship.startDate}
+                endDate={internship.endDate}
                 href={`/opportunities/${internship.slug}`}
-                className="mt-3 text-sm font-medium text-emerald-700 hover:underline"
-              >
-                View details
-              </Link>
-            </li>
-          ))}
-        </ul>
+              />
+            ))}
+          </ul>
+        </Reveal>
       )}
 
       {totalPages > 1 && (
-        <nav aria-label="Pagination" className="flex items-center justify-center gap-2">
-          {page > 1 && (
-            <Link href={hrefFor({ page: String(page - 1) })} className="rounded border px-3 py-1.5 text-sm hover:bg-slate-50">
-              Previous
+        <nav aria-label="Pagination" className="flex items-center justify-center gap-3">
+          {page > 1 ? (
+            <Link href={hrefFor({ page: String(page - 1) })} className="btn btn-outline btn-sm min-h-11">
+              ← Previous
             </Link>
+          ) : (
+            <span aria-hidden="true" className="btn btn-outline btn-sm min-h-11 pointer-events-none opacity-40">← Previous</span>
           )}
-          <span className="text-sm text-slate-600" aria-current="page">
+          <span className="tnum text-sm text-muted-foreground" aria-current="page">
             Page {page} of {totalPages}
           </span>
-          {page < totalPages && (
-            <Link href={hrefFor({ page: String(page + 1) })} className="rounded border px-3 py-1.5 text-sm hover:bg-slate-50">
-              Next
+          {page < totalPages ? (
+            <Link href={hrefFor({ page: String(page + 1) })} className="btn btn-outline btn-sm min-h-11">
+              Next →
             </Link>
+          ) : (
+            <span aria-hidden="true" className="btn btn-outline btn-sm min-h-11 pointer-events-none opacity-40">Next →</span>
           )}
         </nav>
       )}

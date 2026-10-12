@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Script from "next/script";
 
 export function ContactForm() {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -41,32 +42,32 @@ export function ContactForm() {
 
   if (state === "sent") {
     return (
-      <div role="status" className="rounded-xl border border-emerald-300 bg-emerald-50 p-6">
-        <p className="font-semibold text-emerald-800">Message received.</p>
-        <p className="mt-1 text-sm text-emerald-900">Thank you — our team will get back to you by email.</p>
+      <div role="status" className="alert alert-success !p-6">
+        <p className="font-semibold">Message received.</p>
+        <p className="mt-1 text-sm">Thank you — our team will get back to you by email.</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3">
-      <div className="grid gap-3 md:grid-cols-2">
-        <label className="block text-sm">
-          <span className="font-medium">Name *</span>
-          <input name="name" required maxLength={120} className="mt-1 w-full rounded border px-3 py-2" autoComplete="name" />
+    <form onSubmit={onSubmit} className="space-y-4" aria-label="Contact Jalanin">
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="field-label">
+          <span>Name *</span>
+          <input name="name" required maxLength={120} className="field" autoComplete="name" placeholder="Your name" />
         </label>
-        <label className="block text-sm">
-          <span className="font-medium">Email *</span>
-          <input name="email" type="email" required maxLength={320} className="mt-1 w-full rounded border px-3 py-2" autoComplete="email" />
+        <label className="field-label">
+          <span>Email *</span>
+          <input name="email" type="email" required maxLength={320} className="field" autoComplete="email" placeholder="you@example.com" />
         </label>
       </div>
-      <label className="block text-sm">
-        <span className="font-medium">Subject</span>
-        <input name="subject" maxLength={200} className="mt-1 w-full rounded border px-3 py-2" />
+      <label className="field-label">
+        <span>Subject <span className="font-normal text-muted-foreground">(optional)</span></span>
+        <input name="subject" maxLength={200} className="field" placeholder="What is this about?" />
       </label>
-      <label className="block text-sm">
-        <span className="font-medium">Message *</span>
-        <textarea name="message" required maxLength={5000} rows={5} className="mt-1 w-full rounded border px-3 py-2" />
+      <label className="field-label">
+        <span>Message *</span>
+        <textarea name="message" required maxLength={5000} rows={5} className="field" placeholder="How can we help?" />
       </label>
       {siteKey ? (
         <div
@@ -76,16 +77,21 @@ export function ContactForm() {
         />
       ) : null}
       {state === "error" && error && (
-        <p role="alert" className="text-sm text-rose-700">{error}</p>
+        <p role="alert" className="alert alert-error">{error}</p>
       )}
       <button
         type="submit"
         disabled={state === "sending"}
-        className="rounded-lg bg-emerald-700 px-5 py-2.5 font-medium text-white hover:bg-emerald-800 disabled:opacity-50"
+        className="btn btn-primary w-full sm:w-auto"
       >
         {state === "sending" ? "Sending…" : "Send message"}
       </button>
-      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+      {siteKey ? (
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          strategy="afterInteractive"
+        />
+      ) : null}
     </form>
   );
 }

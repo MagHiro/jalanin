@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { allowedNextPlacementStatusesUI } from "./statuses";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface Initial {
   id?: string;
@@ -21,7 +22,7 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const field = "mt-1 w-full rounded border px-3 py-2";
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
   const v = (k: keyof Initial): string => String(initial?.[k] ?? "");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -60,7 +61,6 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
 
   async function transition(to: string) {
     if (!initial?.id) return;
-    if (!window.confirm(`Move placement to ${to}?`)) return;
     setBusy(true);
     setError(null);
     try {
@@ -71,6 +71,7 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) throw new Error(data.error ?? "Transition failed.");
+      setPendingStatus(null);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Transition failed.");
@@ -84,44 +85,46 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
     : [];
 
   return (
-    <div className="max-w-3xl space-y-4">
-      <form onSubmit={onSubmit} className="grid gap-3 md:grid-cols-2">
-        {!initial?.id && (
-          <>
-            <label className="text-sm"><span className="font-medium">Student user ID *</span>
-              <input name="studentUserId" required defaultValue={v("studentUserId")} placeholder="UUID from student record" className={field} /></label>
-            <label className="text-sm"><span className="font-medium">Application ID (optional)</span>
-              <input name="applicationId" defaultValue={v("applicationId")} placeholder="Link to application" className={field} /></label>
-          </>
-        )}
-        <label className="text-sm"><span className="font-medium">Organization *</span>
-          <input name="organization" required defaultValue={v("organization")} className={field} /></label>
-        <label className="text-sm"><span className="font-medium">Role *</span>
-          <input name="role" required defaultValue={v("role")} className={field} /></label>
-        <label className="text-sm"><span className="font-medium">Country code *</span>
-          <input name="countryCode" required minLength={2} maxLength={2} defaultValue={v("countryCode")} className={field} /></label>
-        <label className="text-sm"><span className="font-medium">Start date</span>
-          <input name="startDate" type="date" defaultValue={v("startDate")} className={field} /></label>
-        <label className="text-sm"><span className="font-medium">End date</span>
-          <input name="endDate" type="date" defaultValue={v("endDate")} className={field} /></label>
-        <label className="text-sm md:col-span-2"><span className="font-medium">Notes</span>
-          <textarea name="notes" rows={3} defaultValue={v("notes")} className={field} /></label>
-        <div className="md:col-span-2">
-          <button disabled={busy} className="rounded-lg bg-emerald-700 px-5 py-2.5 font-medium text-white hover:bg-emerald-800 disabled:opacity-50">
-            {busy ? "Saving…" : initial?.id ? "Save placement" : "Create placement (Preparing)"}
-          </button>
+    <div className="max-w-3xl space-y-5">
+      <form onSubmit={onSubmit} aria-label={initial?.id ? "Edit placement" : "New placement"} className="form-section">
+        <div className="grid gap-4 md:grid-cols-2">
+          {!initial?.id && (
+            <>
+              <label className="field-label"><span>Student user ID *</span>
+                <input name="studentUserId" required defaultValue={v("studentUserId")} placeholder="UUID from student record" className="field font-mono text-[13px]" /></label>
+              <label className="field-label"><span>Application ID <span className="font-normal text-muted-foreground">(optional)</span></span>
+                <input name="applicationId" defaultValue={v("applicationId")} placeholder="Link to application" className="field font-mono text-[13px]" /></label>
+            </>
+          )}
+          <label className="field-label"><span>Organization *</span>
+            <input name="organization" required defaultValue={v("organization")} className="field" placeholder="Marina Hotel" /></label>
+          <label className="field-label"><span>Role *</span>
+            <input name="role" required defaultValue={v("role")} className="field" placeholder="Front Office Intern" /></label>
+          <label className="field-label"><span>Country code *</span>
+            <input name="countryCode" required minLength={2} maxLength={2} defaultValue={v("countryCode")} className="field" placeholder="SG" /></label>
+          <label className="field-label"><span>Start date</span>
+            <input name="startDate" type="date" defaultValue={v("startDate")} className="field" /></label>
+          <label className="field-label"><span>End date</span>
+            <input name="endDate" type="date" defaultValue={v("endDate")} className="field" /></label>
+          <label className="field-label md:col-span-2"><span>Notes <span className="font-normal text-muted-foreground">(visible to the student)</span></span>
+            <textarea name="notes" rows={3} defaultValue={v("notes")} className="field" /></label>
+          <div className="md:col-span-2">
+            <button disabled={busy} className="btn btn-primary">
+              {busy ? "Saving…" : initial?.id ? "Save placement" : "Create placement (Preparing)"}
+            </button>
+          </div>
         </div>
       </form>
-      {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
+      {error && <p role="alert" className="alert alert-error">{error}</p>}
       {initial?.id && (
-        <div className="rounded-xl border p-4">
-          <p className="text-sm font-semibold">Status: {initial.placementStatus}</p>
+        <div className="surface-card p-5">
+          <p className="text-sm font-semibold text-foreground">Status: {initial.placementStatus}</p>
           {next.length === 0 ? (
-            <p className="mt-1 text-sm text-slate-500">Terminal state — no further transitions without an approved override.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Terminal state — no further transitions without an approved override.</p>
           ) : (
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap gap-2">
               {next.map((s) => (
-                <button key={s} disabled={busy} onClick={() => transition(s)} className="rounded-lg border px-3 py-1.5 text-sm font-medium hover:bg-slate-50 disabled:opacity-50">
+                <button key={s} disabled={busy} onClick={() => setPendingStatus(s)} className="btn btn-outline btn-sm">
                   Move to {s}
                 </button>
               ))}
@@ -129,6 +132,15 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
           )}
         </div>
       )}
+      <ConfirmDialog
+        open={pendingStatus !== null}
+        title={`Move placement to ${pendingStatus ?? ""}?`}
+        body="The student sees the updated placement status in their dashboard."
+        confirmLabel={`Move to ${pendingStatus ?? ""}`}
+        busy={busy}
+        onClose={() => setPendingStatus(null)}
+        onConfirm={() => pendingStatus && transition(pendingStatus)}
+      />
     </div>
   );
 }

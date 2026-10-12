@@ -4,6 +4,8 @@ import {
   markNotificationRead,
 } from "@/features/admin/service";
 import { redirect } from "next/navigation";
+import { PageHeader } from "@/components/ui/page-header";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const metadata = { title: "Notifications", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -16,8 +18,9 @@ export default async function AdminNotificationsPage({
   searchParams: { unread?: string };
 }) {
   await requireAdmin();
+  const unreadOnly = searchParams.unread === "1";
   const rows = await listAdminNotifications({
-    unreadOnly: searchParams.unread === "1" ? true : undefined,
+    unreadOnly: unreadOnly ? true : undefined,
     page: 1,
     pageSize: 50,
   });
@@ -31,40 +34,53 @@ export default async function AdminNotificationsPage({
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Notifications</h1>
-      <p className="text-sm">
-        <a href="/admin/notifications" className="text-emerald-700 hover:underline">All</a>
-        {" · "}
-        <a href="/admin/notifications?unread=1" className="text-emerald-700 hover:underline">Unread only</a>
-      </p>
+    <div className="space-y-5">
+      <PageHeader
+        icon="●"
+        eyebrow="Alerts"
+        title="Notifications"
+        description="New submissions and student revisions — persisted, with read state."
+        actions={
+          unreadOnly ? (
+            <a href="/admin/notifications" className="btn btn-outline btn-sm">Show all</a>
+          ) : (
+            <a href="/admin/notifications?unread=1" className="btn btn-outline btn-sm">Unread only</a>
+          )
+        }
+      />
       {rows.length === 0 ? (
-        <p className="rounded-xl border border-dashed p-6 text-center text-sm text-slate-500">No alerts. New submissions and student revisions will appear here and by email.</p>
+        <EmptyState
+          icon="●"
+          title={unreadOnly ? "No unread alerts." : "No alerts."}
+          body="New submissions and student revisions will appear here and by email."
+          actionHref="/admin/notifications"
+          actionLabel="Show all"
+        />
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-2.5">
           {rows.map(({ notification, applicationEmail, internshipTitle }) => (
             <li
               key={notification.id}
-              className={`rounded-xl border p-4 text-sm ${notification.isRead ? "bg-white" : "border-amber-300 bg-amber-50"}`}
+              className={`rounded-2xl border p-4 text-sm md:p-5 ${notification.isRead ? "border-border bg-surface" : "notification-unread"}`}
             >
-              <p className="font-semibold">
+              <p className="flex flex-wrap items-center gap-2 font-semibold text-foreground">
                 {notification.eventType === "new_application" ? "New application" : "Re-review required"}
-                {!notification.isRead && <span className="ml-2 rounded-full bg-amber-200 px-2 py-0.5 text-xs">unread</span>}
+                {!notification.isRead && <span className="badge badge-rereview"><span aria-hidden="true" className="badge-dot" />unread</span>}
               </p>
-              <p className="text-slate-600">
+              <p className="tnum mt-1 text-muted-foreground">
                 {applicationEmail ?? "—"} · {internshipTitle ?? "—"} ·
-                {" "}{new Date(notification.createdAt).toLocaleString("en-SG")}
+                {" "}<time>{new Date(notification.createdAt).toLocaleString("en-SG")}</time>
               </p>
-              <div className="mt-2 flex gap-2">
+              <div className="mt-3 flex flex-wrap gap-2">
                 {notification.applicationId && (
-                  <a href={`/admin/applications/${notification.applicationId}`} className="rounded-lg border px-3 py-1.5 font-medium hover:bg-white">
+                  <a href={`/admin/applications/${notification.applicationId}`} className="btn btn-outline btn-sm !bg-surface">
                     Open application
                   </a>
                 )}
                 {!notification.isRead && (
                   <form action={markRead}>
                     <input type="hidden" name="id" value={notification.id} />
-                    <button className="rounded-lg border px-3 py-1.5 hover:bg-white">Mark read</button>
+                    <button className="btn btn-outline btn-sm !bg-surface">Mark read</button>
                   </form>
                 )}
               </div>

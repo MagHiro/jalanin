@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/require";
 import { listAdminPlacements } from "@/features/admin/service";
-import { statusBadgeClass } from "@/components/ui/cn";
+import { PageHeader } from "@/components/ui/page-header";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const metadata = { title: "Placements", robots: "noindex" };
 export const dynamic = "force-dynamic";
+
+const PLACEMENT_STATUSES = ["Preparing", "Confirmed", "Active", "Completed", "Cancelled"];
 
 export default async function AdminPlacementsPage({
   searchParams,
@@ -13,43 +17,59 @@ export default async function AdminPlacementsPage({
 }) {
   await requireAdmin();
   const page = Math.max(1, Number(searchParams.page ?? 1) || 1);
+  const pageSize = 20;
   const { rows, total } = await listAdminPlacements({
     q: searchParams.q,
     status: searchParams.status,
     page,
-    pageSize: 20,
+    pageSize,
   });
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Placements ({total})</h1>
-        <Link href="/admin/placements/new" className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800">
-          New placement
-        </Link>
-      </div>
-      <form method="get" className="flex flex-wrap gap-2 text-sm">
-        <input name="q" defaultValue={searchParams.q ?? ""} placeholder="Search organization or role" className="rounded border px-3 py-1.5" />
-        <select name="status" defaultValue={searchParams.status ?? ""} className="rounded border px-3 py-1.5">
-          <option value="">All statuses</option>
-          {["Preparing", "Confirmed", "Active", "Completed", "Cancelled"].map((s) => <option key={s}>{s}</option>)}
-        </select>
-        <button className="rounded border px-3 py-1.5 hover:bg-slate-50">Filter</button>
+    <div className="space-y-5">
+      <PageHeader
+        icon="✦"
+        eyebrow="Outcomes"
+        title={`Placements (${total})`}
+        description="Manually created and advanced. Only the linked student sees their record."
+        actions={<Link href="/admin/placements/new" className="btn btn-primary btn-sm">+ New placement</Link>}
+      />
+      <form method="get" aria-label="Filter placements" className="toolbar grid gap-3 text-sm sm:grid-cols-[1.4fr_1fr_auto]">
+        <label className="field-label">
+          <span className="sr-only">Search organization or role</span>
+          <input name="q" defaultValue={searchParams.q ?? ""} placeholder="Search organization or role" className="field !min-h-11" />
+        </label>
+        <label className="field-label">
+          <span className="sr-only">Placement status</span>
+          <select name="status" defaultValue={searchParams.status ?? ""} className="field !min-h-11">
+            <option value="">All statuses</option>
+            {PLACEMENT_STATUSES.map((s) => <option key={s}>{s}</option>)}
+          </select>
+        </label>
+        <div className="flex items-end">
+          <button className="btn btn-primary btn-sm min-h-11">Filter</button>
+        </div>
       </form>
-      <ul className="space-y-2">
-        {rows.map((p) => (
-          <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3 text-sm">
-            <div>
-              <p className="font-semibold">{p.role} · {p.organization}</p>
-              <p className="mt-1">
-                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass(p.placementStatus)}`}>{p.placementStatus}</span>
-              </p>
-            </div>
-            <Link href={`/admin/placements/${p.id}/edit`} className="rounded-lg border px-3 py-1.5 font-medium hover:bg-slate-50">Manage</Link>
-          </li>
-        ))}
-        {rows.length === 0 && <li className="rounded-xl border border-dashed p-6 text-center text-sm text-slate-500">No placements found.</li>}
-      </ul>
+
+      {rows.length > 0 ? (
+        <ul className="grid gap-2 md:grid-cols-2">
+          {rows.map((p) => (
+            <li key={p.id} className="surface-card surface-card-hover flex flex-wrap items-center justify-between gap-3 p-4 text-sm">
+              <div className="min-w-0">
+                <p className="font-semibold text-foreground">{p.role} · {p.organization}</p>
+                <p className="mt-1.5"><StatusBadge status={p.placementStatus} /></p>
+              </div>
+              <Link href={`/admin/placements/${p.id}/edit`} className="btn btn-outline btn-sm shrink-0">Manage</Link>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <EmptyState icon="✦" title="No placements found." body="Create placements manually for students — they will see their own records." actionHref="/admin/placements/new" actionLabel="New placement" />
+      )}
+      {totalPages > 1 && (
+        <p className="tnum text-center text-sm text-muted-foreground" role="status">Page {page} of {totalPages} — {total} total.</p>
+      )}
     </div>
   );
 }

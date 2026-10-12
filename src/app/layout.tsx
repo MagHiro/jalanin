@@ -20,15 +20,15 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-white text-slate-900 antialiased">
+      <body className="min-h-screen bg-background text-foreground antialiased">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:bg-emerald-700 focus:p-2 focus:text-white"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:rounded-md focus:bg-primary focus:p-3 focus:text-white"
         >
           Skip to content
         </a>
         <SiteHeader />
-        <main id="main" className="mx-auto w-full max-w-6xl px-4 py-8">
+        <main id="main" className="mx-auto w-full max-w-6xl px-5 py-8 md:px-8 md:py-12">
           {children}
         </main>
         <SiteFooter />

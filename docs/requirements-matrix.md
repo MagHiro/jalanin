@@ -41,6 +41,15 @@ Verification: U=unit, I=integration, E=e2e, M=manual. Updated as work lands.
 | §7.8 | Scoped admin dashboard (real counts only) | `app/admin/page.tsx` | E | Verified |
 | COM-01…05, NOT-01…05 | Contact + Turnstile + storage/notify; notification matrix | `features/contact`, `lib/email` | E | Verified |
 
+## Design system and UX refinement (October 2026)
+
+| Scope | Implementation | Verification | Status |
+|---|---|---|---|
+| Mobbin-informed direction and system | `docs/design/mobbin-research.md` (two live passes), `incident-io-reference-audit.md` (incident.io collection, observed vs inferred), `design-directions.md` (Clear Horizons finalized, superseded Oct 2026 by indigo system), `design-system.md` v2.0; OKLCH semantic CSS/Tailwind tokens + `ui/` primitives + dark admin rail; gsap motion; all routes redesigned | Typecheck, lint, 37 unit tests, 20/20 E2E + 28/28 viewport sweep, production build green | Verified |
+| Responsive/accessibility foundation | Responsive layouts (table→card collapse, sticky→fixed CTA), 44px targets, visible focus, reduced motion/transparency fallbacks, computed AA contrast (text 5.7–15.5, badges 7.9–11.9) | 9/9 API E2E pass; 11 browser tests blocked by missing container libs (no sudo); SSR assertion sweep passes instead | Verified* |
+
+Screen-family visual coverage (12 Oct 2026): **all** route families received bespoke Clear Horizons treatment — public landing/listing/detail/footer/legal/404, auth login/register/forgot/reset, apply + application form, student shell/overview/applications/detail/placements, admin shell/overview/applications/detail/internships/students/placements/contacts/notifications/forms. E2E copy contracts preserved verbatim. *Rendered browser screenshots + axe pass remain a CI follow-up where Chromium libs are installable.
+
 ## Open blockers → `docs/open-decisions.md`
 
 B01 quote expiry · B02 payment tracking · B03 reopen target · B04 deadline

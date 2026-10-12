@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function ForgotPasswordPage() {
@@ -26,29 +27,38 @@ export default function ForgotPasswordPage() {
 
   if (state === "sent") {
     return (
-      <div className="mx-auto max-w-md" role="status">
-        <h1 className="text-2xl font-bold">Check your email</h1>
-        <p className="mt-2 text-sm text-slate-600">
+      <div className="surface-card mx-auto max-w-md p-6 md:p-8" role="status">
+        <p aria-hidden="true" className="grid size-12 place-items-center rounded-2xl bg-secondary text-xl text-primary">✉</p>
+        <h1 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">Check your email</h1>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
           If an account exists for that address, a time-limited reset link is on its way.
+          The link expires — request a new one if it lapses.
         </p>
+        <Link href="/auth/login" className="btn btn-outline mt-5 w-full">
+          Back to log in
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-md">
-      <h1 className="text-2xl font-bold">Forgot your password?</h1>
-      <p className="mt-1 text-sm text-slate-600">Enter your account email to receive a reset link.</p>
-      <form onSubmit={onSubmit} className="mt-4 space-y-3">
-        <label className="block text-sm">
-          <span className="font-medium">Email</span>
-          <input name="email" type="email" required autoComplete="email" className="mt-1 w-full rounded border px-3 py-2" />
+    <div className="surface-card mx-auto max-w-md p-6 md:p-8">
+      <p className="eyebrow">Account recovery</p>
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">Forgot your password?</h1>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">Enter your account email to receive a reset link.</p>
+      <form onSubmit={onSubmit} className="mt-5 space-y-4">
+        <label className="field-label">
+          <span>Email</span>
+          <input name="email" type="email" required autoComplete="email" placeholder="you@example.com" className="field" />
         </label>
-        {state === "error" && error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
-        <button type="submit" disabled={state === "sending"} className="w-full rounded-lg bg-emerald-700 px-5 py-2.5 font-medium text-white hover:bg-emerald-800 disabled:opacity-50">
+        {state === "error" && error && <p role="alert" className="alert alert-error">{error}</p>}
+        <button type="submit" disabled={state === "sending"} className="btn btn-primary w-full">
           {state === "sending" ? "Sending…" : "Send reset link"}
         </button>
       </form>
+      <p className="mt-4 text-center text-sm">
+        <Link href="/auth/login" className="inline-flex min-h-10 items-center font-medium text-primary hover:underline">Back to log in</Link>
+      </p>
     </div>
   );
 }

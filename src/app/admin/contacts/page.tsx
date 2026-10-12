@@ -2,6 +2,8 @@ import { requireAdmin } from "@/lib/auth/require";
 import { db } from "@/lib/db/client";
 import { contactSubmissions } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
+import { PageHeader } from "@/components/ui/page-header";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const metadata = { title: "Contact inbox", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -16,18 +18,25 @@ export default async function AdminContactsPage() {
     .limit(50);
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Contact inbox ({rows.length})</h1>
+    <div className="space-y-5">
+      <PageHeader
+        icon="✉"
+        eyebrow="Inbox"
+        title={`Contact inbox (${rows.length})`}
+        description="Latest inquiries first. Reply by email — addresses are shown for follow-up."
+      />
       {rows.length === 0 ? (
-        <p className="rounded-xl border border-dashed p-6 text-center text-sm text-slate-500">No inquiries yet.</p>
+        <EmptyState icon="✉" title="No inquiries yet." body="Contact form submissions from the landing page will appear here." />
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-2.5">
           {rows.map((c) => (
-            <li key={c.id} className="rounded-xl border p-4 text-sm">
-              <p className="font-semibold">{c.name} <span className="font-normal text-slate-500">· {c.email}</span></p>
-              {c.subject && <p className="text-slate-600">Subject: {c.subject}</p>}
-              <p className="mt-1 whitespace-pre-line">{c.message}</p>
-              <p className="mt-1 text-xs text-slate-500">{new Date(c.createdAt).toLocaleString("en-SG")}</p>
+            <li key={c.id} className="surface-card p-4 text-sm md:p-5">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <p className="font-semibold text-foreground">{c.name} <span className="font-normal text-muted-foreground">· <a href={`mailto:${c.email}`} className="text-primary hover:underline">{c.email}</a></span></p>
+                <p className="tnum text-xs text-muted-foreground"><time>{new Date(c.createdAt).toLocaleString("en-SG")}</time></p>
+              </div>
+              {c.subject && <p className="mt-1 font-medium text-foreground">Subject: {c.subject}</p>}
+              <p className="mt-1.5 whitespace-pre-line leading-6 text-muted-foreground">{c.message}</p>
             </li>
           ))}
         </ul>

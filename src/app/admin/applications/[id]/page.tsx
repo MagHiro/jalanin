@@ -5,10 +5,12 @@ import {
   allowedTransitionsFor,
   getAdminApplication,
 } from "@/features/admin/service";
-import { formatSgd, type ApplicationStatus } from "@/lib/workflow/transitions";
-import { statusBadgeClass } from "@/components/ui/cn";
+import { APPLICATION_STATUSES, formatSgd, type ApplicationStatus } from "@/lib/workflow/transitions";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { StatusTimeline } from "@/components/ui/status-timeline";
 import { TransitionControls } from "@/components/admin/transition-controls";
 import { ReopenControl } from "@/components/admin/reopen-control";
+import { cn } from "@/components/ui/cn";
 
 export const metadata = { title: "Review application", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -27,136 +29,189 @@ export default async function AdminApplicationDetailPage({
   const allowed = application.isDraft
     ? []
     : allowedTransitionsFor(application.lifecycleStatus as ApplicationStatus);
+  const chainIndex = application.isDraft
+    ? -1
+    : APPLICATION_STATUSES.indexOf(application.lifecycleStatus as ApplicationStatus);
 
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/admin/applications" className="text-sm text-emerald-700 hover:underline">← All applications</Link>
-        <h1 className="mt-1 text-2xl font-bold">
+        <nav aria-label="Breadcrumb">
+          <Link href="/admin/applications" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
+            <span aria-hidden="true">←</span> All applications
+          </Link>
+        </nav>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">
           {application.firstName} {application.lastName}
         </h1>
-        <p className="text-sm text-slate-600">
+        <p className="tnum mt-1 text-sm text-muted-foreground">
           {application.email} · {internship.title} · r{application.revision}
           {application.reviewedRevision < application.revision && ` (reviewed r${application.reviewedRevision})`}
         </p>
-        <p className="mt-1">
-          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass(application.lifecycleStatus)}`}>
-            {application.isDraft ? "Draft (not submitted)" : application.lifecycleStatus}
-          </span>
+        <p className="mt-2 flex flex-wrap gap-1.5">
+          <StatusBadge status={application.isDraft ? "Draft (not submitted)" : application.lifecycleStatus} />
           {application.needsReReview && (
-            <span className="ml-2 rounded-full bg-amber-200 px-2 py-0.5 text-xs font-bold text-amber-900">
+            <span className="badge badge-rereview">
+              <span aria-hidden="true" className="badge-dot" />
               Updated — re-review required
             </span>
           )}
         </p>
+        {/* Lifecycle chain (incident.io-informed status chain, DL-04) */}
+        {!application.isDraft && (
+          <ol aria-label="Application lifecycle" className="mt-3 flex flex-wrap items-center gap-1 text-xs">
+            {APPLICATION_STATUSES.map((s, i) => {
+              const reached = i <= chainIndex;
+              const current = i === chainIndex;
+              return (
+                <li key={s} className="flex items-center gap-1">
+                  {i > 0 && <span aria-hidden="true" className="text-muted-foreground">›</span>}
+                  <span
+                    aria-current={current ? "step" : undefined}
+                    className={cn(
+                      "rounded-full px-2.5 py-1 font-semibold",
+                      current
+                        ? "bg-primary text-white"
+                        : reached
+                          ? "bg-secondary text-primary"
+                          : "bg-muted text-muted-foreground",
+                    )}
+                  >
+                    {s}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        )}
       </div>
 
-      <section className="rounded-xl border p-5 text-sm">
-        <h2 className="font-semibold">Submitted snapshot</h2>
-        <dl className="mt-2 grid gap-1 md:grid-cols-2">
-          {[["Nationality", application.nationality],
-            ["University", application.university],
-            ["Course", application.course],
-            ["Graduation year", String(application.graduationYear)],
-            ["Preferred dates", `${application.preferredStart} → ${application.preferredEnd}`],
-            ["Submitted", application.submittedAt ? new Date(application.submittedAt).toLocaleString("en-SG") : "—"],
-          ].map(([k, v]) => (
-            <div key={k} className="flex justify-between gap-3 border-b py-1">
-              <dt className="text-slate-500">{k}</dt><dd className="text-right font-medium">{v}</dd>
-            </div>
-          ))}
-        </dl>
-        {application.additionalInformation && (
-          <p className="mt-2 whitespace-pre-line">{application.additionalInformation}</p>
-        )}
-      </section>
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="min-w-0 space-y-5">
+          <section aria-labelledby="snapshot-h" className="surface-card p-5 md:p-6">
+            <h2 id="snapshot-h" className="text-base font-semibold tracking-tight text-foreground">Submitted snapshot</h2>
+            <dl className="mt-3 grid gap-x-8 text-sm md:grid-cols-2">
+              {[["Nationality", application.nationality],
+                ["University", application.university],
+                ["Course", application.course],
+                ["Graduation year", String(application.graduationYear)],
+                ["Preferred dates", `${application.preferredStart} → ${application.preferredEnd}`],
+                ["Submitted", application.submittedAt ? new Date(application.submittedAt).toLocaleString("en-SG") : "—"],
+              ].map(([k, v]) => (
+                <div key={k} className="flex justify-between gap-4 border-b border-border py-2">
+                  <dt className="shrink-0 text-muted-foreground">{k}</dt><dd className="text-right font-medium text-foreground">{v}</dd>
+                </div>
+              ))}
+            </dl>
+            {application.additionalInformation && (
+              <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{application.additionalInformation}</p>
+            )}
+          </section>
 
-      <section className="rounded-xl border p-5 text-sm">
-        <h2 className="font-semibold">Documents (private — admin only)</h2>
-        {documents.length === 0 ? (
-          <p className="mt-1 text-slate-500">No CV attached.</p>
-        ) : (
-          <ul className="mt-2 space-y-1">
-            {documents.map((d) => (
-              <li key={d.id}>
-                <a
-                  href={`/api/documents/download?documentId=${d.id}`}
-                  className="font-medium text-emerald-700 hover:underline"
-                >
-                  Download {d.originalFilename}
-                </a>
-                <span className="ml-2 text-xs text-slate-500">
-                  {(d.byteSize / 1024).toFixed(0)} KB · {new Date(d.createdAt).toLocaleDateString("en-SG")}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+          <section aria-labelledby="docs-h" className="surface-card p-5 md:p-6">
+            <h2 id="docs-h" className="text-base font-semibold tracking-tight text-foreground">Documents <span className="ml-1 text-xs font-normal text-muted-foreground">(private — admin only)</span></h2>
+            {documents.length === 0 ? (
+              <p className="mt-2 text-sm text-muted-foreground">No CV attached.</p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {documents.map((d) => (
+                  <li key={d.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3 text-sm">
+                    <span className="font-medium text-foreground">{d.originalFilename}
+                      <span className="tnum ml-2 text-xs font-normal text-muted-foreground">
+                        {(d.byteSize / 1024).toFixed(0)} KB · {new Date(d.createdAt).toLocaleDateString("en-SG")}
+                      </span>
+                    </span>
+                    <a
+                      href={`/api/documents/download?documentId=${d.id}`}
+                      className="btn btn-outline btn-sm"
+                    >
+                      Download
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
 
-      {quotes.length > 0 && (
-        <section className="rounded-xl border p-5 text-sm">
-          <h2 className="font-semibold">Quotations (SGD)</h2>
-          <ul className="mt-2 space-y-2">
-            {quotes.map((q) => (
-              <li key={q.id} className="rounded-lg bg-slate-50 p-3">
-                <p className="font-bold">{formatSgd(q.amountMinor)} {q.currency} <span className="font-normal text-slate-500">· revision {q.revision}</span></p>
-                <p className="mt-1"><span className="font-medium">Student terms:</span> {q.notesStudent}</p>
-                {q.notesInternal && <p className="mt-1 text-slate-600"><span className="font-medium">Internal (never emailed):</span> {q.notesInternal}</p>}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {revisions.length > 0 && (
-        <section className="rounded-xl border border-amber-300 p-5 text-sm">
-          <h2 className="font-semibold">Student revision history (auditable)</h2>
-          <ul className="mt-2 space-y-2">
-            {revisions.map((r) => (
-              <li key={r.id} className="rounded-lg bg-amber-50 p-3">
-                <p className="font-medium">Revision r{r.revision} · {new Date(r.createdAt).toLocaleString("en-SG")}</p>
-                <p className="text-xs text-slate-600">Changed: {r.changedFields.join(", ")}</p>
-                <details className="mt-1 text-xs">
-                  <summary className="cursor-pointer text-emerald-700">Old → new values</summary>
-                  <pre className="mt-1 overflow-auto rounded bg-white p-2">{JSON.stringify({ old: r.oldValues, new: r.newValues }, null, 2)}</pre>
-                </details>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <section className="rounded-xl border p-5">
-        <h2 className="font-semibold">Workflow actions</h2>
-        <div className="mt-3">
-          {application.isDraft ? (
-            <p className="text-sm text-slate-500">Drafts cannot transition until the student submits.</p>
-          ) : application.lifecycleStatus === "Rejected" ? (
-            <ReopenControl applicationId={application.id} />
-          ) : (
-            <TransitionControls
-              applicationId={application.id}
-              currentStatus={application.lifecycleStatus}
-              allowed={allowed}
-              revision={application.revision}
-            />
+          {quotes.length > 0 && (
+            <section aria-labelledby="quotes-h" className="surface-card p-5 md:p-6">
+              <h2 id="quotes-h" className="text-base font-semibold tracking-tight text-foreground">Quotations (SGD)</h2>
+              <ul className="mt-3 space-y-2">
+                {quotes.map((q) => (
+                  <li key={q.id} className="rounded-xl bg-muted p-4 text-sm">
+                    <p className="tnum font-bold text-foreground">{formatSgd(q.amountMinor)} {q.currency} <span className="font-normal text-muted-foreground">· revision {q.revision}</span></p>
+                    <p className="mt-1.5"><span className="font-medium text-foreground">Student terms:</span> <span className="text-muted-foreground">{q.notesStudent}</span></p>
+                    {q.notesInternal && <p className="mt-1 text-muted-foreground"><span className="font-medium text-foreground">Internal (never emailed):</span> {q.notesInternal}</p>}
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
-        </div>
-      </section>
 
-      <section className="rounded-xl border p-5 text-sm">
-        <h2 className="font-semibold">Audit & status history</h2>
-        <ol className="mt-2 space-y-1">
-          {events.map((e) => (
-            <li key={e.id} className="flex justify-between gap-3 border-b py-1">
-              <span>{e.fromStatus ? `${e.fromStatus} → ` : ""}<strong>{e.toStatus}</strong>{e.reason ? ` — ${e.reason}` : ""}</span>
-              <span className="text-xs text-slate-500">{new Date(e.createdAt).toLocaleString("en-SG")}</span>
-            </li>
-          ))}
-          {events.length === 0 && <li className="text-slate-500">No events yet.</li>}
-        </ol>
-      </section>
+          {revisions.length > 0 && (
+            <section aria-labelledby="revisions-h" className="revisions-panel p-5 md:p-6">
+              <h2 id="revisions-h" className="text-base font-semibold tracking-tight text-foreground">Student revision history <span className="text-xs font-normal text-muted-foreground">(auditable)</span></h2>
+              <ul className="mt-3 space-y-2">
+                {revisions.map((r) => (
+                  <li key={r.id} className="rounded-xl border border-border bg-surface p-3 text-sm">
+                    <p className="tnum font-medium text-foreground">Revision r{r.revision} · {new Date(r.createdAt).toLocaleString("en-SG")}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">Changed: {r.changedFields.join(", ")}</p>
+                    <details className="mt-1.5 text-xs">
+                      <summary className="cursor-pointer font-medium text-primary">Old → new values</summary>
+                      <pre className="tnum mt-1.5 overflow-auto rounded-lg bg-muted p-2.5 text-[11px] leading-5">{JSON.stringify({ old: r.oldValues, new: r.newValues }, null, 2)}</pre>
+                    </details>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <section aria-labelledby="audit-h" className="surface-card p-5 md:p-6">
+            <h2 id="audit-h" className="text-base font-semibold tracking-tight text-foreground">Audit & status history</h2>
+            <div className="mt-4">
+              <StatusTimeline
+                events={events.map((e) => ({
+                  id: e.id,
+                  fromStatus: e.fromStatus,
+                  toStatus: e.toStatus,
+                  reason: e.reason,
+                  createdAt: e.createdAt,
+                }))}
+                emptyLabel="No events yet."
+              />
+            </div>
+          </section>
+        </div>
+
+        <div className="space-y-5">
+          <section aria-labelledby="actions-h" className="surface-card h-fit p-5 md:p-6 xl:sticky xl:top-28">
+            <h2 id="actions-h" className="text-base font-semibold tracking-tight text-foreground">Workflow actions</h2>
+            <div className="mt-3">
+              {application.isDraft ? (
+                <p className="text-sm text-muted-foreground">Drafts cannot transition until the student submits.</p>
+              ) : application.lifecycleStatus === "Rejected" ? (
+                <ReopenControl applicationId={application.id} />
+              ) : (
+                <TransitionControls
+                  applicationId={application.id}
+                  currentStatus={application.lifecycleStatus}
+                  allowed={allowed}
+                  revision={application.revision}
+                />
+              )}
+            </div>
+          </section>
+
+          <section aria-labelledby="context-h" className="rounded-2xl border border-border bg-muted p-5 text-sm">
+            <h2 id="context-h" className="font-semibold text-foreground">Internship context</h2>
+            <p className="mt-1.5 font-medium text-foreground">{internship.title}</p>
+            <p className="tnum text-xs text-muted-foreground">{internship.city}, {internship.countryCode} · {internship.startDate} → {internship.endDate}</p>
+            <Link href={`/opportunities/${internship.slug}`} className="mt-2 inline-flex min-h-9 items-center text-xs font-semibold text-primary hover:underline">
+              View public listing →
+            </Link>
+          </section>
+        </div>
+      </div>
     </div>
   );
 }

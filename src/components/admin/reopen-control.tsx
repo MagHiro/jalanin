@@ -2,19 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function ReopenControl({ applicationId }: { applicationId: string }) {
   const router = useRouter();
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
 
   async function reopen() {
-    if (!reason.trim()) {
-      setError("A reopen reason is required (audited).");
-      return;
-    }
-    if (!window.confirm("Reopen this rejected application into In Review? The student will be able to edit again per policy.")) return;
     setBusy(true);
     setError(null);
     try {
@@ -25,6 +22,7 @@ export function ReopenControl({ applicationId }: { applicationId: string }) {
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) throw new Error(data.error ?? "Reopen failed.");
+      setConfirming(false);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Reopen failed.");
@@ -33,15 +31,34 @@ export function ReopenControl({ applicationId }: { applicationId: string }) {
   }
 
   return (
-    <div className="space-y-2">
-      <label className="block text-sm">
-        <span className="font-medium">Reopen reason * (audited)</span>
-        <input value={reason} onChange={(e) => setReason(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
+    <div className="space-y-3">
+      <label className="field-label">
+        <span>Reopen reason * <span className="font-normal text-muted-foreground">(audited)</span></span>
+        <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Why is this being reopened?" className="field" />
       </label>
-      {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
-      <button disabled={busy} onClick={reopen} className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-50">
+      {error && <p role="alert" className="alert alert-error">{error}</p>}
+      <button
+        disabled={busy}
+        onClick={() => {
+          if (!reason.trim()) {
+            setError("A reopen reason is required (audited).");
+            return;
+          }
+          setConfirming(true);
+        }}
+        className="btn btn-sm bg-warning text-white hover:brightness-95 disabled:opacity-50"
+      >
         {busy ? "Working…" : "Reopen into In Review (admin only)"}
       </button>
+      <ConfirmDialog
+        open={confirming}
+        title="Reopen this rejected application?"
+        body="It returns to In Review as the same record, and the student can edit again per policy."
+        confirmLabel="Reopen into In Review"
+        busy={busy}
+        onClose={() => setConfirming(false)}
+        onConfirm={reopen}
+      />
     </div>
   );
 }

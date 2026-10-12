@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/require";
 import { getAdminStudent } from "@/features/admin/service";
-import { statusBadgeClass } from "@/components/ui/cn";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 export const metadata = { title: "Student record", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -18,36 +18,46 @@ export default async function AdminStudentDetailPage({
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/admin/students" className="text-sm text-emerald-700 hover:underline">← All students</Link>
-        <h1 className="mt-1 text-2xl font-bold">{data.profile.displayName ?? "(no name)"}</h1>
+        <nav aria-label="Breadcrumb">
+          <Link href="/admin/students" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
+            <span aria-hidden="true">←</span> All students
+          </Link>
+        </nav>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">{data.profile.displayName ?? "(no name)"}</h1>
+        <p className="mt-1 font-mono text-xs text-muted-foreground">User ID: {data.profile.userId}</p>
       </div>
-      <section className="rounded-xl border p-5 text-sm">
-        <h2 className="font-semibold">Applications ({data.applications.length})</h2>
-        <ul className="mt-2 space-y-2">
-          {data.applications.map(({ application, internshipTitle }) => (
-            <li key={application.id} className="flex items-center justify-between gap-2 border-b py-1">
-              <span>{internshipTitle}
-                <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass(application.lifecycleStatus)}`}>
-                  {application.isDraft ? "Draft" : application.lifecycleStatus}
+      <section aria-labelledby="s-apps" className="surface-card p-5 md:p-6">
+        <h2 id="s-apps" className="text-base font-semibold tracking-tight text-foreground">Applications ({data.applications.length})</h2>
+        {data.applications.length === 0 ? (
+          <p className="mt-2 text-sm text-muted-foreground">No applications.</p>
+        ) : (
+          <ul className="mt-2 divide-y divide-border text-sm">
+            {data.applications.map(({ application, internshipTitle }) => (
+              <li key={application.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
+                <span className="text-foreground">{internshipTitle}
+                  <span className="ml-2"><StatusBadge status={application.isDraft ? "Draft" : application.lifecycleStatus} /></span>
                 </span>
-              </span>
-              <Link href={`/admin/applications/${application.id}`} className="font-medium text-emerald-700 hover:underline">Review</Link>
-            </li>
-          ))}
-          {data.applications.length === 0 && <li className="text-slate-500">No applications.</li>}
-        </ul>
+                <Link href={`/admin/applications/${application.id}`} className="inline-flex min-h-9 items-center font-semibold text-primary hover:underline">Review →</Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
-      <section className="rounded-xl border p-5 text-sm">
-        <h2 className="font-semibold">Placements ({data.placements.length})</h2>
-        <ul className="mt-2 space-y-1">
-          {data.placements.map((p) => (
-            <li key={p.id} className="border-b py-1">
-              {p.role} · {p.organization}
-              <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass(p.placementStatus)}`}>{p.placementStatus}</span>
-            </li>
-          ))}
-          {data.placements.length === 0 && <li className="text-slate-500">No placements.</li>}
-        </ul>
+      <section aria-labelledby="s-placements" className="surface-card p-5 md:p-6">
+        <h2 id="s-placements" className="text-base font-semibold tracking-tight text-foreground">Placements ({data.placements.length})</h2>
+        {data.placements.length === 0 ? (
+          <p className="mt-2 text-sm text-muted-foreground">No placements.</p>
+        ) : (
+          <ul className="mt-2 divide-y divide-border text-sm">
+            {data.placements.map((p) => (
+              <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
+                <span className="text-foreground">{p.role} · {p.organization}
+                  <span className="ml-2"><StatusBadge status={p.placementStatus} /></span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </div>
   );

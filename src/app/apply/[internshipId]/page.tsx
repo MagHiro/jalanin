@@ -5,6 +5,7 @@ import { getSessionUser } from "@/lib/auth/require";
 import { ApplicationForm } from "@/components/applications/application-form";
 import { and, eq } from "drizzle-orm";
 import Link from "next/link";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const metadata = { title: "Apply" };
 
@@ -27,10 +28,10 @@ export default async function ApplyPage({
     .limit(1);
   if (listing.length === 0) {
     return (
-      <div>
-        <h1 className="text-2xl font-bold">Internship not found</h1>
-        <p className="mt-2 text-sm text-slate-600">
-          <Link href="/opportunities" className="text-emerald-700 hover:underline">Back to all internships</Link>
+      <div className="mx-auto max-w-2xl py-10 text-center">
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">Internship not found</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          <Link href="/opportunities" className="font-medium text-primary hover:underline">Back to all internships</Link>
         </p>
       </div>
     );
@@ -38,12 +39,13 @@ export default async function ApplyPage({
   const internship = listing[0];
   if (internship.publicationStatus !== "Published") {
     return (
-      <div>
-        <h1 className="text-2xl font-bold">{internship.title}</h1>
-        <p className="mt-2 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+      <div className="mx-auto max-w-2xl space-y-4">
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">{internship.title}</h1>
+        <div role="note" className="alert alert-warning">
           This internship is not currently accepting applications. Your existing
           draft (if any) is preserved — please contact us for guidance.
-        </p>
+        </div>
+        <Link href="/opportunities" className="btn btn-outline">Back to all internships</Link>
       </div>
     );
   }
@@ -59,22 +61,25 @@ export default async function ApplyPage({
     )
     .limit(1);
 
+  const state = existing[0]
+    ? existing[0].isDraft
+      ? "Resume your saved draft below — nothing is sent until you submit."
+      : `You have a ${existing[0].lifecycleStatus} application. Edits are allowed before a quotation is sent and will require admin re-review.`
+    : "Your progress saves as a draft. Nothing is sent until you submit.";
+
   return (
-    <div className="mx-auto max-w-3xl">
-      <p className="text-sm text-slate-500">
-        <Link href={`/opportunities/${internship.slug}`} className="text-emerald-700 hover:underline">← Back to {internship.title}</Link>
-      </p>
-      <h1 className="mt-1 text-3xl font-bold">Apply: {internship.title}</h1>
-      <p className="mt-1 text-sm text-slate-600">
-        {existing.length > 0
-          ? existing[0].isDraft
-            ? "Resume your saved draft below — nothing is sent until you submit."
-            : `You have a ${existing[0].lifecycleStatus} application. Edits are allowed before a quotation is sent and will require admin re-review.`
-          : "Your progress saves as a draft. Nothing is sent until you submit."}
-      </p>
-      <div className="mt-6">
-        <ApplicationForm internshipId={internship.id} existing={existing[0] ? { ...existing[0] } : null} />
+    <div className="mx-auto max-w-3xl space-y-6">
+      <div>
+        <Link href={`/opportunities/${internship.slug}`} className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
+          <span aria-hidden="true">←</span> Back to {internship.title}
+        </Link>
+        <PageHeader
+          eyebrow={internship.city}
+          title={`Apply: ${internship.title}`}
+          description={state}
+        />
       </div>
+      <ApplicationForm internshipId={internship.id} existing={existing[0] ? { ...existing[0] } : null} />
     </div>
   );
 }
