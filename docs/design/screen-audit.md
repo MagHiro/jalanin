@@ -65,3 +65,13 @@ server-error · success · forbidden · mobile-nav · keyboard/focus.
 | Console errors | ✓ zero (one pre-existing Turnstile hydration warning fixed via `next/script`, DL-13) |
 | Copy-contract strings | ✓ intact (`Internships across…`, `How It Works`, `Featured`, `About Jalanin`, `Contact us`, `Apply now`, filter placeholder/button) |
 | Authz guards (SSR) | ✓ anon → `?next=` bounces; draft slug noindex 404 boundary; robots/sitemap public-only |
+# Editorial refresh — 2026-10-12
+
+Current source of truth: `design.md` v2 (user selected Editorial & refined).
+
+- Bespoke re-layout: landing, public header/footer, directory, opportunity cards, detail presentation, login and signup.
+- Shared refresh: Google Sans Flex, warm surface tokens, pills, workspace headers, navigation SVG icons, empty-state SVG icons. Other routes inherit these primitives; their individual workflows were not exhaustively re-audited.
+- Chromium production-browser smoke: `/`, `/opportunities`, `/opportunities/software-engineering-kuala-lumpur`, login, signup, forgot/reset password, privacy, terms, and 404 at **375/768/1440px**. All 30 checks passed without document overflow.
+- GET directory filter submission and password visibility toggle passed. Font loading confirmed in computed styles; mobile landing screenshot visually inspected with reduced motion enabled.
+- Review screenshots: `/tmp/opencode/jalanin-final-{375,768,1440}.png` (session-local artifacts).
+- Typecheck, lint, production build pass. Vitest reports 42 passing; database suite follows its skip path when `DATABASE_URL` is unset. Full authenticated E2E and full interaction/accessibility audits remain unverified for this refresh.

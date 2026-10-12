@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+
+const googleSansFlex = localFont({
+  src: "./fonts/google-sans-flex-latin.woff2",
+  variable: "--font-google-sans-flex",
+  weight: "100 1000",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -19,7 +27,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={googleSansFlex.variable}>
       <body className="min-h-screen bg-background text-foreground antialiased">
         <a
           href="#main"
@@ -28,7 +36,7 @@ export default function RootLayout({
           Skip to content
         </a>
         <SiteHeader />
-        <main id="main" className="mx-auto w-full max-w-6xl px-5 py-8 md:px-8 md:py-12">
+        <main id="main" className="mx-auto w-full max-w-[1280px] px-5 py-8 md:px-10 md:py-12">
           {children}
         </main>
         <SiteFooter />

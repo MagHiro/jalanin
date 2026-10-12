@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowUpRight, MoveUpRight } from "lucide-react";
 import { getSessionUser, isAdminUser } from "@/lib/auth/require";
 import { SignOutButton } from "./sign-out-button";
 
@@ -14,14 +15,14 @@ export async function SiteHeader() {
   const admin = user ? await isAdminUser(user.id) : false;
   return (
     <header className="glass-surface sticky top-0 z-40">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 md:px-8">
+      <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-3 px-5 py-4 md:px-10">
         <Link
           href="/"
           aria-label="Jalanin Internships — home"
           className="flex min-h-11 items-center gap-2.5 text-lg font-bold tracking-tight text-jalanin-900"
         >
-          <span aria-hidden="true" className="grid size-9 place-items-center rounded-xl bg-primary text-base font-bold text-white shadow-sm">J</span>
-          <span>Jalanin <span className="font-normal text-muted-foreground">Internships</span></span>
+          <span aria-hidden="true" className="grid size-9 place-items-center rounded-full bg-primary text-white"><MoveUpRight size={22} strokeWidth={2} /></span>
+          <span className="text-2xl font-semibold tracking-[-.06em]">jalanin<span className="text-primary">.</span></span>
         </Link>
         <nav aria-label="Primary" className="hidden items-center gap-1 text-sm md:flex">
           {PUBLIC_LINKS.map((l) => (
@@ -55,7 +56,7 @@ export async function SiteHeader() {
                 Log in
               </Link>
               <Link href="/auth/sign-up" className="btn btn-primary btn-sm">
-                Sign up
+                Sign up <ArrowUpRight aria-hidden="true" size={16} />
               </Link>
             </>
           )}

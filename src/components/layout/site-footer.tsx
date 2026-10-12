@@ -1,13 +1,14 @@
 import Link from "next/link";
+import { MoveUpRight } from "lucide-react";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-24 border-t border-border bg-surface">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 md:grid-cols-[1.2fr_1fr_1fr] md:px-8 md:py-14">
+    <footer className="mt-12 border-t border-border bg-secondary">
+      <div className="mx-auto grid max-w-[1280px] gap-10 px-5 py-16 md:grid-cols-[2fr_1fr_1fr] md:px-10">
         <div>
           <p className="flex items-center gap-2 text-lg font-bold tracking-tight text-primary">
-            <span aria-hidden="true" className="grid size-8 place-items-center rounded-lg bg-primary text-sm font-bold text-white">J</span>
-            Jalanin Internships
+            <MoveUpRight aria-hidden="true" size={26} />
+            <span className="text-3xl tracking-[-.06em]">jalanin.</span>
           </p>
           <p className="mt-3 max-w-sm text-sm leading-6 text-muted-foreground">
             Internship placements across Southeast Asia with personal guidance
@@ -44,7 +45,7 @@ export function SiteFooter() {
         </nav>
       </div>
       <div className="border-t border-border py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Jalanin. Launching in English only.
+        © {new Date().getFullYear()} Jalanin · Your next chapter starts here.
       </div>
     </footer>
   );

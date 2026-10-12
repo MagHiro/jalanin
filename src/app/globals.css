@@ -18,20 +18,20 @@
   --jalanin-900: oklch(0.27 0.09 265.54);
   --jalanin-950: oklch(0.2 0.065 265.54);
 
-  --background: oklch(0.99 0.003 265.54);
-  --foreground: var(--jalanin-950);
+  --background: #f7f6f2;
+  --foreground: #252822;
   --primary: var(--jalanin-900);
   --primary-foreground: oklch(1 0 0);
   --primary-hover: var(--jalanin-800);
-  --secondary: var(--jalanin-100);
-  --secondary-hover: var(--jalanin-200);
-  --accent: var(--jalanin-200);
-  --surface: oklch(1 0 0);
+  --secondary: #eeeee5;
+  --secondary-hover: #e5e6d8;
+  --accent: #d9e6a6;
+  --surface: #fffefa;
   --surface-elevated: oklch(1 0 0);
-  --muted: var(--jalanin-50);
-  --muted-foreground: oklch(0.45 0.035 265.54);
-  --border: oklch(0.91 0.012 265.54);
-  --border-strong: var(--jalanin-300);
+  --muted: #eeeee7;
+  --muted-foreground: #64685f;
+  --border: #dedfd5;
+  --border-strong: #aaaF9e;
   --ring: var(--jalanin-600);
   --selection: var(--jalanin-100);
 
@@ -70,7 +70,7 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-google-sans-flex), "Google Sans Flex", ui-sans-serif, system-ui, sans-serif;
   font-size: 16px;
   line-height: 1.55;
   font-feature-settings: "tnum" 0, "cv05" 1;
@@ -97,7 +97,7 @@ body {
     gap: 0.5rem;
     min-height: 2.75rem;
     padding: 0.625rem 1.25rem;
-    border-radius: var(--radius-lg);
+    border-radius: 999px;
     border: 1px solid transparent;
     font-size: 0.925rem;
     font-weight: 600;
@@ -420,6 +420,21 @@ body {
     vertical-align: middle;
   }
 }
+
+/* Editorial public system: expansive type, deliberate rules, natural imagery. */
+.editorial-title { font-size: clamp(2.8rem, 5.4vw, 4.6rem); line-height: 1.04; letter-spacing: -.065em; font-weight: 500; }
+.section-title { font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1.1; letter-spacing: -.045em; font-weight: 500; }
+.editorial-section { padding-block: 4.5rem; border-top: 1px solid var(--border); }
+.hero-photo { position: relative; min-height: 440px; overflow: hidden; border-radius: 8px 8px 100px 8px; background: var(--primary); }
+.hero-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 45%, rgb(0 0 0 / .55)); pointer-events: none; }
+.editorial-step { border-top: 1px solid var(--border-strong); padding-top: 1.5rem; }
+.opportunity-card { position: relative; border-radius: 12px; transition: transform 180ms ease, border-color 180ms ease; }
+.opportunity-card:hover { transform: translateY(-4px); }
+.opportunity-card:focus-within { border-color: var(--primary); }
+.auth-layout { display: grid; gap: 3rem; align-items: center; min-height: 65vh; }
+.auth-story { padding: 3rem; border-radius: 16px; background: var(--secondary); }
+@media (min-width: 768px) { .auth-layout { grid-template-columns: 1.1fr .9fr; } }
+@media (max-width: 767px) { .hero-photo { min-height: 340px; } .editorial-section { padding-block: 3rem; } .auth-story { padding: 2rem; } }
 
 @layer utilities {
   .text-balance {

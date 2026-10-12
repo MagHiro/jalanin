@@ -1,11 +1,44 @@
 # Jalanin — Product Design System & UI/UX Constitution
 
-**Version:** 1.0 — implementation baseline, reference audit pending  
+**Version:** 2.0 — Editorial & refined, approved 2026-10-12
 **Product:** Jalanin Internship Platform  
 **Primary visual reference:** [incident.io Web collection on Mobbin](https://mobbin.com/apps/incident-io-web-ba939364-061a-4808-8636-8f7e60a8dca6/dc465259-77ce-459a-9842-38412601ca5c/screens)  
 **Product authority:** `Jalanin_Internship_Platform_PRD_v0.4.md` (or latest approved revision)  
 **Primary brand color (exact):** `oklch(0.27 0.09 265.54)`  
-**Status:** Design specification to use immediately; reference-specific details require Mobbin MCP evidence before final visual decisions.
+**Status:** Active typography and art direction. This revision supersedes the previous cold-indigo, card-heavy public direction. The editorial rules below take priority over older baseline guidance in this document.
+
+## Current direction — Editorial & refined
+
+User-selected direction: warm ivory, charcoal typography, deep-indigo accents, expressive whitespace, and considered photography. Jalanin should feel like the start of a meaningful journey.
+
+### Typography (mandatory for future work)
+
+- Use **Google Sans Flex** on every surface: display, body, labels, forms, tables, legal, student, and admin.
+- Load the local Latin WOFF2 through `next/font/local` (`src/app/fonts/google-sans-flex-latin.woff2`) with `display: swap`. Source: Google Fonts, Google Sans Flex v23. No runtime Google Fonts dependency.
+- Display: fluid 44–74px, weight 500, line-height 1.04, tracking −0.065em. Section headings: 32–56px, weight 500, line-height 1.1, tracking −0.045em.
+- Workspace titles: 30–36px, weight 500. Body: 16px/1.55; editorial supporting copy: 16–18px/28–32px. Labels: 14px; metadata: 12–14px.
+- Use 600 for actions and labels sparingly. Avoid heavy bold on every heading. Use tabular numerals for operational counts, quotations, dates, and tables.
+
+### Palette, composition, and imagery
+
+- Canvas `#f7f6f2`, surface `#fffefa`, charcoal text `#252822`, muted text `#64685f`, rules `#dedfd5`, warm secondary `#eeeee5`. Preserve exact primary `oklch(0.27 0.09 265.54)`.
+- Public layouts: 1280px outer container, asymmetrical text/photography hero, prominent editorial headings, numbered process steps separated by rules, quiet opportunity cards, and a deep-indigo About band.
+- Avoid repetitive bordered boxes, generic benefit dashboards in the hero, blurred gradient blobs, and fabricated counts/testimonials.
+- Use rounded pill actions, 12–16px card corners, restrained shadows. Public photography can use a single expressive corner; data surfaces remain quiet.
+- Destination photography provides atmosphere and is not evidence of a particular internship or partner. Current locally hosted Singapore image: https://images.unsplash.com/photo-1525625293386-3f8f99389edd (Unsplash). Use `next/image`, responsive sizes, and descriptive alt text.
+- Use **Lucide** SVG icons at 16–24px, stroke 1.5–1.7, with labels for interactive controls. No Unicode glyphs as rendered navigation or page-header icons. `DomainIcon` adapts legacy route icon identifiers.
+- Student/admin workspaces inherit the font and warm tokens, with denser tables and restrained headers. Keep semantic status colors distinct.
+
+### Observed Mobbin evidence (2026-10-12)
+
+Actual preview images reviewed via MCP:
+
+- [Ada careers hero](https://mobbin.com/sites/sections/3da0e92d-c14f-43a6-b0ae-c6ecc047e6b6): generous whitespace, oversized lightweight heading, rounded CTA with directional arrow, varied photographic rhythm. Adaptation: editorial Jalanin typography and expressive destination hero.
+- [Canva stories](https://mobbin.com/sites/sections/e4a2c1fa-0807-479c-b24f-73ee6d725ace): large heading and offset photograph/text composition. Adaptation: strong separation of narrative and supporting visuals.
+- [incident.io incidents list](https://mobbin.com/screens/f9757c15-2aaf-4031-9a47-8344c0f81fed): dark compact rail, icon-label navigation, restrained header, scannable bordered rows. Adaptation: shared workspace navigation and quiet data hierarchy.
+- [incident.io home with command overlay](https://mobbin.com/screens/f7b1d160-79fc-4a70-a1f7-e553896d3ce6): modal over a compact operational workspace. Used only as hierarchy evidence; it does not authorize adding command search.
+
+Colors, sizing, font, copy, imagery, and geometry are Jalanin-specific design choices, not pixel measurements extracted from Mobbin. The full collection has not been enumerated. Screenshots and brand artwork are not embedded in the application.
 
 ## 0. Read me first: the design contract
 
@@ -94,7 +127,7 @@ The following ramp is a **proposed Jalanin shade system**, not a claimed extract
 
 **Statuses:** Create semantic `success`, `warning`, `danger`, `info`, `neutral` tokens with accessible foreground/background pairs. Their accents may vary by hue **only to preserve well-recognized meanings**, while primary brand surfaces, borders, and interactive accents use the indigo ramp. Never color all statuses indigo: meanings must remain distinguishable.
 
-**Typography:** Start with Geist or Inter for body and UI (confirm license/availability); optional distinct display treatment only if Mobbin audit supports it and it improves Jalanin. Tokenize sizes, weights, line heights and letter spacing. Use tabular numerals for counts, SGD quotations, and dates.
+**Typography:** Google Sans Flex exclusively; use the current typography specification above. Use tabular numerals for counts, SGD quotations, and dates.
 
 **Spacing:** Use a 4px modular scale (`4, 8, 12, 16, 20, 24, 32, 40, 48, 64`). Audit density against the Mobbin reference. Proposed desktop sidebar 224–256px expanded and 64–76px collapsed; treat these as **initial engineering targets pending actual Mobbin measurement**.
 

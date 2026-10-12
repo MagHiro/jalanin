@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { DomainIcon } from "./domain-icon";
 
 /**
  * Designed empty state: calm dashed surface, explanatory copy,
@@ -25,7 +26,7 @@ export function EmptyState({
           aria-hidden="true"
           className="mx-auto mb-4 grid size-12 place-items-center rounded-2xl bg-secondary text-xl text-primary"
         >
-          {icon}
+          {typeof icon === "string" ? <DomainIcon name={icon} size={24} /> : icon}
         </div>
       )}
       <p className="text-base font-semibold tracking-tight text-foreground">

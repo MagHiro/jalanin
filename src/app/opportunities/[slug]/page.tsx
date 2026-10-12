@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft, ArrowUpRight, Compass } from "lucide-react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
@@ -42,7 +43,7 @@ export default async function InternshipDetailPage({
         <article className="min-w-0">
           <nav aria-label="Breadcrumb">
             <Link href="/opportunities" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-              <span aria-hidden="true">←</span> All internships
+              <ArrowLeft size={16} aria-hidden="true" /> All internships
             </Link>
           </nav>
           <div className="mt-3 flex flex-wrap gap-2 text-xs">
@@ -53,7 +54,7 @@ export default async function InternshipDetailPage({
               {internship.city}, {country}
             </span>
           </div>
-          <h1 className="mt-4 max-w-2xl text-balance text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+          <h1 className="section-title mt-6 max-w-2xl text-balance">
             {internship.title}
           </h1>
           <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
@@ -65,7 +66,7 @@ export default async function InternshipDetailPage({
             )}
           </p>
 
-          <div className="mt-8 space-y-8">
+          <div className="mt-10 space-y-10 border-t border-border pt-10">
             <section aria-labelledby="about-placement" className="max-w-2xl">
               <h2 id="about-placement" className="text-xl font-semibold tracking-tight text-foreground">About this placement</h2>
               <p className="mt-3 whitespace-pre-line text-base leading-7 text-muted-foreground">{internship.description}</p>
@@ -82,7 +83,8 @@ export default async function InternshipDetailPage({
         </article>
 
         {/* Application panel (JOB-07/08) */}
-        <aside aria-labelledby="apply-heading" className="h-fit rounded-2xl border border-border bg-surface p-6 shadow-sm lg:sticky lg:top-28">
+        <aside aria-labelledby="apply-heading" className="h-fit rounded-2xl border border-border bg-surface p-7 lg:sticky lg:top-28">
+          <Compass size={30} strokeWidth={1.4} className="mb-5 text-primary" aria-hidden="true" />
           <h2 id="apply-heading" className="text-base font-semibold tracking-tight text-foreground">Apply for this internship</h2>
           <dl className="mt-4 space-y-0 text-sm">
             {[
@@ -105,7 +107,7 @@ export default async function InternshipDetailPage({
             href={`/apply/${internship.id}`}
             className="btn btn-primary mt-4 hidden w-full lg:inline-flex"
           >
-            Apply now
+            Apply now <ArrowUpRight size={17} aria-hidden="true" />
           </Link>
           <p className="mt-3 hidden text-xs leading-5 text-muted-foreground lg:block">
             You will be asked to log in or create an account first.

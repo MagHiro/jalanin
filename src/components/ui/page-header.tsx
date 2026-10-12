@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { DomainIcon } from "./domain-icon";
 
 /**
  * Consistent page heading block: icon tile + eyebrow + title + optional
@@ -19,19 +20,19 @@ export function PageHeader({
   icon?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-4">
+    <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-7">
       <div className="flex min-w-0 items-start gap-3">
         {icon && (
           <span
             aria-hidden="true"
             className="grid size-10 shrink-0 place-items-center rounded-xl border border-border bg-surface text-lg text-primary"
           >
-            {icon}
+            {typeof icon === "string" ? <DomainIcon name={icon} /> : icon}
           </span>
         )}
         <div className="min-w-0 max-w-3xl">
           {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-          <h1 className="mt-1 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+          <h1 className="mt-2 text-balance text-3xl font-medium tracking-[-.04em] text-foreground md:text-4xl">
             {title}
           </h1>
           {description && (

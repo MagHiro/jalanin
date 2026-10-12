@@ -5,7 +5,6 @@ import {
   listPublishedInternships,
   COUNTRY_NAMES,
 } from "@/features/internships/service";
-import { PageHeader } from "@/components/ui/page-header";
 import { InternshipCard } from "@/components/ui/internship-card";
 import { ActiveFilterChips } from "@/components/ui/active-filter-chips";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -87,25 +86,21 @@ export default async function OpportunitiesPage({
     sort === "title" ? "Title A–Z" : sort === "start" ? "Soonest start" : "Newest published";
 
   return (
-    <div className="space-y-8">
-      <PageHeader
-        icon="▤"
-        eyebrow="Explore opportunities"
-        title="Find an experience that moves you forward."
-        description={
-          <span role="status" className="tnum">
+    <div className="space-y-9">
+      <div className="grid gap-6 border-b border-border pb-10 md:grid-cols-[1.5fr_1fr] md:items-end">
+        <div><p className="eyebrow">Explore opportunities</p><h1 className="section-title mt-4 max-w-2xl">Find an experience that moves you forward.</h1></div>
+        <div><p className="mb-4 max-w-sm leading-7 text-muted-foreground">A new city. Real-world experience. Discover a placement that fits your next chapter.</p><span role="status" className="tnum text-sm text-muted-foreground">
             {total} published {total === 1 ? "placement" : "placements"}
             {total > 0 && <> · sorted by {sortLabel}</>}
-          </span>
-        }
-      />
+          </span></div>
+      </div>
 
       {/* Filters — GET form keeps state in shareable URL params (JOB-*) */}
       <form
         method="get"
         action="/opportunities"
         aria-label="Search and filter internships"
-        className="toolbar grid gap-4 !p-4 md:grid-cols-6 md:!p-5"
+        className="grid gap-4 rounded-xl border border-border bg-surface p-5 md:grid-cols-2 xl:grid-cols-6 xl:p-6"
       >
         <label className="field-label md:col-span-2">
           <span>Search role or location</span>

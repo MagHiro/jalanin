@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/components/ui/cn";
+import { DomainIcon } from "@/components/ui/domain-icon";
+import { ArrowLeftRight, Menu, MoveUpRight, X } from "lucide-react";
 
 export interface RailItem {
   href: string;
@@ -63,7 +65,7 @@ export function WorkspaceRail({
             }
           >
             <span aria-hidden="true" className="grid size-6 shrink-0 place-items-center text-base">
-              {item.icon}
+              <DomainIcon name={item.icon} size={18} />
             </span>
             <span className="min-w-0 flex-1 truncate">{item.label}</span>
             {typeof item.badge === "number" && item.badge > 0 && (
@@ -94,7 +96,7 @@ export function WorkspaceRail({
           aria-controls="workspace-rail-drawer"
           className="btn btn-outline btn-sm"
         >
-          <span aria-hidden="true">☰</span> {title} menu
+          <Menu size={18} aria-hidden="true" /> {title} menu
         </button>
         {switchLink && (
           <Link href={switchLink} className="btn btn-ghost btn-sm">
@@ -134,7 +136,7 @@ export function WorkspaceRail({
                   light ? "text-muted-foreground hover:bg-secondary hover:text-primary" : "text-rail-muted hover:bg-rail-raised hover:text-rail-foreground",
                 )}
               >
-                ✕
+                <X size={20} aria-hidden="true" />
               </button>
             </div>
             {nav}
@@ -145,7 +147,7 @@ export function WorkspaceRail({
                 onClick={() => setOpen(false)}
                 className={light ? "inline-flex min-h-10 w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-primary" : "rail-btn mt-auto"}
               >
-                <span aria-hidden="true">⇄</span> {switchLabel}
+                <ArrowLeftRight size={16} aria-hidden="true" /> {switchLabel}
               </Link>
             )}
           </div>
@@ -168,7 +170,7 @@ export function WorkspaceRail({
               light ? "bg-primary text-white" : "bg-jalanin-100 text-jalanin-900",
             )}
           >
-            J
+            <MoveUpRight size={20} aria-hidden="true" />
           </span>
           <p className="min-w-0 text-sm font-bold leading-tight tracking-tight">
             <span className={cn("block text-[11px] font-semibold uppercase tracking-[0.16em]", light ? "text-muted-foreground" : "text-rail-muted")}>
@@ -189,7 +191,7 @@ export function WorkspaceRail({
                 : "rail-btn border-white/10",
             )}
           >
-            <span aria-hidden="true">⇄</span> {switchLabel}
+            <ArrowLeftRight size={16} aria-hidden="true" /> {switchLabel}
           </Link>
         )}
       </aside>
