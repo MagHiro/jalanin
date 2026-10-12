@@ -13,16 +13,19 @@ Supabase CLI (required for local Supabase Auth/Storage).
 ```bash
 pnpm install
 cp .env.example .env            # fill Supabase local keys from 'supabase status -o env'
-pnpm stack:start                # Supabase CLI: Docker Postgres :54322, Auth :54321, Storage
+pnpm db:start                   # Supabase CLI: Docker Postgres :54322, Auth :54321, Storage
 pnpm db:seed                    # deterministic dev listings (migrations applied by Supabase)
 pnpm dev                        # http://localhost:3000
 ```
 
-For PostgreSQL-only integration tests, `pnpm db:start` runs Docker Compose
-(PostgreSQL + Mailpit) and `pnpm db:migrate` applies versioned SQL. This
-database-only mode **does not run Supabase Auth or Storage** and is not a
-replacement for `pnpm stack:start` when testing registration and uploads.
-Never start both stacks simultaneously: both use port 54322.
+For PostgreSQL-only integration tests, `pnpm db:postgres-only` runs Docker
+Compose (PostgreSQL + Mailpit). Override both `DATABASE_URL` and
+`SUPABASE_DB_URL` to
+`postgresql://jalanin:jalanin@127.0.0.1:54322/jalanin`, then run
+`pnpm db:migrate && pnpm db:seed`. This database-only mode **does not run
+Supabase Auth or Storage**. Do not start both stacks simultaneously, since
+both use port 54322. On the full local stack, the Supabase CLI applies
+migrations automatically; do not run the standalone migration runner again.
 
 Development and production both use PostgreSQL; Supabase hosts PostgreSQL,
 Auth, and private Storage in production. Production must configure

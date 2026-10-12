@@ -4,6 +4,8 @@
 
 - **App:** Vercel, one Next.js deployment, custom subdomain
   `internships.jalanin.com` (D01). Legacy site untouched.
+- **Development:** Supabase CLI Docker stack — PostgreSQL 16 + Auth + private Storage.
+  Default local DB URL: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`.
 - **Data:** hosted Supabase project — PostgreSQL + Auth + Storage
   (private bucket `documents`).
 - **Email:** SMTP provider (transactional host) via the outbox dispatcher.
