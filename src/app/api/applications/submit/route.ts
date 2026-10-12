@@ -97,7 +97,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
     if (err instanceof AuthError) {
-      return NextResponse.json({ ok: false, error: "Login required." }, { status: 401 });
+      return NextResponse.json({ ok: false, error: err.message }, { status: err.status });
     }
     return NextResponse.json(
       { ok: false, error: err instanceof Error ? err.message : "Submission failed." },

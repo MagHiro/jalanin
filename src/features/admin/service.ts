@@ -282,7 +282,8 @@ export async function transitionApplication(input: {
       .from(applications)
       .innerJoin(internships, eq(applications.internshipId, internships.id))
       .where(eq(applications.id, input.applicationId))
-      .limit(1);
+      .limit(1)
+      .for("update");
     if (rows.length === 0) throw new Error("Application not found.");
     const { application: app, internship } = rows[0];
     if (app.isDraft) throw new Error("Draft applications cannot transition.");

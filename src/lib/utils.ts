@@ -1,4 +1,5 @@
 import { db } from "@/lib/db/client";
+type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 import { auditEvents } from "@/lib/db/schema";
 
 /** Append a sanitized audit event. Never pass secrets, tokens, or file bytes. */
@@ -8,8 +9,8 @@ export async function audit(input: {
   entityId: string;
   action: string;
   changes?: Record<string, unknown>;
-}): Promise<void> {
-  await db.insert(auditEvents).values({
+}, tx?: Transaction): Promise<void> {
+  await (tx ?? db).insert(auditEvents).values({
     actorUserId: input.actorUserId,
     entityType: input.entityType,
     entityId: input.entityId,

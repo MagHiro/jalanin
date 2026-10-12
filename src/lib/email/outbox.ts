@@ -1,12 +1,13 @@
 import { db } from "@/lib/db/client";
+type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 import { notificationOutbox } from "@/lib/db/schema";
 import { and, asc, eq, lte } from "drizzle-orm";
 
 /**
  * Enqueue an email exactly once per event_key. Concurrent callers racing on
  * the same key converge on a single row (UNIQUE + on-conflict-do-nothing).
- * Never throws: outbox failures must not roll back the business transaction,
- * so callers enqueue inside the tx and log failures separately.
+ * If a transaction is supplied, enqueue must succeed inside that transaction
+ * so both business state and its notification are committed atomically.
  */
 export async function enqueueEmail(input: {
   eventKey: string;
@@ -14,9 +15,9 @@ export async function enqueueEmail(input: {
   templateKey: string;
   payload: Record<string, unknown>;
   runAfterMinutes?: number;
-}): Promise<void> {
+}, tx?: Transaction): Promise<void> {
   const next = new Date(Date.now() + (input.runAfterMinutes ?? 0) * 60000);
-  await db
+  await (tx ?? db)
     .insert(notificationOutbox)
     .values({
       eventKey: input.eventKey,

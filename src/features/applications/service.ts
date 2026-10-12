@@ -397,7 +397,8 @@ export async function editSubmittedApplication(input: {
       .select()
       .from(applications)
       .where(eq(applications.id, input.applicationId))
-      .limit(1);
+      .limit(1)
+      .for("update");
     if (rows.length === 0) throw new Error("Application not found.");
     const app = rows[0];
     if (app.applicantUserId !== input.userId) {
@@ -418,12 +419,12 @@ export async function editSubmittedApplication(input: {
     const patch: Record<string, unknown> = {};
     for (const field of STUDENT_EDITABLE_FIELDS) {
       const next = (values as Record<string, unknown>)[field];
-      const prev = (app as unknown as Record<string, unknown>)[snake(field)];
+      const prev = (app as unknown as Record<string, unknown>)[field];
       if (next !== undefined && String(next) !== String(prev ?? "")) {
         changedFields.push(field);
         oldValues[field] = prev ?? null;
         newValues[field] = next;
-        patch[snake(field)] = next;
+        patch[field] = next;
       }
     }
     if (changedFields.length === 0) {
@@ -490,10 +491,6 @@ export async function editSubmittedApplication(input: {
 
     return { revision: nextRevision };
   });
-}
-
-function snake(camel: string): string {
-  return camel.replace(/[A-Z]/g, (m) => `_${m.toLowerCase()}`);
 }
 
 /** Student-scoped application list for the dashboard. */

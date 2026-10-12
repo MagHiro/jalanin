@@ -33,5 +33,5 @@ export function createSupabaseServerClient() {
 // back to the local privileged client with explicit dev-session headers.
 // Production builds never enable this (see src/lib/auth/require.ts).
 export function isE2EMode(): boolean {
-  return process.env.E2E_MODE === "1";
+  return process.env.NODE_ENV !== "production" && process.env.E2E_MODE === "1";
 }

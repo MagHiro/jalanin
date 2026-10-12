@@ -72,26 +72,36 @@ export function ApplicationForm({ internshipId, existing }: Props) {
       const file = form.get("cv");
       const cvFile = file instanceof File && file.size > 0 ? file : null;
 
-      // 1. Persist the draft (creates or resumes the single row).
-      const draftRes = await fetch("/api/applications/draft", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ internshipId, values }),
-      });
-      const draft = (await draftRes.json()) as {
-        ok?: boolean;
-        applicationId?: string;
-        error?: string;
-      };
-      if (!draftRes.ok || !draft.ok || !draft.applicationId) {
-        throw new Error(draft.error ?? "Could not save draft.");
+      // A submitted record is *not* a draft: do not call the draft-only API.
+      // Its updates go through the audited revision endpoint below.
+      const isRevision = existing !== null && !existing.isDraft;
+      if (isRevision && kind === "draft") {
+        throw new Error("Submitted applications cannot be saved as drafts.");
       }
-      // 2. Upload/replace the CV (allowed pre-lock).
-      await uploadCv(draft.applicationId, cvFile);
+      let applicationId = isRevision ? existing.id : "";
+      if (!isRevision) {
+        const draftRes = await fetch("/api/applications/draft", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ internshipId, values }),
+        });
+        const draft = (await draftRes.json()) as {
+          ok?: boolean;
+          applicationId?: string;
+          error?: string;
+        };
+        if (!draftRes.ok || !draft.ok || !draft.applicationId) {
+          throw new Error(draft.error ?? "Could not save draft.");
+        }
+        applicationId = draft.applicationId;
+      }
+      // Uploading a replacement CV on a submitted application also creates
+      // a re-review revision on the server, independently of text changes.
+      await uploadCv(applicationId, cvFile);
 
       if (kind === "submit") {
         // 3. Atomic final submit (idempotency key defeats double-clicks).
-        const key = `${draft.applicationId}:${Date.now()}`;
+        const key = `${applicationId}:${Date.now()}`;
         const subRes = await fetch("/api/applications/submit", {
           method: "POST",
           headers: {
@@ -106,7 +116,7 @@ export function ApplicationForm({ internshipId, existing }: Props) {
         });
         const sub = (await subRes.json()) as { ok?: boolean; ref?: string; error?: string };
         if (!subRes.ok || !sub.ok) throw new Error(sub.error ?? "Submission failed.");
-        router.push(`/dashboard/applications/${draft.applicationId}?submitted=1`);
+        router.push(`/dashboard/applications/${applicationId}?submitted=1`);
         return;
       }
       router.push(`/dashboard/applications?draft=1`);

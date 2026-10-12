@@ -28,8 +28,14 @@ class LocalDocumentStore implements DocumentStore {
 
   private fullPath(storagePath: string): string {
     // Prevent path traversal: storagePath is `<uuid>/<uuid>.<ext>`.
-    const normalized = path.normalize(storagePath).replace(/^(\.\.(\/|\\|$))+/, "");
-    return path.join(this.dir, normalized);
+    if (!/^[0-9a-f-]{36}\/cv\.(pdf|docx)$/i.test(storagePath)) {
+      throw new Error("Invalid document storage key.");
+    }
+    const resolved = path.resolve(this.dir, storagePath);
+    if (!resolved.startsWith(this.dir + path.sep)) {
+      throw new Error("Invalid document storage path.");
+    }
+    return resolved;
   }
 
   async put(objectName: string, bytes: Buffer): Promise<StoredDocument> {
@@ -106,7 +112,10 @@ class SupabaseDocumentStore implements DocumentStore {
 export function getDocumentStore(): DocumentStore {
   const backend = (process.env.STORAGE_BACKEND ?? "local").toLowerCase();
   if (backend === "supabase") return new SupabaseDocumentStore();
-  return new LocalDocumentStore();
+  if (backend === "local" && process.env.NODE_ENV !== "production") {
+    return new LocalDocumentStore();
+  }
+  throw new Error("Private Supabase Storage must be configured in production.");
 }
 
 // ---- Upload validation (interim operational config, NOT a confirmed

@@ -7,7 +7,14 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const next = url.searchParams.get("next") ?? "/dashboard";
-  const safeNext = next.startsWith("/") ? next : "/dashboard";
+  // A path beginning with "//" is a protocol-relative external URL.
+  // Require an internal relative path and disallow backslashes/control chars.
+  const safeNext =
+    next.startsWith("/") &&
+    !next.startsWith("//") &&
+    !/[\\\\\u0000-\u001f]/.test(next)
+      ? next
+      : "/dashboard";
   if (code) {
     const supabase = createSupabaseServerClient();
     await supabase.auth.exchangeCodeForSession(code);
