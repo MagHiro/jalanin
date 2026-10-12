@@ -14,7 +14,7 @@ function layout(title: string, bodyHtml: string, bodyText: string): { html: stri
   return { html, text: `${title}\n\n${bodyText}\n\n— Jalanin Internships` };
 }
 
-function esc(s: string): string {
+export function esc(s: string): string {
   return s
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

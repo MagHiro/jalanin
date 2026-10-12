@@ -32,8 +32,10 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
               },
             });
       if (result.error) throw new Error(result.error.message);
-      // E2E/dev seam: mirror the session into a signed cookie when requested.
-      if (process.env.NEXT_PUBLIC_E2E === "1" || window.location.hostname === "localhost") {
+      // E2E/dev seam: mirror the session into a signed test cookie ONLY when
+      // explicitly enabled (NEXT_PUBLIC_E2E=1, local/CI runs). The endpoint
+      // itself 404s unless E2E_MODE=1 server-side, so this is doubly gated.
+      if (process.env.NEXT_PUBLIC_E2E === "1") {
         try {
           await fetch("/api/dev/session", {
             method: "POST",

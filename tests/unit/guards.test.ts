@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { isStudentEditLocked } from "@/lib/workflow/transitions";
 import { quotationEmail, statusChangeEmail } from "@/lib/email/templates";
+import { buildEmail } from "@/lib/email/dispatcher-templates";
 import { validateUpload } from "@/lib/storage/documents";
 
 describe("student edit lock (D14)", () => {
@@ -42,6 +43,19 @@ describe("email content rules (D03, ADM-APP-11, B01)", () => {
       nextStep: "Next steps.",
     });
     expect(`${html} ${text}`).not.toContain(secret);
+  });
+
+  it("escapes visitor content in contact-notify HTML (stored-XSS guard)", () => {
+    const built = buildEmail("contact-notify", {
+      name: "<img src=x onerror=alert(1)>",
+      email: "kim@example.com",
+      subject: "Hello",
+      message: "<script>alert(2)</script>",
+    });
+    expect(built).not.toBeNull();
+    expect(built!.html).not.toContain("<script>");
+    expect(built!.html).toContain("&lt;script&gt;");
+    expect(built!.text).toContain("<script>");
   });
 });
 

@@ -1,6 +1,7 @@
 import { emailReplyTo } from "./provider";
 import {
   adminAlertEmail,
+  esc,
   quotationEmail,
   statusChangeEmail,
 } from "./templates";
@@ -55,12 +56,17 @@ export function buildEmail(
         }),
       };
     case "contact-notify": {
-      const subject = `Contact inquiry — ${str("subject") || str("name")}`;
+      // Visitor-supplied content: escape for HTML, keep plain text raw.
+      const name = esc(str("name"));
+      const email = esc(str("email"));
+      const subjectField = esc(str("subject"));
+      const messageHtml = esc(str("message")).replace(/\n/g, "<br>");
+      const subject = `Contact inquiry — ${str("subject") || str("name")}`.replace(/[\r\n]+/g, " ");
       const body = `Name: ${str("name")}\nEmail: ${str("email")}\n\n${str("message")}`;
       return {
         subject,
         text: body,
-        html: `<p>Name: ${str("name")}<br>Email: ${str("email")}</p><p>${str("message")}</p>`,
+        html: `<p>Name: ${name}<br>Email: ${email}${subjectField ? `<br>Subject: ${subjectField}` : ""}</p><p>${messageHtml}</p>`,
       };
     }
     default:

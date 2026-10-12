@@ -7,7 +7,6 @@ import { expect, test, type APIRequestContext, type Page } from "@playwright/tes
 
 const STUDENT_A = "00000000-0000-0000-0000-00000000aa01";
 const STUDENT_B = "00000000-0000-0000-0000-00000000aa02";
-const ADMIN = "00000000-0000-0000-0000-00000000ad01";
 
 const VALS = {
   firstName: "E2E",
@@ -27,46 +26,6 @@ const VALS = {
 async function loginAs(request: APIRequestContext, userId: string): Promise<void> {
   const res = await request.post("/api/dev/session", { data: { userId } });
   expect(res.ok()).toBe(true);
-}
-
-async function internshipId(request: APIRequestContext, slug: string): Promise<string> {
-  const res = await request.get(`/opportunities/${slug}`);
-  expect(res.ok()).toBe(true);
-  return "";
-}
-
-async function draftAndSubmit(
-  request: APIRequestContext,
-  internshipId: string,
-  studentId: string,
-  values: Record<string, unknown> = VALS,
-  key: string,
-): Promise<{ applicationId: string; ref: string }> {
-  const pdf = Buffer.from([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x0a, 0x25]);
-  const draft = await request.post("/api/applications/draft", {
-    headers: { "x-e2e-user-id": studentId },
-    data: { internshipId, values },
-  });
-  expect(draft.ok()).toBe(true);
-  const { applicationId } = (await draft.json()) as { applicationId: string };
-  const upload = await request.post("/api/documents/upload", {
-    headers: { "x-e2e-user-id": studentId },
-    multipart: {
-      applicationId,
-      file: { name: "cv.pdf", mimeType: "application/pdf", buffer: pdf },
-    },
-  });
-  expect(upload.ok()).toBe(true);
-  const submit = await request.post("/api/applications/submit", {
-    headers: {
-      "x-e2e-user-id": studentId,
-      "x-e2e-user-email": "e2e-student@example.com",
-      "Idempotency-Key": key,
-    },
-    data: { internshipId, values, idempotencyKey: key },
-  });
-  expect(submit.ok()).toBe(true);
-  return (await submit.json()) as { applicationId: string; ref: string };
 }
 
 test.describe("public platform (UAT-01…06, UAT-24)", () => {

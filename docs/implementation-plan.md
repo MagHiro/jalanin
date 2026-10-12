@@ -5,28 +5,31 @@ Phases P0–P10 per master prompt §23. Status updated as work lands.
 - [x] P0 Requirements & architecture (`docs/requirements-matrix.md`,
       `docs/architecture.md`, `docs/database-design.md`, `docs/open-decisions.md`,
       this plan)
-- [ ] P1 Foundation: Next.js+TS+Tailwind+pnpm, lint/format, layouts/nav,
+- [x] P1 Foundation: Next.js+TS+Tailwind+pnpm, lint/format, layouts/nav,
       env handling, docker-compose (postgres+mailpit), scripts
-- [ ] P2 Database & auth: migrations, RLS, seed, Supabase Auth flows
+- [x] P2 Database & auth: migrations, RLS, seed, Supabase Auth flows
       (register/login/logout/forgot/reset), profiles, admin provisioning,
       route protection, constraint/permission tests
-- [ ] P3 Public platform: landing, `/opportunities` (search/filter/sort/page),
+- [x] P3 Public platform: landing, `/opportunities` (search/filter/sort/page),
       `/opportunities/[slug]`, contact + Turnstile, SEO (sitemap/robots/meta)
-- [ ] P4 Student applications: form + Zod, draft save/resume, upload, atomic
+- [x] P4 Student applications: form + Zod, draft save/resume, upload, atomic
       submit (unique + idempotent), confirmation, revision + re-review + lock
-- [ ] P5 Admin: overview (real counts), internship CRUD + publish, application
+- [x] P5 Admin: overview (real counts), internship CRUD + publish, application
       directory + transitions + quotations (SGD), students, contacts,
       notifications, audit, reopen-rejected, manual complete
-- [ ] P6 Student dashboard + placements: overview, applications, drafts,
+- [x] P6 Student dashboard + placements: overview, applications, drafts,
       quotation status, placement history; admin placement CRUD + transitions
-- [ ] P7 Email/ops: templates, outbox dispatcher + retries, Turnstile/rate
+- [x] P7 Email/ops: templates, outbox dispatcher + retries, Turnstile/rate
       limits, error logging, privacy-respecting analytics
-- [ ] P8 Hardening & QA: unit (vitest), integration (DB), e2e (playwright 20
-      journeys + V04 set), a11y checks, security review, perf pass
-- [ ] P9 Deployment prep: `docs/deployment.md`, Vercel + Supabase runbooks,
+- [x] P8 Hardening & QA: unit (vitest 37), integration (DB 6), e2e
+      (playwright 20: journeys 11 + admin-lifecycle 4 + a11y 5), security
+      review (stored-XSS fix), perf notes, responsive QA
+- [x] P9 Deployment prep: `docs/deployment.md`, Vercel + Supabase runbooks,
       migration/seed instructions, backup/restore, rollback
-- [ ] P10 Verification & handover: matrix reconciliation, full test runs,
-      production build, UAT checklist, README/AGENTS, handover report
+- [ ] P10 Verification & handover: matrix reconciled (Verified except M-items
+      needing production services); production build green; UAT checklist
+      ready; handover = this plan + README + docs. Awaiting owner UAT sign-off
+      and B01/B02/B07/B08 decisions before launch.
 
 ## Major risks
 
