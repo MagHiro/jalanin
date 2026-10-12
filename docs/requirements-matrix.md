@@ -50,6 +50,16 @@ Verification: U=unit, I=integration, E=e2e, M=manual. Updated as work lands.
 
 Screen-family visual coverage (12 Oct 2026): **all** route families received bespoke Clear Horizons treatment — public landing/listing/detail/footer/legal/404, auth login/register/forgot/reset, apply + application form, student shell/overview/applications/detail/placements, admin shell/overview/applications/detail/internships/students/placements/contacts/notifications/forms. E2E copy contracts preserved verbatim. *Rendered browser screenshots + axe pass remain a CI follow-up where Chromium libs are installable.
 
+## Audit qualification (2026-10-12)
+
+The `Verified` labels above refer to repository/CI tests and prior implementation
+checks; they do **not** establish production security certification or live
+Supabase Auth/Storage/email integration. See `docs/security-and-scope-audit.md`
+for source-based findings, remaining operational tests and release blockers.
+Basic analytics now persist in PostgreSQL, and admin lists support active
+sorting/pagination. The configured CI development-session test seam is not
+an end-to-end hosted Supabase Auth test.
+
 ## Open blockers → `docs/open-decisions.md`
 
 B01 quote expiry · B02 payment tracking · B03 reopen target · B04 deadline

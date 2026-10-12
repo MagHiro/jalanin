@@ -34,6 +34,19 @@ export async function POST(request: Request) {
     if (file.size === 0 || file.size > cvPolicy().maxBytes) {
       return NextResponse.json({ ok: false, error: "CV exceeds the allowed size or is empty." }, { status: 413 });
     }
+    // Pre-authorize before performing any side effect in object storage.
+    // The transaction below locks and checks again to handle status races.
+    const [eligible] = await db.select({
+      userId: applications.applicantUserId,
+      isDraft: applications.isDraft,
+      lifecycleStatus: applications.lifecycleStatus,
+    }).from(applications).where(eq(applications.id, applicationId)).limit(1);
+    if (!eligible || eligible.userId !== user.id) {
+      return NextResponse.json({ ok: false, error: "Application not found." }, { status: 404 });
+    }
+    if (!eligible.isDraft && isStudentEditLocked(eligible.lifecycleStatus as ApplicationStatus)) {
+      return NextResponse.json({ ok: false, error: "Application editing is locked." }, { status: 403 });
+    }
     const bytes = Buffer.from(await file.arrayBuffer());
     const check = validateUpload({ filename: file.name, mimeType: file.type, bytes });
     if (!check.ok) {

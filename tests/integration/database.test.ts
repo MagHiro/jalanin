@@ -112,6 +112,46 @@ describe("database constraints", () => {
     ).rejects.toThrow(/check|constraint|invalid/i);
   });
 
+  it("prevents direct student writes bypassing reviewed workflows", async () => {
+    if (skipped()) return;
+    const { rows } = await client.query(
+      `SELECT policyname FROM pg_policies
+       WHERE schemaname = 'public' AND tablename = 'applications'`,
+    );
+    const names = rows.map((r) => r.policyname as string);
+    expect(names).toContain("applications_student_read");
+    expect(names).not.toContain("applications_student_insert");
+    expect(names).not.toContain("applications_student_update");
+    expect(names).not.toContain("applications_student_update_submitted");
+  });
+
+  it("enforces one active CV metadata record per application", async () => {
+    if (skipped()) return;
+    const { rows } = await client.query("SELECT id FROM applications LIMIT 1");
+    const appId = rows[0]?.id as string;
+    expect(appId).toBeTruthy();
+    const base = [
+      appId, "local:00000000-0000-0000-0000-000000000000/cv.pdf",
+      "cv.pdf", "application/pdf", 100,
+      "00000000-0000-0000-0000-000000000101",
+    ];
+    const query = `INSERT INTO application_documents
+      (application_id, document_type, storage_path, original_filename,
+       mime_type, byte_size, uploaded_by)
+      VALUES ($1, 'cv', $2, $3, $4, $5, $6)`;
+    await client.query(query, base);
+    await expect(client.query(query, base)).rejects.toThrow(/duplicate|unique/i);
+  });
+
+  it("restricts raw access to analytics and rate limit tables", async () => {
+    if (skipped()) return;
+    const { rows } = await client.query(
+      `SELECT tablename FROM pg_tables WHERE schemaname='public'
+       AND rowsecurity IS TRUE AND tablename IN ('analytics_events','request_rate_limits')`,
+    );
+    expect(rows.map((r) => r.tablename).sort()).toEqual(["analytics_events", "request_rate_limits"]);
+  });
+
   it("exposes RLS policies on user-data tables", async () => {
     if (skipped()) return;
     const { rows } = await client.query(

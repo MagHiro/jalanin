@@ -14,6 +14,9 @@ export async function GET(request: Request) {
   if (!user) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
+  // Authorization before lookup prevents document-id enumeration.
+  const admin = await isAdminUser(user.id);
+  if (!admin) return NextResponse.json({ ok: false }, { status: 403 });
   const { searchParams } = new URL(request.url);
   const documentId = searchParams.get("documentId") ?? "";
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(documentId)) {
@@ -26,12 +29,6 @@ export async function GET(request: Request) {
     .where(eq(applicationDocuments.id, documentId))
     .limit(1);
   if (rows.length === 0) return NextResponse.json({ ok: false }, { status: 404 });
-
-  const admin = await isAdminUser(user.id);
-  if (!admin) {
-    // Default-deny for students (explicit policy exception pending, B05).
-    return NextResponse.json({ ok: false }, { status: 403 });
-  }
 
   const { document } = rows[0];
   const store = getDocumentStore();

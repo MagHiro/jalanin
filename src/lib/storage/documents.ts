@@ -173,6 +173,13 @@ export function validateUpload(input: {
   if (!matches) {
     return { ok: false, error: "File contents do not match the declared type." };
   }
+  if (
+    input.mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
+    (!input.bytes.includes(Buffer.from("[Content_Types].xml")) ||
+      !input.bytes.includes(Buffer.from("word/document.xml")))
+  ) {
+    return { ok: false, error: "The DOCX archive is missing required Word entries." };
+  }
   return { ok: true };
 }
 

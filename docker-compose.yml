@@ -16,7 +16,7 @@ services:
       POSTGRES_DB: jalanin
     ports:
       # 54322 matches the Supabase CLI default DB port; document accordingly.
-      - "54322:5432"
+      - "127.0.0.1:54322:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -31,8 +31,8 @@ services:
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: "1"
     ports:
-      - "1025:1025" # SMTP (SMTP_HOST/SMTP_PORT)
-      - "8025:8025" # Web UI for inspecting test emails
+      - "127.0.0.1:1025:1025" # SMTP (SMTP_HOST/SMTP_PORT)
+      - "127.0.0.1:8025:8025" # Web UI for inspecting test emails
 
 volumes:
   pgdata:
