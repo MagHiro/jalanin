@@ -8,6 +8,16 @@ DROP POLICY IF EXISTS applications_student_update_submitted ON applications;
 DROP POLICY IF EXISTS profiles_owner_write ON profiles;
 DROP POLICY IF EXISTS profiles_owner_update ON profiles;
 
+-- Prevent SECURITY DEFINER function lookup through attacker-controlled schemas.
+CREATE OR REPLACE FUNCTION public.is_admin() RETURNS BOOLEAN
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = ''
+AS $
+  SELECT EXISTS (
+    SELECT 1 FROM public.admin_users
+    WHERE user_id = auth.uid() AND active IS TRUE
+  );
+$;
+
 -- A CV is a single active attachment per application. The server atomically
 -- swaps the metadata and queues re-review before deleting the old object.
 CREATE UNIQUE INDEX IF NOT EXISTS application_documents_one_cv_uq

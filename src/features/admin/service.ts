@@ -366,13 +366,13 @@ export async function transitionApplication(input: {
       })
       .where(eq(applications.id, app.id));
 
-    await tx.insert(applicationStatusEvents).values({
+    const [statusEvent] = await tx.insert(applicationStatusEvents).values({
       applicationId: app.id,
       fromStatus: from,
       toStatus: input.to,
       actorUserId: input.adminId,
       reason: input.reason ?? null,
-    });
+    }).returning({ id: applicationStatusEvents.id });
 
     await audit({
       actorUserId: input.adminId,
@@ -385,7 +385,7 @@ export async function transitionApplication(input: {
         reason: input.reason ?? null,
         revision: app.revision,
       },
-    });
+    }, tx);
 
     const ref = applicationRef(app.id);
     const studentName = `${app.firstName} ${app.lastName}`.trim() || "there";
@@ -393,7 +393,7 @@ export async function transitionApplication(input: {
       // Quotation email carries amount + currency + student terms (D03).
       // Internal notes are never included (ADM-APP-11). No expiry claimed (B01).
       await enqueueEmail({
-        eventKey: `quotation:${app.id}:r${app.revision}`,
+        eventKey: `quotation:${statusEvent.id}`,
         recipient: app.email,
         templateKey: "quotation-sent",
         payload: {
@@ -403,10 +403,10 @@ export async function transitionApplication(input: {
           amountMinor: quoteForEmail.amountMinor,
           terms: quoteForEmail.terms,
         },
-      });
+      }, tx);
     } else {
       await enqueueEmail({
-        eventKey: `status-change:${app.id}:${input.to}:r${app.revision}`,
+        eventKey: `status-change:${statusEvent.id}`,
         recipient: app.email,
         templateKey: "status-change",
         payload: {
@@ -416,7 +416,7 @@ export async function transitionApplication(input: {
           status: input.to,
           nextStep: STATUS_NEXT_STEPS[input.to] ?? "Our team will be in touch.",
         },
-      });
+      }, tx);
     }
     return { ref };
   });
@@ -432,7 +432,8 @@ export async function acknowledgeRevision(input: {
       .select()
       .from(applications)
       .where(eq(applications.id, input.applicationId))
-      .limit(1);
+      .limit(1)
+      .for("update");
     if (rows.length === 0) throw new Error("Application not found.");
     const app = rows[0];
     await tx
@@ -449,7 +450,7 @@ export async function acknowledgeRevision(input: {
       entityId: app.id,
       action: "revision-acknowledged",
       changes: { revision: app.revision },
-    });
+    }, tx);
     // Mark related re-review notifications read.
     await tx
       .update(adminNotifications)
@@ -500,7 +501,21 @@ export async function reopenRejected(input: {
       entityId: app.id,
       action: "reopened",
       changes: { from: "Rejected", to: "In Review", reason: input.reason },
-    });
+    }, tx);
+    const [listing] = await tx.select({ title: internships.title })
+      .from(internships).where(eq(internships.id, app.internshipId)).limit(1);
+    await enqueueEmail({
+      eventKey: `status-change:reopened:${app.id}:${new Date().getTime()}`,
+      recipient: app.email,
+      templateKey: "status-change",
+      payload: {
+        studentName: app.firstName,
+        internshipTitle: listing?.title ?? "Internship",
+        applicationRef: applicationRef(app.id),
+        status: "In Review",
+        nextStep: STATUS_NEXT_STEPS["In Review"],
+      },
+    }, tx);
   });
 }
 

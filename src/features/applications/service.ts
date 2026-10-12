@@ -351,7 +351,7 @@ export async function submitApplication(input: {
           applicationRef: ref,
           adminUrl,
         },
-      });
+      }, tx);
     }
     if (input.userEmail) {
       await enqueueEmail({
@@ -365,7 +365,7 @@ export async function submitApplication(input: {
           status: "New",
           nextStep: STATUS_NEXT_STEPS.New,
         },
-      });
+      }, tx);
     }
 
     await audit({
@@ -374,7 +374,7 @@ export async function submitApplication(input: {
       entityId: appId,
       action: "submitted",
       changes: { ref, internshipId: input.internshipId },
-    });
+    }, tx);
 
     return { applicationId: appId, ref, duplicate: false };
   });
@@ -478,7 +478,7 @@ export async function editSubmittedApplication(input: {
           applicationRef: ref,
           adminUrl: appUrl(`/admin/applications/${app.id}`),
         },
-      });
+      }, tx);
     }
 
     await audit({
@@ -487,7 +487,7 @@ export async function editSubmittedApplication(input: {
       entityId: app.id,
       action: "student-revision",
       changes: { revision: nextRevision, changedFields, oldValues, newValues },
-    });
+    }, tx);
 
     return { revision: nextRevision };
   });

@@ -8,20 +8,26 @@ Supabase Storage (private) · Vercel. Implements PRD v0.4 (`docs/Jalanin_Interns
 ## Quickstart (new developer)
 
 Prerequisites: Node 20+, pnpm 9+, Docker (or the no-Docker fallback below),
-Supabase CLI (optional full stack).
+Supabase CLI (required for local Supabase Auth/Storage).
 
 ```bash
 pnpm install
-cp .env.example .env            # defaults work for local dev
-pnpm db:start                   # Docker: postgres :54322 + mailpit :1025/:8025
-pnpm db:migrate                 # version-controlled SQL (supabase/migrations)
-pnpm db:seed                    # deterministic dev listings
+cp .env.example .env            # fill Supabase local keys from 'supabase status -o env'
+pnpm stack:start                # Supabase CLI: Docker Postgres :54322, Auth :54321, Storage
+pnpm db:seed                    # deterministic dev listings (migrations applied by Supabase)
 pnpm dev                        # http://localhost:3000
 ```
 
-No-Docker fallback (this environment): a user-space PostgreSQL 17 on port
-54322 stands in for `docker compose up postgres`. `docker-compose.yml`
-remains the canonical local DB definition (Supabase-CLI-parity port 54322).
+For PostgreSQL-only integration tests, `pnpm db:start` runs Docker Compose
+(PostgreSQL + Mailpit) and `pnpm db:migrate` applies versioned SQL. This
+database-only mode **does not run Supabase Auth or Storage** and is not a
+replacement for `pnpm stack:start` when testing registration and uploads.
+Never start both stacks simultaneously: both use port 54322.
+
+Development and production both use PostgreSQL; Supabase hosts PostgreSQL,
+Auth, and private Storage in production. Production must configure
+`STORAGE_BACKEND=supabase`, real Supabase credentials, and SMTP email.
+The placeholder keys in `.env.example` are not working credentials.
 
 Useful commands:
 

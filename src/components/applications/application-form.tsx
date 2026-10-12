@@ -233,11 +233,11 @@ export function ApplicationForm({ internshipId, existing }: Props) {
           <h2 id="consent">{step("5", "Consent & review")}</h2>
           <div className="mt-4 space-y-3 text-sm">
             <label className="flex gap-3">
-              <input type="checkbox" name="consentPrivacy" required className="mt-1 size-4 shrink-0 accent-primary" />
+              <input type="checkbox" name="consentPrivacy" defaultChecked={Boolean(existing && !existing.isDraft)} required className="mt-1 size-4 shrink-0 accent-primary" />
               <span>I consent to the processing of my personal data under the <a href="/privacy" className="font-medium text-primary hover:underline" target="_blank" rel="noreferrer">privacy policy</a>. *</span>
             </label>
             <label className="flex gap-3">
-              <input type="checkbox" name="consentTerms" required className="mt-1 size-4 shrink-0 accent-primary" />
+              <input type="checkbox" name="consentTerms" defaultChecked={Boolean(existing && !existing.isDraft)} required className="mt-1 size-4 shrink-0 accent-primary" />
               <span>I agree to the <a href="/terms" className="font-medium text-primary hover:underline" target="_blank" rel="noreferrer">terms of service</a>. *</span>
             </label>
           </div>
@@ -247,7 +247,7 @@ export function ApplicationForm({ internshipId, existing }: Props) {
       {error && <p role="alert" className="alert alert-error">{error}</p>}
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row">
-        <button
+        {(!existing || existing.isDraft) && <button
           type="button"
           disabled={locked || busy !== null}
           onClick={(e) => {
@@ -257,7 +257,7 @@ export function ApplicationForm({ internshipId, existing }: Props) {
           className="btn btn-outline flex-1"
         >
           {busy === "draft" ? "Saving…" : "Save draft"}
-        </button>
+        </button>}
         <button
           type="submit"
           disabled={locked || busy !== null}
@@ -267,7 +267,7 @@ export function ApplicationForm({ internshipId, existing }: Props) {
         </button>
       </div>
       <p className="text-center text-xs leading-5 text-muted-foreground">
-        Drafts save explicitly and resume after logout. Nothing is sent until you submit.
+        {existing && !existing.isDraft ? "Changes to a submitted application require admin re-review." : "Drafts save explicitly and resume after logout. Nothing is sent until you submit."}
       </p>
     </form>
     </Reveal>

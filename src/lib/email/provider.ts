@@ -40,6 +40,9 @@ export function adminAlertRecipients(): string[] {
 export function getEmailProvider(): EmailProvider {
   const kind = (process.env.EMAIL_PROVIDER ?? "smtp").toLowerCase();
   if (kind === "log") {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("EMAIL_PROVIDER=log is prohibited in production.");
+    }
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { LogEmailProvider } = require("./log") as typeof import("./log");
     return new LogEmailProvider();
