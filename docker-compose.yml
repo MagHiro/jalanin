@@ -1,0 +1,38 @@
+# Local development infrastructure.
+# Default full stack is the Supabase CLI (`supabase start`), which provides
+# Dockerized PostgreSQL + Auth + Storage. This compose file is the lightweight
+# complement: it runs ONLY the application database (PostgreSQL 16 on the
+# Supabase-CLI-parity port 54322) plus Mailpit for local email testing.
+# It intentionally does NOT launch a second application database.
+name: jalanin
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: jalanin
+      POSTGRES_PASSWORD: jalanin
+      POSTGRES_DB: jalanin
+    ports:
+      # 54322 matches the Supabase CLI default DB port; document accordingly.
+      - "54322:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jalanin -d jalanin"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+    ports:
+      - "1025:1025" # SMTP (SMTP_HOST/SMTP_PORT)
+      - "8025:8025" # Web UI for inspecting test emails
+
+volumes:
+  pgdata:
