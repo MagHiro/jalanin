@@ -1,6 +1,7 @@
 // Deterministic development seed runner. Loads supabase/seed.sql.
 // Flags: --test truncates user-data tables first for isolated test runs.
 // Usage: pnpm db:seed | pnpm db:seed:test
+import "./load-env";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { Client } from "pg";
@@ -13,6 +14,19 @@ if (!connectionString) {
 }
 
 const testMode = process.argv.includes("--test");
+
+// Test seeding truncates user data: NEVER run this against hosted Supabase,
+// even if a developer accidentally leaves the dev project's URL in .env.local.
+if (testMode) {
+  const host = new URL(connectionString).hostname.toLowerCase();
+  if (!["localhost", "127.0.0.1", "::1"].includes(host)) {
+    console.error(
+      "Refusing destructive db:seed:test against a remote PostgreSQL server. " +
+        "Use an isolated local Docker database for test seeding.",
+    );
+    process.exit(1);
+  }
+}
 
 async function main(): Promise<void> {
   const client = new Client({ connectionString });

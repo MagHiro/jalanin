@@ -1,6 +1,7 @@
 // Applies version-controlled SQL migrations in order (supabase/migrations).
 // Works against the local Docker PostgreSQL and hosted Supabase PostgreSQL.
 // Usage: pnpm db:migrate
+import "./load-env";
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { Client } from "pg";

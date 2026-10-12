@@ -12,7 +12,7 @@ Supabase CLI (required for local Supabase Auth/Storage).
 
 ```bash
 pnpm install
-cp .env.example .env            # fill Supabase local keys from 'supabase status -o env'
+cp .env.example .env.local      # fill Supabase local keys from 'supabase status -o env'
 pnpm db:start                   # Supabase CLI: Docker Postgres :54322, Auth :54321, Storage
 pnpm db:seed                    # deterministic dev listings (migrations applied by Supabase)
 pnpm dev                        # http://localhost:3000
@@ -26,6 +26,26 @@ Compose (PostgreSQL + Mailpit). Override both `DATABASE_URL` and
 Supabase Auth or Storage**. Do not start both stacks simultaneously, since
 both use port 54322. On the full local stack, the Supabase CLI applies
 migrations automatically; do not run the standalone migration runner again.
+
+Standalone CLI commands (`pnpm db:migrate`, `pnpm db:seed`,
+`pnpm db:seed:test`, `pnpm admin:grant`, `pnpm email:dispatch`, and
+`pnpm db:generate`) now load Next.js-style environment files automatically
+via `@next/env`. You do **not** need `node --env-file=...` or `dotenv`.
+For local development, precedence is: **exported shell environment** →
+`.env.development.local` → `.env.local` → `.env.development` → `.env`.
+CI can continue supplying `DATABASE_URL` directly. Never commit real
+credentials.
+
+**Hosted Supabase development:** Create a separate Supabase development
+project and put its API keys and the **Session Pooler PostgreSQL connection**
+in `.env.local` (both `DATABASE_URL` and `SUPABASE_DB_URL`). The direct
+`db.<project>.supabase.co` connection may require IPv6 and fail with
+`ENETUNREACH` on IPv4-only networks. Run `pnpm db:migrate`, then
+`pnpm db:seed`, then `pnpm dev` (do **not** start the local Docker stack).
+`pnpm db:seed:test` **deletes user records**, so it explicitly refuses
+remote database hosts. Use the local PostgreSQL CI/test database instead.
+When using the local Supabase CLI stack, `supabase start` applies migrations
+as part of its initialization; avoid applying them twice via another tool.
 
 Development and production both use PostgreSQL; Supabase hosts PostgreSQL,
 Auth, and private Storage in production. Production must configure

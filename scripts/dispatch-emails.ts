@@ -2,6 +2,7 @@
 // idempotent single-flight claims and backoff (see src/lib/email/outbox.ts).
 // Local: pnpm email:dispatch. Production: POST /api/cron/dispatch-emails
 // with CRON_SECRET (scheduled via Vercel Cron or equivalent).
+import "./load-env";
 import { dispatchDueEmails } from "../src/lib/email/outbox";
 
 async function main(): Promise<void> {

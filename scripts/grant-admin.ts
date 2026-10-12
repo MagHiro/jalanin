@@ -2,6 +2,7 @@
 // existing Supabase Auth user id. Requires the service-role key and is
 // NEVER exposed through the app UI or any client-callable endpoint.
 // Usage: SUPABASE_SERVICE_ROLE_KEY=... pnpm admin:grant <auth-user-uuid> [--by <granter-uuid>]
+import "./load-env";
 import { Client } from "pg";
 
 const userId = process.argv[2];
