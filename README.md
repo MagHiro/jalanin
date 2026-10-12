@@ -55,7 +55,8 @@ Local email: `EMAIL_PROVIDER=log` writes rendered mail to
   `auth/` (server session + role), `db/` (Drizzle privileged client + schema),
   `email/` (provider adapter, templates, outbox), `storage/` (document store),
   `security/` (rate limit, Turnstile), `analytics/` (privacy-safe events).
-- `supabase/migrations` — `0001_init.sql` (schema), `0002_rls.sql` (RLS).
+- `supabase/migrations` — schema, RLS, least-privilege hardening and
+  operational event/throttle migrations (0001–0004).
 - `tests/` — `unit/` (30), `integration/` (DB constraints), `e2e/` (15 journeys).
 - `docs/` — PRD, requirements matrix, architecture, database design,
   implementation plan, open decisions, deployment, UAT checklist.

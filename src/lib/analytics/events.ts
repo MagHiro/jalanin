@@ -1,8 +1,8 @@
 // Privacy-respecting analytics (PRD §11.3). Allowlisted event names only;
 // payloads must never contain PII (no email, nationality, CV filename, notes).
-// Transport: POST /api/analytics → structured server log. No third-party
-// tracker is bundled; enabling NEXT_PUBLIC_ANALYTICS_ENABLED=1 activates the
-// beacon. Conversion denominators come from database records, not this log.
+// Transport: POST /api/analytics → minimal PostgreSQL analytics_events row.
+// No third-party tracker is bundled; enabling NEXT_PUBLIC_ANALYTICS_ENABLED=true
+// activates the beacon. No PII or raw client payload is stored.
 export const ANALYTICS_EVENTS = [
   "page_view",
   "internship_view",

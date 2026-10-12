@@ -14,7 +14,9 @@
 
 1. Create the project in the Jalanin-owned Supabase account.
 2. Apply migrations in order: `supabase/migrations/0001_init.sql`,
-   then `0002_rls.sql` (SQL editor or `supabase db push`).
+   then `0002_rls.sql`, `0003_security_hardening.sql` and
+   `0004_operational_events.sql` (using the migration runner or Supabase CLI).
+   Verify each migration has been applied in order.
 3. Create the private bucket and service-role-only policy (see the storage
    comment block at the end of `0002_rls.sql`):
    `documents`, `public = false`, service-role full access; no anon/authenticated grants.
@@ -41,6 +43,7 @@ Environment variables (production):
 | `SMTP_HOST/PORT/USER/PASS/SECURE` | transactional SMTP |
 | `ADMIN_ALERT_EMAIL` | Jalanin operations inbox(es) |
 | `CRON_SECRET` | long random secret |
+| `RATE_LIMIT_PEPPER` | separate random secret for hashing throttle keys |
 | `STORAGE_BACKEND` | `supabase` |
 | `STORAGE_BUCKET` | `documents` |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | production keys |
@@ -81,4 +84,8 @@ Domain: add `internships.jalanin.com` in Vercel → Domains; create the DNS
   `processed/sent/failed`. Alert on repeated failures.
 - App: Vercel logs + error tracking per approved provider; auth-failure spikes
   indicate abuse (rate limits + Turnstile already in front of public forms).
-- Analytics intake logs to stdout (JSON `type: analytics`); no PII is stored.
+- Analytics intake persists allowlisted events in PostgreSQL `analytics_events`, with
+  no PII or raw IP. Enable the client beacon only after tracking/consent approval.
+- Rate limits use hashed PostgreSQL buckets across instances; the dispatch
+  cron prunes expired counters. Protect rate-limited routes from SQL outages
+  using platform edge controls as well; confirm retention of analytics events.

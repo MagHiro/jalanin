@@ -1,42 +1,49 @@
-// Minimal in-memory IP rate limiter for public endpoints (contact, auth).
-// Single-instance semantics are sufficient for MVP scale; documented so a
-// shared store (or platform limits) can replace it without changing callers.
-const buckets = new Map<string, { count: number; resetAt: number }>();
+import { createHash } from "node:crypto";
+import { sql } from "drizzle-orm";
+import { db } from "@/lib/db/client";
 
+// PostgreSQL-backed throttling across Vercel instances and Docker development.
+// Only a salted bucket hash is stored, never an IP address.
 export interface RateLimitResult {
   ok: boolean;
   remaining: number;
   resetAfterMs: number;
 }
 
-export function rateLimit(
+export async function rateLimit(
   key: string,
   limit: number,
   windowMs: number,
-): RateLimitResult {
+): Promise<RateLimitResult> {
+  if (!Number.isInteger(limit) || limit < 1 || !Number.isInteger(windowMs) || windowMs < 1000) {
+    throw new Error("Invalid rate limiting configuration.");
+  }
   const now = Date.now();
-  const existing = buckets.get(key);
-  if (!existing || existing.resetAt <= now) {
-    buckets.set(key, { count: 1, resetAt: now + windowMs });
-    return { ok: true, remaining: limit - 1, resetAfterMs: windowMs };
-  }
-  if (existing.count >= limit) {
-    return { ok: false, remaining: 0, resetAfterMs: existing.resetAt - now };
-  }
-  existing.count += 1;
+  const window = Math.floor(now / windowMs);
+  const expires = new Date((window + 1) * windowMs);
+  const pepper = process.env.RATE_LIMIT_PEPPER || process.env.CRON_SECRET || "development-only";
+  const digest = createHash("sha256").update(`${pepper}:${key}:${window}`).digest("hex");
+  const result = await db.execute(sql`
+    INSERT INTO request_rate_limits (bucket_hash, request_count, expires_at)
+    VALUES (${digest}, 1, ${expires})
+    ON CONFLICT (bucket_hash)
+    DO UPDATE SET request_count = request_rate_limits.request_count + 1
+    RETURNING request_count
+  `);
+  const count = Number(result.rows[0]?.request_count ?? 1);
   return {
-    ok: true,
-    remaining: limit - existing.count,
-    resetAfterMs: existing.resetAt - now,
+    ok: count <= limit,
+    remaining: Math.max(0, limit - count),
+    resetAfterMs: Math.max(0, expires.getTime() - now),
   };
 }
 
 export function clientIp(headers: Headers): string {
-  return (
-    headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    headers.get("x-real-ip") ||
-    "unknown"
-  );
+  // On Vercel, prefer the provider-supplied address over client-controlled XFF.
+  const raw = process.env.VERCEL === "1"
+    ? headers.get("x-vercel-forwarded-for")
+    : headers.get("x-real-ip") || headers.get("x-forwarded-for");
+  return raw?.split(",")[0]?.trim() || "unknown";
 }
 
 /** Server-side Cloudflare Turnstile verification. Never trust client alone. */
@@ -45,24 +52,20 @@ export async function verifyTurnstile(
   remoteIp?: string,
 ): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
-  // Cloudflare's always-pass testing secrets MUST NOT be deployable as a
-  // production anti-bot control. Missing secrets fail closed everywhere.
   if (!secret || (process.env.NODE_ENV === "production" && /^[123]x0{10,}/.test(secret))) {
     return false;
   }
   try {
-    const res = await fetch(
-      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-      {
-        method: "POST",
-        headers: { "content-type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          secret,
-          response: token,
-          ...(remoteIp ? { remoteip: remoteIp } : {}),
-        }),
-      },
-    );
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        secret,
+        response: token,
+        ...(remoteIp ? { remoteip: remoteIp } : {}),
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
     const data = (await res.json()) as { success?: boolean };
     return data.success === true;
   } catch {

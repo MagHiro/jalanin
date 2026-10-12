@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { db } from "@/lib/db/client";
+import { sql } from "drizzle-orm";
 import { dispatchDueEmails } from "@/lib/email/outbox";
 
 // Production cron entrypoint (Vercel Cron or equivalent) for the email
@@ -10,6 +12,8 @@ export async function POST(request: Request) {
   if (!expected || !provided || provided !== expected) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
+  // Keep the shared throttle table bounded.
+  await db.execute(sql`DELETE FROM request_rate_limits WHERE expires_at < now()`);
   const outcome = await dispatchDueEmails();
   return NextResponse.json({ ok: true, ...outcome });
 }

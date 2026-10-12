@@ -10,7 +10,7 @@ import { contactInputSchema } from "@/lib/validation/schemas";
 // Rate-limited per IP. Failures never expose internals.
 export async function POST(request: Request) {
   const ip = clientIp(request.headers);
-  const limit = rateLimit(`contact:${ip}`, 10, 10 * 60 * 1000);
+  const limit = await rateLimit(`contact:${ip}`, 10, 10 * 60 * 1000);
   if (!limit.ok) {
     return NextResponse.json(
       { ok: false, error: "Too many messages. Please try again later." },
