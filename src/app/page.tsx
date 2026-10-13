@@ -26,7 +26,7 @@ export default async function LandingPage() {
         <div className="learn-hero-content">
           <p data-hero-copy className="learn-kicker">Real experience. A new perspective.</p>
           <h1 data-hero-copy id="hero-heading">You have a world ahead.<br /><span>Make it your classroom.</span></h1>
-          <p data-hero-copy className="learn-hero-description">Internships across Southeast Asia.<br />Personal guidance for your next step.</p>
+          <h2 data-hero-copy className="learn-hero-summary">Internships across Southeast Asia.</h2><p data-hero-copy className="learn-hero-description">Personal guidance for your next step.</p>
           <Link data-hero-copy href="/opportunities" className="learn-hero-action">Browse internships <ArrowUpRight size={19} aria-hidden="true" /></Link>
         </div>
         <div className="learn-hero-side-note" aria-hidden="true"><span>Discover your next step</span><strong>Go somewhere.<br />Grow everywhere.</strong><span>Southeast Asia awaits.</span></div>
@@ -47,12 +47,12 @@ export default async function LandingPage() {
       </section>
 
       <section id="about" aria-labelledby="about-heading" className="learn-about scroll-mt-28">
-        <div data-scroll-reveal className="learn-about-copy"><p className="learn-kicker">03 / About Jalanin</p><h2 id="about-heading" className="section-title mt-6">Your journey is personal.<br />So is our approach.</h2><p className="mt-6 leading-8 text-jalanin-100">We connect students with internship experiences across Southeast Asia. Our team reads every application and prepares a custom quotation, because the right next step looks different for everyone.</p><Link href="#contact" className="learn-hero-action mt-8">Let’s talk <ArrowRight size={18} aria-hidden="true" /></Link></div>
+        <div data-scroll-reveal className="learn-about-copy"><h2 className="learn-kicker">03 / About Jalanin</h2><h2 id="about-heading" className="section-title mt-6">Your journey is personal.<br />So is our approach.</h2><p className="mt-6 leading-8 text-jalanin-100">We connect students with internship experiences across Southeast Asia. Our team reads every application and prepares a custom quotation, because the right next step looks different for everyone.</p><Link href="#contact" className="learn-hero-action mt-8">Let’s talk <ArrowRight size={18} aria-hidden="true" /></Link></div>
         <figure className="learn-about-photo"><Image src="/images/singapore.jpg" alt="Singapore’s waterfront and skyline at dusk" fill sizes="(min-width: 1024px) 880px, 100vw" className="object-cover" /><figcaption><MapPin size={15} aria-hidden="true" /> Singapore, Southeast Asia · A new perspective.</figcaption></figure>
       </section>
 
       <section id="contact" aria-labelledby="contact-heading" className="learn-section learn-contact scroll-mt-28">
-        <div data-scroll-reveal className="learn-contact-note"><p className="eyebrow">04 / Contact us</p><h3 className="mt-6 flex items-center gap-3 text-base font-medium"><Mail size={20} strokeWidth={1.5} aria-hidden="true" /> A real conversation.</h3><p className="mt-3 max-w-xs text-sm leading-7 text-muted-foreground">Our team will reply by email. See our <Link href="/privacy" className="underline underline-offset-4">privacy policy</Link>.</p><Link href="/opportunities" className="learn-text-link mt-8">Explore placements first <ArrowUpRight size={17} aria-hidden="true" /></Link></div><div className="learn-contact-form"><h2 id="contact-heading" className="section-title mb-10">A question, an idea,<br />a next step.<br />We’d love to hear from you.</h2><ContactForm /></div>
+        <div data-scroll-reveal className="learn-contact-note"><h2 className="eyebrow">04 / Contact us</h2><h3 className="mt-6 flex items-center gap-3 text-base font-medium"><Mail size={20} strokeWidth={1.5} aria-hidden="true" /> A real conversation.</h3><p className="mt-3 max-w-xs text-sm leading-7 text-muted-foreground">Our team will reply by email. See our <Link href="/privacy" className="underline underline-offset-4">privacy policy</Link>.</p><Link href="/opportunities" className="learn-text-link mt-8">Explore placements first <ArrowUpRight size={17} aria-hidden="true" /></Link></div><div className="learn-contact-form"><h2 id="contact-heading" className="section-title mb-10">A question, an idea,<br />a next step.<br />We’d love to hear from you.</h2><ContactForm /></div>
       </section>
     </PublicMotion>
   );
