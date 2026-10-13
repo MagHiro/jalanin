@@ -68,3 +68,8 @@ Desktop Explore disclosure: grouped existing links and a destination-photo CTA i
 - Overview vocabulary: welcome, rule-separated stat strip, priority band, pipeline, activity list, application/draft/placement rows, helpful zero states and deep-indigo note.
 - Scoped controls in `globals.css`: fields, selects, textareas, date inputs, checkbox/radio, file input, labels/hints/errors, focus, invalid/read-only/disabled states; pills, badges, toolbar, table, cards, alerts, quotation/revision panels and inherited confirmation actions. Google Sans Flex throughout, including operational identifiers previously rendered monospace.
 - Existing nested CRUD/review forms use this shared vocabulary; input values, validation and server workflow handlers retain their existing contracts.
+# Direction G additions (2026-10-13)
+
+Non-hero follow-up: `InternshipCard` now renders a category/title/location/dates/action role row. Public CSS adds Clay-like process tiles, centered photo About section, underlined contact fields, form-left auth, labelled application sections and legal document navigation. Source mapping: `section-reference-map.md`.
+
+Public-only composition in `src/app/public-design.css`, shared photographic `AuthStory`, and GSAP `PublicMotion`. Existing forms/cards retain behavior. Responsive photo/text layouts, ruled detail sections, legal reading layout, and compact navigation are scoped through `RouteFrame`'s `.public-site`. See `public-direction-g.md` for evidence.

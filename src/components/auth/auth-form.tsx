@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { Check, Compass } from "lucide-react";
+import { AuthStory } from "./auth-story";
 
 // Centered auth card (PayPal/Krea-inspired, email+password per PRD AUTH-*).
 // E2E asserts: heading "Log in", labelled email/password inputs, submit
@@ -69,24 +69,7 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
 
   return (
     <div className="auth-layout mx-auto max-w-5xl">
-        <div className="auth-story">
-          <Compass size={42} strokeWidth={1.2} className="text-primary" aria-hidden="true" />
-          <p className="eyebrow mt-8">Your next chapter</p>
-          <h2 className="section-title mt-4">A world of possibilities.<br />A place to begin.</h2>
-          <p className="mt-5 max-w-md leading-7 text-muted-foreground">Build your experience beyond the classroom, with personal guidance at every step.</p>
-          <ul className="mt-4 space-y-4 text-sm leading-6">
-            {[
-              ["Save drafts as you go", "Start an application and resume any time — nothing is sent until you submit."],
-              ["Track every status", "See Draft, Submitted, In Review and quotation updates in your dashboard."],
-              ["Quotations by email", "A custom quotation arrives after review. Reply to accept — no hidden fees."],
-            ].map(([t, b]) => (
-              <li key={t} className="flex gap-3">
-                <Check aria-hidden="true" size={18} className="mt-1 shrink-0 text-primary" />
-                <span><b className="block font-medium text-foreground">{t}</b><span className="text-muted-foreground">{b}</span></span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <AuthStory />
       <div className="px-2 py-6 md:px-8">
         <p className="eyebrow">Jalanin student account</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">

@@ -99,3 +99,8 @@ Public-header-only redesign using supplied logo/favicon and existing local Googl
 - Nested route smoke at 375/1440px: student applications/placements; admin internships/new, students, placements/new, contacts and notifications. No public chrome or document overflow. Admin student toolbar additionally checked at 320px.
 - Admin form text entry, textarea entry, select changes and checkbox operation pass. Screenshots `/tmp/opencode/workspace-{admin,student}-{width}.png` and `workspace-admin-form.png`; desktop admin overview, desktop form, and mobile student overview visually reviewed.
 - The local data slice is empty for applications/placements/audit. Populated details, quotation/CV states, destructive confirmation and complete mutation workflows are not newly browser-audited in this presentation pass; they inherit scoped components and existing backend coverage. Exhaustive state certification is pending.
+# 2026-10-13 public direction G update
+
+Follow-up: non-hero sections now mapped individually to inspected Mobbin previews in `section-reference-map.md`; directory uses role rows, process uses four steps, About is centered, contact uses underlined inputs, authentication puts the form first, legal uses document navigation, and public application field sections use a label column. Hero retained.
+
+Public landing, directory/detail, auth/recovery, application intro and legal surfaces refreshed; `/admin` and `/dashboard` excluded. Seven-width public route browser sweep, keyboard flow, reduced-motion/no-JS and route interruption coverage: see [direction G evidence](public-direction-g.md). Authenticated application form states retain prior coverage and were not visually re-audited in this pass.

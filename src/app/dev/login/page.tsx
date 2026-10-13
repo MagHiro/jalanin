@@ -11,13 +11,13 @@ const PRESETS = [
   },
   {
     id: "00000000-0000-0000-0000-00000000ac01",
-    label: "Student (Admin Flow)",
-    detail: "3 submitted applications (In Review, Quotation Sent, Completed) + 1 placement.",
+    label: "Amina Rahman",
+    detail: "Hospitality student: saved draft, reviews, quotation, accepted and completed applications; two placements.",
   },
   {
     id: "00000000-0000-0000-0000-00000000aa01",
-    label: "Student (draft)",
-    detail: "One saved draft to resume via Apply.",
+    label: "Rizky Pratama",
+    detail: "Computer science student: new application, portfolio feedback and a saved draft to resume.",
   },
 ];
 

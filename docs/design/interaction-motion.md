@@ -38,3 +38,6 @@ Public navigation uses 160ms CSS color/underline transitions, disabled under red
 `WorkspaceShell` scopes GSAP to its content container. Route changes use an 8px / 320ms content entrance; no individual operational row sequencing or ScrollTrigger. `useGSAP` reverts on route updates/unmount; `gsap.matchMedia` disables entrances for reduced motion and reacts to preference changes. Server content is visible without JavaScript. Hover/focus remain CSS. Mobile navigation uses a native modal dialog with browser focus containment and Escape/focus restoration.
 
 Chromium workspace tests exercise reduced-motion rendering, non-reduced route navigation, navigation away/back, mobile dialog dismissal and focus restoration.
+# Direction G public motion (2026-10-13)
+
+`PublicMotion` adds GSAP hero image/copy sequencing and one-shot IntersectionObserver section entrances. Native scroll preserved; visible SSR content; live reduced-motion media matching; observers disconnected and GSAP contexts reverted on cleanup. Browser tests cover interruption, reduced-motion changes, and no-JS navigation. See `public-direction-g.md`.

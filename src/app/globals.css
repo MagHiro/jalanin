@@ -188,7 +188,7 @@ html { scroll-padding-top: 116px; }
   .public-nav-link, .public-nav-link::after { transition: none; }
 }
 
-/* Landing-only editorial collage. Headline, story and photo have independent rhythm. */
+/* Legacy collage rules; the selected public direction is scoped under .public-site. */
 .journey-hero {
   position: relative;
   display: grid;

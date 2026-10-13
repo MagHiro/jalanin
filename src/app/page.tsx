@@ -1,79 +1,58 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowDown, ArrowRight, ArrowUpRight, Compass, FileCheck2, Mail, MapPin, Search, Send } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUpRight, Mail, MapPin } from "lucide-react";
 import { listFeaturedInternships, COUNTRY_NAMES } from "@/features/internships/service";
 import { ContactForm } from "@/components/contact/contact-form";
 import { InternshipCard } from "@/components/ui/internship-card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Reveal } from "@/components/motion/reveal";
+import { PublicMotion } from "@/components/motion/public-motion";
 
 export const revalidate = 120;
 
 const steps = [
-  { title: "Browse", body: "Find a role that fits your interests. Explore by country, location, and field.", icon: Search },
-  { title: "Review", body: "Get to know the placement: dates, responsibilities, and what you’ll need.", icon: FileCheck2 },
-  { title: "Apply", body: "Tell us about yourself and upload your CV. Save a draft and return anytime.", icon: Send },
-  { title: "Quotation", body: "Our team reviews your application and emails a custom quotation. Reply to accept.", icon: Mail },
+  ["Browse", "Find a role that fits your interests. Explore by country, location, and field."],
+  ["Review", "Get to know the placement: dates, responsibilities, and what you’ll need."],
+  ["Apply", "Tell us about yourself and upload your CV. Save a draft and return anytime."],
+  ["Quotation", "Our team reviews your application and emails a custom quotation. Reply to accept."],
 ];
 
 export default async function LandingPage() {
   const featured = await listFeaturedInternships(6);
   return (
-    <div>
-      <Reveal>
-        <section aria-labelledby="hero-heading" className="journey-hero">
-          <div data-reveal className="journey-hero-intro">
-            <p className="journey-hero-kicker"><span className="journey-hero-kicker-rule" aria-hidden="true" /> A new place. A new perspective.</p>
-            <h1 id="hero-heading" className="journey-hero-title">Internships across <span className="text-primary">Southeast Asia,</span> with personal guidance.</h1>
-          </div>
-
-          <div data-reveal className="journey-hero-story">
-            <p className="max-w-sm text-base leading-7 text-muted-foreground">Step beyond the classroom. Discover meaningful internship experiences, explore a different culture, and take your next step with a real person by your side.</p>
-            <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
-              <Link href="/opportunities" className="btn btn-primary min-h-12 gap-5 px-6">Browse internships <ArrowUpRight size={18} strokeWidth={1.6} aria-hidden="true" /></Link>
-              <Link href="/#how-it-works" className="journey-hero-secondary">How it works <ArrowDown size={16} strokeWidth={1.6} aria-hidden="true" /></Link>
-            </div>
-            <p className="journey-hero-footnote">Your next chapter starts with a little curiosity.</p>
-          </div>
-
-          <figure data-reveal className="journey-hero-destination">
-            <div className="journey-hero-image">
-              <Image src="/images/singapore.jpg" alt="Singapore’s waterfront and skyline at dusk" fill priority sizes="(min-width: 1280px) 560px, (min-width: 1024px) 48vw, (min-width: 768px) 58vw, 100vw" className="object-cover" />
-            </div>
-            <figcaption className="journey-hero-caption"><span className="inline-flex items-center gap-2"><MapPin size={14} strokeWidth={1.6} aria-hidden="true" /> Singapore, Southeast Asia</span><span className="text-muted-foreground">A view of what’s beyond.</span></figcaption>
-          </figure>
-
-          <aside data-reveal className="journey-hero-note" aria-label="Personal application guidance">
-            <div className="flex items-center justify-between gap-4"><Compass size={24} strokeWidth={1.5} aria-hidden="true" /><span className="text-xs text-jalanin-200">The Jalanin approach</span></div>
-            <p className="mt-7 text-2xl font-medium leading-tight tracking-[-.045em]">A new chapter.<br />A real person by your side.</p>
-            <p className="mt-4 text-sm leading-6 text-jalanin-100">Every application reviewed by our team. Personal from the very first step.</p>
-          </aside>
-        </section>
-      </Reveal>
-
-      <section aria-labelledby="featured-heading" className="editorial-section">
-        <div className="flex flex-wrap items-end justify-between gap-6">
-          <div><p className="eyebrow">Possibilities, handpicked</p><h2 id="featured-heading" className="section-title mt-3">Featured internships</h2><p className="mt-4 max-w-lg text-muted-foreground">Find your place in a new city. Make space for what comes next.</p></div>
-          <Link href="/opportunities" className="btn btn-outline">Explore all opportunities <ArrowUpRight size={18} aria-hidden="true" /></Link>
+    <PublicMotion>
+      <section aria-labelledby="hero-heading" className="learn-hero">
+        <Image data-hero-image src="/images/learning-together.jpg" alt="Young professionals sharing a table and working together on laptops" fill priority sizes="(min-width: 1440px) 1360px, (min-width: 1024px) calc(100vw - 80px), 100vw" className="object-cover" />
+        <div className="learn-hero-shade" />
+        <div className="learn-hero-content">
+          <p data-hero-copy className="learn-kicker">Real experience. A new perspective.</p>
+          <h1 data-hero-copy id="hero-heading">You have a world ahead.<br /><span>Make it your classroom.</span></h1>
+          <p data-hero-copy className="learn-hero-description">Internships across Southeast Asia.<br />Personal guidance for your next step.</p>
+          <Link data-hero-copy href="/opportunities" className="learn-hero-action">Browse internships <ArrowUpRight size={19} aria-hidden="true" /></Link>
         </div>
-        {featured.length === 0 ? <div className="mt-8"><EmptyState title="No featured internships right now" body="Please check back soon or browse all openings." actionHref="/opportunities" actionLabel="Browse internships" /></div> : <Reveal><ul className="mt-9 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{featured.map(({ internship, categoryName }) => <InternshipCard key={internship.id} title={internship.title} city={internship.city} country={COUNTRY_NAMES[internship.countryCode] ?? internship.countryCode} categoryName={categoryName} startDate={internship.startDate} endDate={internship.endDate} href={`/opportunities/${internship.slug}`} />)}</ul></Reveal>}
+        <div className="learn-hero-bottom"><span>Go further. Learn by doing.</span><Link href="#how-it-works" aria-label="Discover how it works"><ArrowDown size={20} aria-hidden="true" /></Link></div>
       </section>
 
-      <section id="how-it-works" aria-labelledby="hiw-heading" className="editorial-section scroll-mt-32">
-        <div className="grid gap-5 md:grid-cols-2"><div><p className="eyebrow">A little clarity goes a long way</p><h2 id="hiw-heading" className="section-title mt-3">How It Works</h2></div><p className="max-w-md text-lg leading-8 text-muted-foreground md:justify-self-end">Big experiences start with simple steps. We’ll help you move from a possibility to a plan.</p></div>
-        <Reveal><ol className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">{steps.map(({ title, body, icon: Icon }, i) => <li data-reveal key={title} className="editorial-step"><div className="flex items-center justify-between"><span className="tnum text-sm text-muted-foreground">0{i + 1}</span><Icon size={22} strokeWidth={1.5} className="text-primary" aria-hidden="true" /></div><h3 className="mt-7 text-2xl font-medium tracking-tight">{title}</h3><p className="mt-3 text-sm leading-7 text-muted-foreground">{body}</p></li>)}</ol></Reveal>
+      <div className="learn-intro-strip"><p>We believe in<br /><span>learning by doing.</span></p><div><p>Step beyond the classroom, discover a different culture, and build your experience with a real person by your side.</p><Link href="#about" className="learn-text-link mt-5">Get to know Jalanin <ArrowUpRight size={17} aria-hidden="true" /></Link></div></div>
+
+      <section aria-labelledby="featured-heading" className="learn-section">
+        <div data-scroll-reveal className="learn-section-heading"><div><p className="eyebrow">01 / Find your next step</p><h2 id="featured-heading" className="section-title mt-4">Big possibilities.<br />Real-world experience.</h2></div><div><p className="mb-5 max-w-xs leading-7 text-muted-foreground">A new city. A different perspective. Find a placement that feels right for you.</p><Link href="/opportunities" className="learn-text-link">Explore all opportunities <ArrowUpRight size={18} aria-hidden="true" /></Link></div></div>
+        <h3 className="mt-10 mb-5 text-sm font-medium">Featured internships</h3>
+        {featured.length === 0 ? <EmptyState title="No featured internships right now" body="Please check back soon or browse all openings." actionHref="/opportunities" actionLabel="Browse internships" /> : <ul className="learn-opportunity-grid">{featured.map(({ internship, categoryName }) => <InternshipCard key={internship.id} title={internship.title} city={internship.city} country={COUNTRY_NAMES[internship.countryCode] ?? internship.countryCode} categoryName={categoryName} startDate={internship.startDate} endDate={internship.endDate} href={`/opportunities/${internship.slug}`} />)}</ul>}
       </section>
 
-      <section id="about" aria-labelledby="about-heading" className="my-8 scroll-mt-32 overflow-hidden rounded-2xl bg-primary text-white">
-        <div className="grid gap-12 p-8 md:p-14 lg:grid-cols-[1.1fr_.9fr] lg:p-16">
-          <div><Compass size={40} strokeWidth={1.2} aria-hidden="true" /><p className="mt-10 text-xs font-medium uppercase tracking-[.15em] text-jalanin-200">About Jalanin</p><h2 id="about-heading" className="section-title mt-4">About Jalanin</h2><p className="mt-4 text-2xl font-medium leading-snug tracking-tight">Your journey is personal.<br />So is our approach.</p><p className="mt-6 max-w-md leading-7 text-jalanin-100">We connect students with internship experiences across Southeast Asia. Every application is reviewed by our team, and every placement receives a custom quotation — because the right experience is personal.</p><Link href="/#contact" className="mt-8 inline-flex min-h-11 items-center gap-3 font-medium text-white underline underline-offset-4">Let’s talk about your next step <ArrowRight size={18} aria-hidden="true" /></Link></div>
-          <div className="flex flex-col justify-center">{[["01", "People, not an algorithm", "Our team reads your application and considers your next step with care."], ["02", "A quotation made for you", "Custom quotations explained by email after your application is reviewed."], ["03", "A different perspective", "Explore placements across the region and experience life beyond the familiar."]].map(([n, title, body]) => <div key={n} className="border-t border-white/20 py-7"><p className="text-xs text-jalanin-200">{n}</p><h3 className="mt-3 text-xl font-medium">{title}</h3><p className="mt-2 text-sm leading-7 text-jalanin-100">{body}</p></div>)}</div>
-        </div>
+      <section id="how-it-works" aria-labelledby="hiw-heading" className="learn-section learn-process scroll-mt-28">
+        <div data-scroll-reveal><p className="eyebrow">02 / From curious to ready</p><h2 id="hiw-heading" className="section-title mt-4">How It Works</h2><Link href="/opportunities" className="btn btn-primary mt-6">Get started <ArrowRight size={17} aria-hidden="true" /></Link></div>
+        <ol>{steps.map(([title, body], i) => <li data-scroll-reveal key={title} className="learn-process-step"><span className="tnum">[{i + 1}]</span><div><h3>{title}</h3><p>{body}</p></div></li>)}</ol>
       </section>
 
-      <section id="contact" aria-labelledby="contact-heading" className="editorial-section mt-16 scroll-mt-32">
-        <div className="grid gap-10 lg:grid-cols-2 lg:gap-20"><div><p className="eyebrow">Good questions. Real conversations.</p><h2 id="contact-heading" className="section-title mt-4">Contact us</h2><p className="mt-6 max-w-sm text-lg leading-8 text-muted-foreground">Wondering where to begin? Let’s figure out your next step together.</p><div className="mt-10 flex items-start gap-3 text-sm leading-7 text-muted-foreground"><Mail size={20} className="mt-1 shrink-0 text-primary" aria-hidden="true" /><p>Send us a message and our team will reply by email. See our <Link href="/privacy" className="text-primary underline underline-offset-4">privacy policy</Link>.</p></div></div><div className="surface-card p-6 md:p-8"><ContactForm /></div></div>
+      <section id="about" aria-labelledby="about-heading" className="learn-about scroll-mt-28">
+        <div data-scroll-reveal className="learn-about-copy"><p className="learn-kicker">03 / About Jalanin</p><h2 id="about-heading" className="section-title mt-6">Your journey is personal.<br />So is our approach.</h2><p className="mt-6 leading-8 text-jalanin-100">We connect students with internship experiences across Southeast Asia. Our team reads every application and prepares a custom quotation, because the right next step looks different for everyone.</p><Link href="#contact" className="learn-hero-action mt-8">Let’s talk <ArrowRight size={18} aria-hidden="true" /></Link></div>
+        <figure className="learn-about-photo"><Image src="/images/singapore.jpg" alt="Singapore’s waterfront and skyline at dusk" fill sizes="(min-width: 1024px) 880px, 100vw" className="object-cover" /><figcaption><MapPin size={15} aria-hidden="true" /> Singapore, Southeast Asia · A new perspective.</figcaption></figure>
       </section>
-    </div>
+
+      <section id="contact" aria-labelledby="contact-heading" className="learn-section learn-contact scroll-mt-28">
+        <div data-scroll-reveal className="learn-contact-note"><p className="eyebrow">04 / Contact us</p><h3 className="mt-6 flex items-center gap-3 text-base font-medium"><Mail size={20} strokeWidth={1.5} aria-hidden="true" /> A real conversation.</h3><p className="mt-3 max-w-xs text-sm leading-7 text-muted-foreground">Our team will reply by email. See our <Link href="/privacy" className="underline underline-offset-4">privacy policy</Link>.</p></div><div className="learn-contact-form"><h2 id="contact-heading" className="section-title mb-10">A question, an idea,<br />a next step.<br />We’d love to hear from you.</h2><ContactForm /></div>
+      </section>
+    </PublicMotion>
   );
 }

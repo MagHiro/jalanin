@@ -72,11 +72,15 @@ export async function saveDraft(input: {
     throw new Error("This internship is not currently accepting drafts.");
   }
 
-  const parsed = applicationFormBase.partial().parse({
-    ...input.values,
-    consentPrivacy: input.values.consentPrivacy ?? true,
-    consentTerms: input.values.consentTerms ?? true,
-  });
+  // Empty browser inputs are omitted for partial drafts. Consent is enforced
+  // at submission, not while saving unfinished work.
+  const draftValues = Object.fromEntries(
+    Object.entries(input.values).filter(([key, value]) =>
+      key !== "consentPrivacy" && key !== "consentTerms" &&
+      !(typeof value === "string" && value.trim() === "" && key !== "additionalInformation"),
+    ),
+  );
+  const parsed = applicationFormBase.partial().parse(draftValues);
 
   return db.transaction(async (tx) => {
     const existing = await tx

@@ -4,7 +4,7 @@ import Link from "next/link";
 // actionable next step. Unpublished internships and unknown private ids land here.
 export default function NotFound() {
   return (
-    <div className="mx-auto max-w-xl py-16 text-center md:py-24">
+    <div className="public-state mx-auto max-w-xl py-16 text-center md:py-24">
       <p aria-hidden="true" className="mx-auto grid size-16 place-items-center rounded-3xl bg-secondary text-3xl text-primary">🧭</p>
       <p className="eyebrow mt-6 !text-center">404 — not found</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">Page not found</h1>

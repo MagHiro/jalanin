@@ -3,8 +3,9 @@ import { MoveUpRight } from "lucide-react";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-12 border-t border-border bg-secondary">
-      <div className="mx-auto grid max-w-[1280px] gap-10 px-5 py-16 md:grid-cols-[2fr_1fr_1fr] md:px-10">
+    <footer className="learn-footer mt-12 border-t border-border bg-secondary">
+      <div className="learn-footer-heading"><p>Find your next chapter.</p><Link href="/opportunities" className="btn btn-primary">Browse internships <MoveUpRight size={18} aria-hidden="true" /></Link></div>
+      <div className="learn-footer-content mx-auto grid gap-10 px-5 py-16 md:grid-cols-[2fr_1fr_1fr] md:px-10">
         <div>
           <p className="flex items-center gap-2 text-lg font-bold tracking-tight text-primary">
             <MoveUpRight aria-hidden="true" size={26} />

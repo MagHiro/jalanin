@@ -38,7 +38,7 @@ export default async function InternshipDetailPage({
     : null;
 
   return (
-    <div className="pb-24 lg:pb-0">
+    <div className="learn-detail pb-24 lg:pb-0">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-10">
         <article className="min-w-0">
           <nav aria-label="Breadcrumb">

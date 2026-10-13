@@ -13,7 +13,7 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <div className="mx-auto max-w-xl py-16 text-center md:py-24">
+    <div className="public-state mx-auto max-w-xl py-16 text-center md:py-24">
       <p aria-hidden="true" className="error-mark">!</p>
       <h1 className="mt-6 text-3xl font-semibold tracking-tight text-foreground">
         Something went wrong

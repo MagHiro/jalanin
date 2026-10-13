@@ -43,7 +43,7 @@ export function ApplicationForm({ internshipId, existing }: Props) {
       nationality: base.get("nationality"),
       university: base.get("university"),
       course: base.get("course"),
-      graduationYear: Number(base.get("graduationYear")),
+      graduationYear: base.get("graduationYear") === "" ? undefined : Number(base.get("graduationYear")),
       preferredStart: base.get("preferredStart"),
       preferredEnd: base.get("preferredEnd"),
       additionalInformation: base.get("additionalInformation") ?? "",
@@ -117,6 +117,7 @@ export function ApplicationForm({ internshipId, existing }: Props) {
         const sub = (await subRes.json()) as { ok?: boolean; ref?: string; error?: string };
         if (!subRes.ok || !sub.ok) throw new Error(sub.error ?? "Submission failed.");
         router.push(`/dashboard/applications/${applicationId}?submitted=1`);
+        router.refresh();
         return;
       }
       router.push(`/dashboard/applications?draft=1`);

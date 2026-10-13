@@ -6,6 +6,7 @@ import { ApplicationForm } from "@/components/applications/application-form";
 import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import { PageHeader } from "@/components/ui/page-header";
+import { ArrowLeft } from "lucide-react";
 
 export const metadata = { title: "Apply" };
 
@@ -68,10 +69,10 @@ export default async function ApplyPage({
     : "Your progress saves as a draft. Nothing is sent until you submit.";
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <div>
+    <div className="learn-application mx-auto max-w-3xl space-y-6">
+      <div className="learn-application-heading">
         <Link href={`/opportunities/${internship.slug}`} className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
-          <span aria-hidden="true">←</span> Back to {internship.title}
+          <ArrowLeft size={16} aria-hidden="true" /> Back to {internship.title}
         </Link>
         <PageHeader
           eyebrow={internship.city}

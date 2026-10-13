@@ -47,3 +47,8 @@ User selected **Editorial studio**, **spacious for both roles**, and all in-page
 Jalanin-specific adaptation: deep-indigo admin rail versus ivory student rail; 36px Google Sans Flex workspace titles; rule-separated live statistics; next-step band; application rows; roomy pipeline and activity sections. No screenshot artwork embedded. Native mobile dialog provides focus containment, Escape and focus restoration. Nested routes share scoped field/button/table/form/feedback styling.
 
 Observed references: [incident.io incidents list](https://mobbin.com/screens/f9757c15-2aaf-4031-9a47-8344c0f81fed), [home with command overlay](https://mobbin.com/screens/f7b1d160-79fc-4a70-a1f7-e553896d3ce6), [notifications](https://mobbin.com/screens/f479153e-9b68-47ad-bd5f-242132562e49). The search API exposes relevant screens, not collection enumeration; exhaustive collection coverage is not claimed.
+# 2026-10-13 — User selected direction G
+
+Subsequent user instruction: inspect and closely reproduce a suitable Mobbin reference for each non-hero section. Implemented the per-section mapping in `section-reference-map.md`, keeping the approved hero, typography, palette and 1440px shell. No backend or workspace changes.
+
+Selected Human-centered learning from the observed [Wix Learn Mobbin hero](https://mobbin.com/sites/sections/6eae0753-3cdb-4ca3-b070-0a207d352552). Replaces the public collage composition with an inset photographic hero, centered type, compact navigation, alternating imagery and shared photographic authentication panels. Preserves Google Sans Flex and Jalanin tokens. Workspace routes excluded by explicit user request. Full adaptation/provenance/verification record: `public-direction-g.md`.

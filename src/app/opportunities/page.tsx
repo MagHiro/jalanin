@@ -87,7 +87,7 @@ export default async function OpportunitiesPage({
 
   return (
     <div className="space-y-9">
-      <div className="grid gap-6 border-b border-border pb-10 md:grid-cols-[1.5fr_1fr] md:items-end">
+      <div className="learn-directory-heading">
         <div><p className="eyebrow">Explore opportunities</p><h1 className="section-title mt-4 max-w-2xl">Find an experience that moves you forward.</h1></div>
         <div><p className="mb-4 max-w-sm leading-7 text-muted-foreground">A new city. Real-world experience. Discover a placement that fits your next chapter.</p><span role="status" className="tnum text-sm text-muted-foreground">
             {total} published {total === 1 ? "placement" : "placements"}
@@ -100,7 +100,7 @@ export default async function OpportunitiesPage({
         method="get"
         action="/opportunities"
         aria-label="Search and filter internships"
-        className="grid gap-4 rounded-xl border border-border bg-surface p-5 md:grid-cols-2 xl:grid-cols-6 xl:p-6"
+        className="learn-filters grid gap-4 md:grid-cols-2 xl:grid-cols-6"
       >
         <label className="field-label md:col-span-2">
           <span>Search role or location</span>
@@ -169,7 +169,7 @@ export default async function OpportunitiesPage({
         />
       ) : (
         <Reveal>
-          <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <ul className="learn-opportunity-grid">
             {rows.map(({ internship, categoryName }) => (
               <InternshipCard
                 key={internship.id}

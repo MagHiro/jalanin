@@ -1,6 +1,6 @@
 # Jalanin — Product Design System & UI/UX Constitution
 
-**Version:** 2.0 — Editorial & refined, approved 2026-10-12
+**Version:** 2.1 — Human-centered learning (public direction G), approved 2026-10-13
 **Product:** Jalanin Internship Platform  
 **Primary visual reference:** [incident.io Web collection on Mobbin](https://mobbin.com/apps/incident-io-web-ba939364-061a-4808-8636-8f7e60a8dca6/dc465259-77ce-459a-9842-38412601ca5c/screens)  
 **Product authority:** `Jalanin_Internship_Platform_PRD_v0.4.md` (or latest approved revision)  
@@ -8,6 +8,12 @@
 **Status:** Active typography and art direction. This revision supersedes the previous cold-indigo, card-heavy public direction. The editorial rules below take priority over older baseline guidance in this document.
 
 ## Current direction — Editorial & refined
+
+### Public direction G — selected 2026-10-13
+
+The user selected **Human-centered learning**, referencing the actual [Wix Learn hero on Mobbin](https://mobbin.com/sites/sections/6eae0753-3cdb-4ca3-b070-0a207d352552). Public pages now use compact navigation, a large rounded photographic hero with centered overlaid typography and outlined CTA, alternating image/text sections, and photographic auth panels. This supersedes the earlier public asymmetrical collage requirement below. Google Sans Flex and all existing color tokens remain authoritative. `/admin` and `/dashboard` are excluded from this revision.
+
+Public outer container maximum: **1440px**, shared by navigation, main content, and both footer sections. Reading/form columns remain narrower for usability. Implementation evidence, image sources, and verification: `docs/design/public-direction-g.md`.
 
 User-selected direction: warm ivory, charcoal typography, deep-indigo accents, expressive whitespace, and considered photography. Jalanin should feel like the start of a meaningful journey.
 
@@ -22,7 +28,7 @@ User-selected direction: warm ivory, charcoal typography, deep-indigo accents, e
 ### Palette, composition, and imagery
 
 - Canvas `#f7f6f2`, surface `#fffefa`, charcoal text `#252822`, muted text `#64685f`, rules `#dedfd5`, warm secondary `#eeeee5`. Preserve exact primary `oklch(0.27 0.09 265.54)`.
-- Public layouts: 1280px outer container, asymmetrical text/photography hero, prominent editorial headings, numbered process steps separated by rules, quiet opportunity cards, and a deep-indigo About band.
+- Public layouts: 1440px outer container, approved direction-G photographic hero, reference-matched non-hero sections (see `docs/design/section-reference-map.md`), and a deep-indigo About band.
 - Avoid repetitive bordered boxes, generic benefit dashboards in the hero, blurred gradient blobs, and fabricated counts/testimonials.
 - Use rounded pill actions, 12–16px card corners, restrained shadows. Public photography can use a single expressive corner; data surfaces remain quiet.
 - Destination photography provides atmosphere and is not evidence of a particular internship or partner. Current locally hosted Singapore image: https://images.unsplash.com/photo-1525625293386-3f8f99389edd (Unsplash). Use `next/image`, responsive sizes, and descriptive alt text.
