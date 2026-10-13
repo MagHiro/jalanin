@@ -839,3 +839,33 @@ html { scroll-padding-top: 116px; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Mobbin-informed workspace refinement: compact operational clarity.
+   Unlike the editorial public pages, these remain data- and task-first. */
+.workspace-shell .workspace-topbar { background: color-mix(in srgb, var(--surface) 93%, var(--background)); }
+.workspace-shell .workspace-content { width: 100%; }
+.workspace-shell .workspace-welcome h1 { font-size: clamp(38px, 4vw, 54px); letter-spacing: -.06em; }
+.workspace-shell .workspace-priority { border: 1px solid var(--border); background: linear-gradient(115deg, var(--secondary), var(--surface)); border-radius: 20px; }
+.workspace-shell .workspace-stat { transition: background-color 180ms ease; }
+.workspace-shell .workspace-stat:hover, .workspace-shell .workspace-stat:focus-within { background: var(--secondary); }
+.workspace-shell .workspace-pipeline { border-radius: 20px; }
+.workspace-shell .workspace-pipeline a { transition: background-color 180ms ease; }
+.workspace-shell .workspace-quiet-empty { border-radius: 20px; background: var(--surface); }
+.workspace-shell .workspace-application-list li { transition: background-color 180ms ease; }
+.workspace-shell .workspace-application-list li:hover { background: color-mix(in srgb, var(--secondary) 55%, transparent); }
+.workspace-shell .workspace-record-action { transition: background-color 160ms ease, border-color 160ms ease; }
+.workspace-shell .workspace-record-action:hover { border-color: var(--primary); }
+.workspace-shell .workspace-note { border-radius: 20px; }
+.workspace-shell .table-shell tbody tr { transition: background-color 160ms ease; }
+.workspace-shell .form-section { background: var(--surface); border: 1px solid var(--border); }
+.workspace-shell :is(a, button, input, select, textarea):focus-visible,
+.public-site :is(a, button, input, select, textarea):focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+@media (max-width: 767px) {
+  .workspace-shell .workspace-content { padding-inline: 18px; }
+  .workspace-shell .workspace-priority { padding: 22px; }
+  .workspace-shell .workspace-welcome h1 { font-size: 37px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace-shell .workspace-stat, .workspace-shell .workspace-application-list li,
+  .workspace-shell .workspace-record-action, .workspace-shell .table-shell tbody tr { transition: none; }
+}

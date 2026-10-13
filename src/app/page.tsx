@@ -29,10 +29,11 @@ export default async function LandingPage() {
           <p data-hero-copy className="learn-hero-description">Internships across Southeast Asia.<br />Personal guidance for your next step.</p>
           <Link data-hero-copy href="/opportunities" className="learn-hero-action">Browse internships <ArrowUpRight size={19} aria-hidden="true" /></Link>
         </div>
+        <div className="learn-hero-side-note" aria-hidden="true"><span>Discover your next step</span><strong>Go somewhere.<br />Grow everywhere.</strong><span>Southeast Asia awaits.</span></div>
         <div className="learn-hero-bottom"><span>Go further. Learn by doing.</span><Link href="#how-it-works" aria-label="Discover how it works"><ArrowDown size={20} aria-hidden="true" /></Link></div>
       </section>
 
-      <div className="learn-intro-strip"><p>We believe in<br /><span>learning by doing.</span></p><div><p>Step beyond the classroom, discover a different culture, and build your experience with a real person by your side.</p><Link href="#about" className="learn-text-link mt-5">Get to know Jalanin <ArrowUpRight size={17} aria-hidden="true" /></Link></div></div>
+      <div className="learn-intro-strip"><p><span className="learn-intro-eyebrow">A little about us</span>We believe in<br /><span>learning by doing.</span></p><div><p>Step beyond the classroom, discover a different culture, and build your experience with a real person by your side.</p><Link href="#about" className="learn-text-link mt-5">Get to know Jalanin <ArrowUpRight size={17} aria-hidden="true" /></Link></div><figure className="learn-intro-image"><Image src="/images/work-together.jpg" alt="Colleagues collaborating around a work table" fill sizes="(min-width: 1024px) 250px, (min-width: 768px) 220px, 100vw" className="object-cover" /><figcaption>Learn by doing.</figcaption></figure></div>
 
       <section aria-labelledby="featured-heading" className="learn-section">
         <div data-scroll-reveal className="learn-section-heading"><div><p className="eyebrow">01 / Find your next step</p><h2 id="featured-heading" className="section-title mt-4">Big possibilities.<br />Real-world experience.</h2></div><div><p className="mb-5 max-w-xs leading-7 text-muted-foreground">A new city. A different perspective. Find a placement that feels right for you.</p><Link href="/opportunities" className="learn-text-link">Explore all opportunities <ArrowUpRight size={18} aria-hidden="true" /></Link></div></div>
@@ -41,8 +42,8 @@ export default async function LandingPage() {
       </section>
 
       <section id="how-it-works" aria-labelledby="hiw-heading" className="learn-section learn-process scroll-mt-28">
-        <div data-scroll-reveal><p className="eyebrow">02 / From curious to ready</p><h2 id="hiw-heading" className="section-title mt-4">How It Works</h2><Link href="/opportunities" className="btn btn-primary mt-6">Get started <ArrowRight size={17} aria-hidden="true" /></Link></div>
-        <ol>{steps.map(([title, body], i) => <li data-scroll-reveal key={title} className="learn-process-step"><span className="tnum">[{i + 1}]</span><div><h3>{title}</h3><p>{body}</p></div></li>)}</ol>
+        <div data-scroll-reveal><p className="eyebrow">02 / From curious to ready</p><h2 id="hiw-heading" className="section-title mt-4">How It Works</h2><p className="learn-process-intro">From finding a role to receiving your quotation, each step is designed to be clear.</p><Link href="/opportunities" className="btn btn-primary mt-6">Get started <ArrowRight size={17} aria-hidden="true" /></Link></div>
+        <ol>{steps.map(([title, body], i) => <li data-scroll-reveal key={title} className="learn-process-step"><span className="tnum" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span><div><h3>{title}</h3><p>{body}</p></div></li>)}</ol>
       </section>
 
       <section id="about" aria-labelledby="about-heading" className="learn-about scroll-mt-28">
@@ -51,7 +52,7 @@ export default async function LandingPage() {
       </section>
 
       <section id="contact" aria-labelledby="contact-heading" className="learn-section learn-contact scroll-mt-28">
-        <div data-scroll-reveal className="learn-contact-note"><p className="eyebrow">04 / Contact us</p><h3 className="mt-6 flex items-center gap-3 text-base font-medium"><Mail size={20} strokeWidth={1.5} aria-hidden="true" /> A real conversation.</h3><p className="mt-3 max-w-xs text-sm leading-7 text-muted-foreground">Our team will reply by email. See our <Link href="/privacy" className="underline underline-offset-4">privacy policy</Link>.</p></div><div className="learn-contact-form"><h2 id="contact-heading" className="section-title mb-10">A question, an idea,<br />a next step.<br />We’d love to hear from you.</h2><ContactForm /></div>
+        <div data-scroll-reveal className="learn-contact-note"><p className="eyebrow">04 / Contact us</p><h3 className="mt-6 flex items-center gap-3 text-base font-medium"><Mail size={20} strokeWidth={1.5} aria-hidden="true" /> A real conversation.</h3><p className="mt-3 max-w-xs text-sm leading-7 text-muted-foreground">Our team will reply by email. See our <Link href="/privacy" className="underline underline-offset-4">privacy policy</Link>.</p><Link href="/opportunities" className="learn-text-link mt-8">Explore placements first <ArrowUpRight size={17} aria-hidden="true" /></Link></div><div className="learn-contact-form"><h2 id="contact-heading" className="section-title mb-10">A question, an idea,<br />a next step.<br />We’d love to hear from you.</h2><ContactForm /></div>
       </section>
     </PublicMotion>
   );

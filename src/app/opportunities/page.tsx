@@ -159,6 +159,11 @@ export default async function OpportunitiesPage({
         </div>
       )}
 
+      <div className="learn-results-heading">
+        <div><p className="eyebrow">Your possibilities</p><h2>Available internships <span className="tnum">{total}</span></h2></div>
+        <p>{chips.length > 0 ? "Results reflect your selected filters." : "Browse the latest published opportunities, or narrow your search above."}</p>
+      </div>
+
       {rows.length === 0 ? (
         <EmptyState
           icon="○"

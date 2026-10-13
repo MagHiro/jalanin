@@ -217,3 +217,143 @@
   .public-site .opportunity-card, .learn-hero-action { transition: none; }
   .public-site .opportunity-card:hover { transform: none; }
 }
+
+
+/* Mobbin-informed 2026 section refresh: brand-level editorial hierarchy.
+   All public changes live below .public-site; application data and flows are untouched. */
+.public-site .learn-hero {
+  min-height: min(720px, 82vh);
+  place-items: center start;
+  text-align: left;
+  border-radius: 24px;
+}
+.public-site .learn-hero > img { object-position: 52% 48%; }
+.public-site .learn-hero-shade {
+  background: linear-gradient(90deg, rgb(10 20 35 / .85) 0%, rgb(10 20 35 / .70) 40%, rgb(10 20 35 / .16) 100%),
+    linear-gradient(0deg, rgb(10 20 35 / .40), transparent 38%);
+}
+.public-site .learn-hero-content {
+  width: min(100%, 880px);
+  padding: 112px 40px 126px clamp(40px, 6.5vw, 104px);
+}
+.public-site .learn-hero h1 {
+  font-size: clamp(48px, 5.6vw, 80px);
+  font-weight: 500;
+  letter-spacing: -.064em;
+  line-height: 1.06;
+}
+.public-site .learn-hero-description { margin: 26px 0 30px; color: #f2f3ed; }
+.public-site .learn-hero-action { background: var(--surface); border-color: var(--surface); color: var(--primary); font-weight: 600; }
+.public-site .learn-hero-action:hover { background: var(--accent); border-color: var(--accent); color: var(--primary); }
+.learn-hero-side-note {
+  position: absolute; top: 50%; right: 44px; transform: translateY(-40%);
+  width: 218px; padding: 28px 24px; display: flex; flex-direction: column;
+  gap: 20px; border: 1px solid rgb(255 255 255 / .50);
+  border-radius: 16px; background: rgb(14 27 54 / .30); color: #fff;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.learn-hero-side-note span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.learn-hero-side-note strong { font-size: 25px; line-height: 1.12; letter-spacing: -.045em; font-weight: 500; }
+.public-site .learn-hero-bottom { bottom: 28px; left: 40px; right: 40px; }
+.learn-intro-strip { grid-template-columns: 1fr 1.25fr 220px; gap: 44px; align-items: center; padding: 70px 0; }
+.learn-intro-strip > p:first-child { align-self: start; }
+.learn-intro-eyebrow { display: block; margin-bottom: 24px; font-size: 11px; line-height: 1.5; text-transform: uppercase; letter-spacing: .11em; color: var(--muted-foreground); }
+.learn-intro-image { position: relative; align-self: stretch; min-height: 210px; overflow: hidden; border-radius: 18px; background: var(--secondary); }
+.learn-intro-image img { object-position: center; }
+.learn-intro-image figcaption { position: absolute; right: 12px; bottom: 12px; border-radius: 999px; padding: 8px 13px; font-size: 11px; color: var(--foreground); background: var(--surface); }
+.public-site .learn-section-heading { padding-top: 24px; border-top: 1px solid var(--border); }
+.public-site .learn-section-heading h2 { letter-spacing: -.06em; }
+.public-site .learn-opportunity-grid { border: 1px solid var(--border); border-radius: 20px; padding-inline: 24px; overflow: hidden; }
+.public-site .opportunity-card { padding: 28px 16px; transition: background-color 180ms ease; }
+.public-site .opportunity-card:hover, .public-site .opportunity-card:focus-within { background: var(--background); }
+.public-site .opportunity-role h3 { max-width: 420px; line-height: 1.25; font-size: clamp(18px, 1.65vw, 23px); }
+.public-site .opportunity-label { text-transform: uppercase; letter-spacing: .075em; font-size: 10px; font-weight: 600; }
+.public-site .opportunity-action { border-radius: 999px; padding: 10px 14px !important; background: var(--secondary); font-weight: 500; white-space: nowrap; }
+.public-site .opportunity-action:hover { background: var(--primary); color: white; text-decoration: none; }
+.learn-process { border-top: 0; }
+.learn-process > div:first-child { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; column-gap: 64px; }
+.learn-process-intro { max-width: 430px; margin-top: 20px; color: var(--muted-foreground); font-size: 16px; line-height: 1.75; }
+.learn-process > ol { gap: 14px; margin-top: 40px; }
+.public-site .learn-process-step { display: flex; flex-direction: column; min-height: 265px; border: 1px solid var(--border); padding: 28px; border-radius: 20px; background: var(--surface); }
+.public-site .learn-process-step:nth-child(2), .public-site .learn-process-step:nth-child(4) { background: var(--secondary); }
+.public-site .learn-process-step > span { width: fit-content; min-width: 46px; height: 46px; border: 1px solid var(--border); border-radius: 50%; display: grid; place-items: center; font-size: 15px; line-height: 1; }
+.public-site .learn-process-step > div { margin-top: auto; padding-top: 38px; }
+.public-site .learn-process-step h3 { margin-top: 0; font-size: 23px; }
+.public-site .learn-process-step p { line-height: 1.65; }
+.public-site .learn-about { margin-block: 10px; padding: 80px 48px 48px; border-radius: 24px; background: var(--primary); }
+.public-site .learn-about-copy { max-width: 770px; }
+.public-site .learn-about .section-title { font-size: clamp(36px, 4.6vw, 65px); }
+.public-site .learn-about .learn-hero-action { margin-top: 32px; background: transparent; border-color: rgb(255 255 255 / .6); color: white; }
+.public-site .learn-about .learn-hero-action:hover { background: white; color: var(--primary); }
+.public-site .learn-about-photo { max-width: 100%; aspect-ratio: 2.35; border-radius: 18px; }
+.public-site .learn-contact { align-items: start; border-top: 1px solid var(--border); gap: min(8vw, 120px); }
+.public-site .learn-contact-note { align-self: stretch; padding-top: 12px; display: flex; flex-direction: column; align-items: flex-start; }
+.public-site .learn-contact-note > .learn-text-link { margin-top: auto; }
+.public-site .learn-contact-form { padding: 32px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; }
+.public-site .learn-contact-form h2 { max-width: 620px; font-size: clamp(30px, 3.4vw, 48px); line-height: 1.12; }
+.public-site .learn-contact-form .field { min-height: 48px; }
+.public-site .learn-contact-form textarea.field { min-height: 130px; }
+.public-site .learn-filters { margin-top: 24px; padding: 28px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
+.public-site .learn-filters .field { background: var(--background); }
+.learn-results-heading { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 16px; padding: 8px 0 18px; border-bottom: 1px solid var(--border); }
+.learn-results-heading h2 { margin-top: 8px; font-size: clamp(24px, 2.8vw, 32px); font-weight: 500; letter-spacing: -.045em; }
+.learn-results-heading h2 span { margin-left: 10px; color: var(--muted-foreground); font-size: 16px; }
+.learn-results-heading > p { max-width: 360px; font-size: 13px; color: var(--muted-foreground); line-height: 1.6; }
+.public-site .learn-detail article > h1 { font-size: clamp(40px, 4.7vw, 64px); line-height: 1.08; }
+.public-site .learn-detail article section { padding-block: 26px 40px; }
+.public-site .learn-detail article section h2 { font-size: 20px; }
+.public-site .learn-detail aside { border-radius: 20px; padding: 30px; }
+.public-site .learn-detail aside .btn { justify-content: space-between; }
+.public-site .auth-layout > .learn-auth-story { border-radius: 24px; }
+.public-site .learn-application-heading { border-radius: 20px; }
+.public-site .public-legal-layout > nav a:hover { background: var(--secondary); }
+.public-site .learn-footer { border-top: 0; }
+.learn-footer-heading { padding-block: 82px 72px; align-items: end; }
+.learn-footer-kicker { margin-bottom: 24px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--jalanin-200); }
+.learn-footer-invitation > p:last-child { font-size: clamp(42px, 5.8vw, 78px); line-height: 1.03; font-weight: 500; letter-spacing: -.065em; }
+.learn-footer-invitation > p:last-child span { color: var(--accent); }
+.learn-footer-heading .btn { min-height: 54px; padding-inline: 26px; justify-content: space-between; }
+.public-site .learn-footer-content { padding-top: 58px; padding-bottom: 72px; }
+.learn-footer-signoff { margin-top: 40px; font-size: 12px; font-weight: 500; letter-spacing: .06em; color: var(--accent); }
+.learn-footer-link { display: flex; width: fit-content; align-items: center; gap: 10px; min-height: 39px; padding: 5px 0; }
+.learn-footer-link svg { opacity: 0; transform: translate(-4px, 4px); transition: opacity 160ms, transform 160ms; }
+.learn-footer-link:hover svg, .learn-footer-link:focus-visible svg { opacity: 1; transform: translate(0); }
+.learn-footer-link:hover { color: white; }
+.learn-footer-bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; max-width: var(--public-max-width); margin: auto; padding: 26px 40px; border-top: 1px solid rgb(255 255 255 / .2); color: var(--jalanin-200); font-size: 12px; }
+@media (max-width: 1279px) { .learn-hero-side-note { display: none; } }
+@media (max-width: 1023px) {
+  .learn-intro-strip { grid-template-columns: 1fr 1.4fr; gap: 32px; }
+  .learn-intro-image { grid-column: 1 / -1; min-height: 260px; }
+  .public-site .learn-process-step { min-height: 245px; }
+  .public-site .learn-contact { gap: 36px; }
+  .public-site .learn-contact-form { padding: 24px; }
+}
+@media (max-width: 767px) {
+  .public-site .learn-hero { place-items: center; text-align: center; min-height: 610px; border-radius: 18px; }
+  .public-site .learn-hero-shade { background: linear-gradient(180deg, rgb(10 20 35 / .40), rgb(10 20 35 / .78) 58%, rgb(10 20 35 / .78)); }
+  .public-site .learn-hero-content { padding: 76px 18px 106px; }
+  .public-site .learn-hero h1 { font-size: clamp(39px, 8.4vw, 56px); letter-spacing: -.062em; }
+  .public-site .learn-hero-description { margin: 24px auto; }
+  .public-site .learn-hero-bottom { left: 20px; right: 20px; bottom: 20px; }
+  .learn-intro-strip { grid-template-columns: 1fr; gap: 24px; padding: 48px 0; }
+  .learn-intro-image { grid-column: auto; min-height: 245px; }
+  .public-site .learn-opportunity-grid { padding-inline: 14px; }
+  .public-site .opportunity-card { padding: 24px 10px; gap: 14px; }
+  .public-site .opportunity-action { justify-self: start; }
+  .learn-process > ol { gap: 12px; }
+  .public-site .learn-process-step { min-height: 0; }
+  .public-site .learn-about { padding: 52px 20px 20px; border-radius: 18px; }
+  .public-site .learn-about-photo { aspect-ratio: 1; }
+  .public-site .learn-contact { display: flex; flex-direction: column; }
+  .public-site .learn-contact-note { order: 2; }
+  .public-site .learn-contact-form { width: 100%; padding: 20px; }
+  .public-site .learn-filters { padding: 18px; border-radius: 16px; }
+  .learn-results-heading { align-items: start; flex-direction: column; }
+  .learn-footer-heading { padding: 56px 20px 40px; }
+  .learn-footer-invitation > p:last-child { font-size: clamp(40px, 10vw, 56px); }
+  .public-site .learn-footer-content { padding: 42px 20px 52px; }
+  .learn-footer-bottom { padding: 22px 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-site .opportunity-card, .learn-footer-link svg { transition: none; }
+}
