@@ -54,7 +54,8 @@ export default async function InternshipDetailPage({
               {internship.city}, {country}
             </span>
           </div>
-          <h1 className="section-title mt-6 max-w-2xl text-balance">
+          <p className="eyebrow mt-10">An opportunity to learn by doing</p>
+          <h1 className="section-title mt-5 max-w-2xl text-balance">
             {internship.title}
           </h1>
           <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">

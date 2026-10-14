@@ -79,3 +79,20 @@ test("mobile navigation dismisses with Escape and landing sections render", asyn
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: "/tmp/opencode/jalanin-g-desktop.png", fullPage: true });
 });
+
+test("editorial sections retain functional links, labels and responsive image layout", async ({ page }) => {
+  for (const width of [320, 375, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await expect(page.locator(".learn-intro-image img")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "How It Works" })).toBeVisible();
+    await expect(page.getByRole("form", { name: "Contact Jalanin" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Browse internships/ }).first()).toHaveAttribute("href", "/opportunities");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), `landing width ${width}`).toBeLessThanOrEqual(1);
+    await page.goto("/opportunities");
+    await expect(page.getByRole("heading", { name: /Available internships/ })).toBeVisible();
+    await expect(page.getByRole("form", { name: "Search and filter internships" })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), `directory width ${width}`).toBeLessThanOrEqual(1);
+  }
+});
