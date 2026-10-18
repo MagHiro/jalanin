@@ -2,6 +2,7 @@ import { db } from "@/lib/db/client";
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 import { notificationOutbox } from "@/lib/db/schema";
 import { and, asc, eq, lte } from "drizzle-orm";
+import { logServerError } from "@/lib/observability/logger";
 
 /**
  * Enqueue an email exactly once per event_key. Concurrent callers racing on
@@ -78,25 +79,35 @@ export async function dispatchDueEmails(limit = 25): Promise<DispatchOutcome> {
       .returning({ id: notificationOutbox.id });
     if (claimed.length === 0) continue;
 
-    const built = buildEmail(
-      row.templateKey,
-      row.payload as Record<string, unknown>,
-    );
+    let built: ReturnType<typeof buildEmail> = null;
+    try {
+      built = buildEmail(row.templateKey, row.payload as Record<string, unknown>);
+    } catch (error) {
+      logServerError("email.template.failed", error, { template: row.templateKey });
+    }
     if (!built) {
       await db
         .update(notificationOutbox)
-        .set({ status: "failed", error: `Unknown template ${row.templateKey}` })
+        .set({ status: "failed", error: "Unknown or invalid email template." })
         .where(eq(notificationOutbox.id, row.id));
       failed += 1;
       continue;
     }
-    const result = await provider.send({
-      to: row.recipient,
-      subject: built.subject,
-      text: built.text,
-      html: built.html,
-      replyTo: built.replyTo,
-    });
+    // A provider exception must not abort the batch or leave a claimed row
+    // without a diagnostic; normal failures follow the existing retry policy.
+    let result: Awaited<ReturnType<typeof provider.send>>;
+    try {
+      result = await provider.send({
+        to: row.recipient,
+        subject: built.subject,
+        text: built.text,
+        html: built.html,
+        replyTo: built.replyTo,
+      });
+    } catch (error) {
+      const incidentId = logServerError("email.provider.failed", error, { provider: provider.name });
+      result = { ok: false, error: `Provider error (incident ${incidentId})` };
+    }
     if (result.ok) {
       await db
         .update(notificationOutbox)

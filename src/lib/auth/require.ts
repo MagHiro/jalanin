@@ -4,6 +4,7 @@ import { db } from "@/lib/db/client";
 import { adminUsers } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { cookies, headers } from "next/headers";
+import { logServerError } from "@/lib/observability/logger";
 
 export interface SessionUser {
   id: string;
@@ -72,7 +73,8 @@ export async function getSessionUser(): Promise<SessionUser | null> {
       email: data.user.email ?? null,
       emailConfirmed: (data.user.confirmed_at ?? null) !== null,
     };
-  } catch {
+  } catch (error) {
+    logServerError("auth.session.lookup.failed", error);
     return null;
   }
 }
