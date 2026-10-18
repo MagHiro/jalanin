@@ -1,32 +1,31 @@
 "use client";
 
-import { useRef } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+import { useEffect, useRef } from "react";
 
-gsap.registerPlugin(useGSAP);
-
-/** Public-only enhancement: content remains visible without JavaScript. */
+/**
+ * Lightweight progressive reveal for public sections. Content is visible
+ * without JS and animations are browser-native; no GSAP runtime is shipped
+ * on landing and directory routes.
+ */
 export function PublicMotion({ children }: { children: React.ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
-  useGSAP(() => {
-    const media = gsap.matchMedia();
-    let observer: IntersectionObserver | undefined;
-    media.add("(prefers-reduced-motion: no-preference)", () => {
-      gsap.fromTo("[data-hero-image]", { scale: 1.035 }, { scale: 1, duration: 1.2, ease: "power2.out", clearProps: "transform" });
-      gsap.fromTo("[data-hero-copy]", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.09, clearProps: "opacity,transform" });
-      const context = gsap.context(() => {}, root);
-      observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          context.add(() => gsap.fromTo(entry.target, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power2.out", clearProps: "opacity,transform" }));
-          observer?.unobserve(entry.target);
-        });
-      }, { threshold: 0.12 });
-      root.current?.querySelectorAll("[data-scroll-reveal]").forEach((el) => observer?.observe(el));
-      return () => { observer?.disconnect(); context.revert(); };
-    });
-    return () => { observer?.disconnect(); media.revert(); };
-  }, { scope: root });
+
+  useEffect(() => {
+    if (
+      !root.current ||
+      typeof IntersectionObserver === "undefined" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) return;
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add("public-revealed");
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: 0.12 });
+    root.current.querySelectorAll("[data-scroll-reveal]").forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, []);
+
   return <div ref={root}>{children}</div>;
 }

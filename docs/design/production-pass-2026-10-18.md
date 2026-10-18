@@ -20,3 +20,10 @@ References are inspiration rather than UI assets; no external screenshots are em
 - Production errors expose only a support reference. Server incident logs omit potentially sensitive error messages.
 
 Verification must come from PR CI plus staging tests with real Supabase Auth/Storage, SMTP, and approved legal/retention configuration. No production deployment is implied.
+
+
+## Lightweight motion follow-up
+
+- Public section entrances now use the browser's IntersectionObserver and CSS animation; grouped form entrances use the Web Animations API. Both preserve visible content when JavaScript is unavailable or the visitor requests reduced motion.
+- Client bundles no longer import GSAP via the shared workspace shell or these two motion wrappers. Package removal is deferred to a separate lockfile-reviewed maintenance task.
+- Production SMTP now fails explicitly when required connection/sender settings are omitted. Real provider delivery, browser motion smoothness and shipped bundle size should be checked in staging.

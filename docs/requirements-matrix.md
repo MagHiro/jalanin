@@ -93,3 +93,5 @@ placeholder behavior shipped as confirmed.
 - WEB-08 / auth error UX: error fallback can show a safe support reference; sign-up confirmation guidance and honest sign-out failure states improved. Real hosted Supabase confirmation and sign-out still require staging validation.
 - APP-* / document interaction: client-side file size/type checks and single-flight submission improve perceived reliability; server-side policy and workflow remain authoritative.
 - NFR (performance): shared workspace no longer initializes GSAP on each route; admin navigation uses one indexed count rather than full overview aggregates. Verify page-bundle and latency impact in deployment telemetry.
+
+- NFR (bundle performance): public motion and form reveal now use lightweight browser APIs instead of GSAP imports; accessibility/reduced-motion behavior must be verified by CI/browser testing.
