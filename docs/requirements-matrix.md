@@ -85,3 +85,11 @@ enforcement · B05 file policy · B06 terms/tax/revision · B07 legal/retention 
 B08 ops/sender/backups · B09 commercial approval · B10 launch content.
 All `Blocked` until product-owner sign-off; interim rules documented, no
 placeholder behavior shipped as confirmed.
+
+
+## Production hardening follow-up (2026-10-18)
+
+- NOT-03 / operational email: scheduled GET/POST dispatch accepts only a constant-time compared bearer secret; provider exceptions are logged and retried as ordinary outbox failures. Actual hosted SMTP and scheduled invocation require staging verification.
+- WEB-08 / auth error UX: error fallback can show a safe support reference; sign-up confirmation guidance and honest sign-out failure states improved. Real hosted Supabase confirmation and sign-out still require staging validation.
+- APP-* / document interaction: client-side file size/type checks and single-flight submission improve perceived reliability; server-side policy and workflow remain authoritative.
+- NFR (performance): shared workspace no longer initializes GSAP on each route; admin navigation uses one indexed count rather than full overview aggregates. Verify page-bundle and latency impact in deployment telemetry.

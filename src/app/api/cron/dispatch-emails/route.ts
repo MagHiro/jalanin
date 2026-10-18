@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 function authorized(request: Request): boolean {
   const expected = process.env.CRON_SECRET;
   const auth = request.headers.get("authorization");
-  const match = auth?.match(/^Bearer\\s+(.+)$/i);
+  const match = auth?.match(/^Bearer\s+(.+)$/i);
   if (!expected || !match) return false;
   const provided = Buffer.from(match[1], "utf8");
   const secret = Buffer.from(expected, "utf8");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Reveal } from "@/components/motion/reveal";
 
@@ -22,6 +22,7 @@ interface Props {
 export function ApplicationForm({ internshipId, existing }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState<"draft" | "submit" | null>(null);
+  const inFlight = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [cvName, setCvName] = useState<string | null>(null);
   const [cvSize, setCvSize] = useState<string | null>(null);
@@ -58,12 +59,14 @@ export function ApplicationForm({ internshipId, existing }: Props) {
     form.set("applicationId", applicationId);
     form.set("file", file);
     const res = await fetch("/api/documents/upload", { method: "POST", body: form });
-    const data = (await res.json()) as { ok?: boolean; error?: string };
+    const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
     if (!res.ok || !data.ok) throw new Error(data.error ?? "CV upload failed.");
   }
 
   async function onAction(kind: "draft" | "submit", e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (inFlight.current || locked) return;
+    inFlight.current = true;
     setBusy(kind);
     setError(null);
     try {
@@ -71,6 +74,12 @@ export function ApplicationForm({ internshipId, existing }: Props) {
       const values = await collect(form);
       const file = form.get("cv");
       const cvFile = file instanceof File && file.size > 0 ? file : null;
+      if (cvFile && cvFile.size > 5 * 1024 * 1024) {
+        throw new Error("CV exceeds the 5 MB upload limit.");
+      }
+      if (cvFile && !/\\.(pdf|docx)$/i.test(cvFile.name)) {
+        throw new Error("Please upload a PDF or DOCX CV.");
+      }
 
       // A submitted record is *not* a draft: do not call the draft-only API.
       // Its updates go through the audited revision endpoint below.
@@ -85,7 +94,7 @@ export function ApplicationForm({ internshipId, existing }: Props) {
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ internshipId, values }),
         });
-        const draft = (await draftRes.json()) as {
+        const draft = (await draftRes.json().catch(() => ({}))) as {
           ok?: boolean;
           applicationId?: string;
           error?: string;
@@ -114,7 +123,7 @@ export function ApplicationForm({ internshipId, existing }: Props) {
             idempotencyKey: key,
           }),
         });
-        const sub = (await subRes.json()) as { ok?: boolean; ref?: string; error?: string };
+        const sub = (await subRes.json().catch(() => ({}))) as { ok?: boolean; ref?: string; error?: string };
         if (!subRes.ok || !sub.ok) throw new Error(sub.error ?? "Submission failed.");
         router.push(`/dashboard/applications/${applicationId}?submitted=1`);
         router.refresh();
@@ -125,6 +134,7 @@ export function ApplicationForm({ internshipId, existing }: Props) {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
       setBusy(null);
+      inFlight.current = false;
     }
   }
 

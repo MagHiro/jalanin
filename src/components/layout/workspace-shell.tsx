@@ -3,14 +3,10 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import { ArrowLeft, ArrowUpRight, Menu, MoveUpRight, X } from "lucide-react";
 import { DomainIcon } from "@/components/ui/domain-icon";
 import { SignOutButton } from "./sign-out-button";
 import type { RailItem } from "./workspace-rail";
-
-gsap.registerPlugin(useGSAP);
 
 export function WorkspaceShell({ children, role, items, switchLink, switchLabel, email }: {
   children: React.ReactNode;
@@ -24,14 +20,9 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
   const root = useRef<HTMLDivElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const current = [...items].reverse().find(item => item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`));
-  useEffect(() => { dialog.current?.close(); }, [pathname]);
-  useGSAP(() => {
-    const media = gsap.matchMedia();
-    media.add("(prefers-reduced-motion: no-preference)", () => {
-      gsap.fromTo(".workspace-content > *", { y: 8, opacity: 0.75 }, { y: 0, opacity: 1, duration: 0.32, ease: "power2.out", clearProps: "all" });
-    });
-    return () => media.revert();
-  }, { scope: root, dependencies: [pathname], revertOnUpdate: true });
+  useEffect(() => {
+    if (dialog.current?.open) dialog.current.close();
+  }, [pathname]);
 
   const navigation = <nav aria-label={`${role === "admin" ? "Admin" : "Student"} workspace`}>
     <p className="workspace-nav-label">{role === "admin" ? "Manage" : "Your workspace"}</p>
@@ -52,11 +43,12 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
   </div>;
 
   return <div ref={root} className={`workspace-shell workspace-${role}`}>
+    <a href="#main" className="workspace-skip-link">Skip to main content</a>
     <aside className="workspace-sidebar">{brand}{navigation}{bottom}</aside>
     <div className="workspace-body">
       <header className="workspace-topbar">
         <div className="flex min-w-0 items-center gap-3">
-          <button type="button" className="workspace-menu-button" onClick={() => dialog.current?.showModal()} aria-label="Open workspace navigation" aria-haspopup="dialog"><Menu size={20} /></button>
+          <button type="button" className="workspace-menu-button" onClick={() => { if (!dialog.current?.open) dialog.current?.showModal(); }} aria-label="Open workspace navigation" aria-controls="workspace-mobile-navigation" aria-haspopup="dialog"><Menu size={20} /></button>
           <p className="workspace-breadcrumb"><span>{role === "admin" ? "Administration" : "My workspace"}</span><span aria-hidden="true">/</span><b>{current?.label ?? "Overview"}</b></p>
         </div>
         <Link href={role === "admin" ? "/admin/notifications" : "/opportunities"} className="workspace-topbar-link">{role === "admin" ? "Notifications" : "Explore internships"}<ArrowUpRight size={16} /></Link>
@@ -64,7 +56,7 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
       <main id="main" className="workspace-content">{children}</main>
       <footer className="workspace-footer"><span>Jalanin · {role === "admin" ? "A little clarity. A lot of possibility." : "Your next chapter starts here."}</span><Link href="/privacy">Privacy</Link></footer>
     </div>
-    <dialog ref={dialog} className="workspace-mobile-dialog" aria-label="Workspace navigation" onClick={event => { if (event.target === dialog.current) dialog.current.close(); }}>
+    <dialog ref={dialog} id="workspace-mobile-navigation" className="workspace-mobile-dialog" aria-label="Workspace navigation" onClick={event => { if (event.target === dialog.current) dialog.current.close(); }}>
       <div className="workspace-mobile-panel"><div className="flex items-center justify-between gap-3">{brand}<button type="button" className="workspace-close-button" aria-label="Close workspace navigation" onClick={() => dialog.current?.close()}><X size={20} /></button></div>{navigation}{bottom}</div>
     </dialog>
   </div>;

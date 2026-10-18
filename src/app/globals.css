@@ -869,3 +869,32 @@ html { scroll-padding-top: 116px; }
   .workspace-shell .workspace-stat, .workspace-shell .workspace-application-list li,
   .workspace-shell .workspace-record-action, .workspace-shell .table-shell tbody tr { transition: none; }
 }
+
+/* Shared application/workspace usability, informed by task-first recruiting
+   patterns. Zero runtime animation libraries on authenticated workspaces. */
+.workspace-skip-link {
+  position: fixed;
+  z-index: 100;
+  top: -100px;
+  left: 16px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 600;
+}
+.workspace-skip-link:focus { top: 12px; outline: 3px solid var(--ring); outline-offset: 3px; }
+.workspace-content { min-width: 0; }
+.workspace-shell .workspace-priority { align-items: center; }
+.workspace-shell .workspace-priority-actions { flex-shrink: 0; }
+.workspace-shell .table-shell { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
+.workspace-shell .workspace-application-list li:focus-within,
+.workspace-shell .workspace-pipeline li:focus-within { background: var(--secondary); }
+.workspace-shell .field:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 20%, transparent); }
+@media (max-width: 479px) {
+  .workspace-shell .workspace-priority { gap: 18px; }
+  .workspace-shell .workspace-priority > div:nth-child(2) { min-width: 0; flex-basis: 100%; }
+  .workspace-shell .workspace-stat { padding-inline: 12px; }
+  .workspace-shell .workspace-stat strong { font-size: 32px; }
+  .workspace-shell .workspace-section-heading { flex-wrap: wrap; gap: 12px; }
+}
