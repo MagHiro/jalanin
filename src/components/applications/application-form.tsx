@@ -77,7 +77,7 @@ export function ApplicationForm({ internshipId, existing }: Props) {
       if (cvFile && cvFile.size > 5 * 1024 * 1024) {
         throw new Error("CV exceeds the 5 MB upload limit.");
       }
-      if (cvFile && !/\\.(pdf|docx)$/i.test(cvFile.name)) {
+      if (cvFile && !/\.(pdf|docx)$/i.test(cvFile.name)) {
         throw new Error("Please upload a PDF or DOCX CV.");
       }
 
