@@ -7,6 +7,7 @@ import Link from "next/link";
  * never a blank screen or leaked internals.
  */
 export default function Error({
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
@@ -22,6 +23,11 @@ export default function Error({
         Please try again. If the problem persists, contact us and mention
         what you were doing.
       </p>
+      {error.digest && (
+        <p className="mt-3 text-xs text-muted-foreground">
+          Support reference: <code className="select-all font-mono">{error.digest}</code>
+        </p>
+      )}
       <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
         <button type="button" onClick={reset} className="btn btn-primary">
           Try again

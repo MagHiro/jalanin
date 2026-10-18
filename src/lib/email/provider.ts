@@ -48,6 +48,10 @@ export function getEmailProvider(): EmailProvider {
     return new LogEmailProvider();
   }
   if (kind === "smtp") {
+    if (process.env.NODE_ENV === "production" &&
+        (!process.env.SMTP_HOST || !process.env.SMTP_PORT || !process.env.EMAIL_FROM)) {
+      throw new Error("Production SMTP requires SMTP_HOST, SMTP_PORT, and EMAIL_FROM.");
+    }
     // Lazy import keeps nodemailer server-only.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { SmtpEmailProvider } = require("./smtp") as typeof import("./smtp");

@@ -9,8 +9,11 @@
 - **Data:** hosted Supabase project — PostgreSQL + Auth + Storage
   (private bucket `documents`).
 - **Email:** SMTP provider (transactional host) via the outbox dispatcher.
-- **Cron:** `POST /api/cron/dispatch-emails` (Bearer `CRON_SECRET`) on a
-  5-minute schedule (Vercel Cron or equivalent).
+- **Cron:** `GET /api/cron/dispatch-emails` for Vercel Cron, or `POST` for
+  an external worker, both with `Authorization: Bearer <CRON_SECRET>`.
+  Configure a 5-minute schedule only on a plan that supports that cadence;
+  otherwise schedule a compatible interval with a trusted external worker.
+  The endpoint is deliberately uncached.
 
 ## 1. Supabase project setup
 
@@ -83,7 +86,9 @@ Domain: add `internships.jalanin.com` in Vercel → Domains; create the DNS
 ## 6. Monitoring
 
 - Outbox: query `notification_outbox WHERE status='failed'`; dispatcher logs
-  `processed/sent/failed`. Alert on repeated failures.
+  `processed/sent/failed`. Alert on repeated failures and nonzero failed
+  counts. Structured server errors contain an `incidentId`, event name and
+  error category/code; production intentionally omits message text and PII.
 - App: Vercel logs + error tracking per approved provider; auth-failure spikes
   indicate abuse (rate limits + Turnstile already in front of public forms).
 - Analytics intake persists allowlisted events in PostgreSQL `analytics_events`, with

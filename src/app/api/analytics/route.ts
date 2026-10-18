@@ -3,10 +3,12 @@ import { sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { isAnalyticsEvent, sanitizePayload } from "@/lib/analytics/events";
 import { clientIp, rateLimit } from "@/lib/security/ratelimit";
+import { logServerError } from "@/lib/observability/logger";
 
 // Persist allowlisted events without identifiers or arbitrary payloads.
 // Event data can be aggregated later; no vendor tracker or PII is required.
 export async function POST(request: Request) {
+  try {
   const ip = clientIp(request.headers);
   if (!(await rateLimit(`analytics:${ip}`, 120, 60 * 1000)).ok) {
     return NextResponse.json({ ok: false }, { status: 429 });
@@ -36,4 +38,8 @@ export async function POST(request: Request) {
     VALUES (${raw.event}, ${path}, ${slug})
   `);
   return NextResponse.json({ ok: true });
+  } catch (error) {
+    const incidentId = logServerError("analytics.ingest.failed", error);
+    return NextResponse.json({ ok: false, incidentId }, { status: 503 });
+  }
 }

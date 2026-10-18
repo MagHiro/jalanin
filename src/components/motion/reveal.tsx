@@ -1,16 +1,11 @@
 "use client";
 
-import { useRef } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-
-gsap.registerPlugin(useGSAP);
+import { useEffect, useRef } from "react";
 
 /**
- * Selective entrance motion (see docs/design/interaction-motion.md).
- * Hero, card grids, and form sections only — never admin data tables.
- * Content is server-rendered visible; GSAP enhances from a slight offset
- * and always clears props. Reduced-motion users see no animation.
+ * Optional browser-native entrance transitions for grouped form sections.
+ * No motion is required to read or use the form; unsupported browsers and
+ * reduced-motion preferences render the content immediately.
  */
 export function Reveal({
   children,
@@ -27,33 +22,25 @@ export function Reveal({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useGSAP(
-    () => {
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      const root = ref.current;
-      if (!root) return;
-      const targets = Array.from(root.querySelectorAll<HTMLElement>("[data-reveal]"));
-      if (targets.length === 0) return;
-      gsap.fromTo(
-        targets,
-        { opacity: 0, y },
+  useEffect(() => {
+    if (!ref.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const nodes = ref.current.querySelectorAll<HTMLElement>("[data-reveal]");
+    const animations = Array.from(nodes).flatMap((node, index) => {
+      if (typeof node.animate !== "function") return [];
+      return [node.animate(
+        [
+          { opacity: 0.82, transform: `translateY(${y}px)` },
+          { opacity: 1, transform: "translateY(0)" },
+        ],
         {
-          opacity: 1,
-          y: 0,
-          duration,
-          ease: "power2.out",
-          stagger,
-          clearProps: "opacity,transform",
-          overwrite: "auto",
+          duration: duration * 1000,
+          delay: index * stagger * 1000,
+          easing: "ease-out",
         },
-      );
-    },
-    { scope: ref },
-  );
+      )];
+    });
+    return () => animations.forEach((animation) => animation.cancel());
+  }, [duration, stagger, y]);
 
-  return (
-    <div ref={ref} className={className}>
-      {children}
-    </div>
-  );
+  return <div ref={ref} className={className}>{children}</div>;
 }

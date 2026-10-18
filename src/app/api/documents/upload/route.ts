@@ -14,6 +14,7 @@ import { isStudentEditLocked, type ApplicationStatus } from "@/lib/workflow/tran
 import { enqueueEmail } from "@/lib/email/outbox";
 import { adminAlertRecipients } from "@/lib/email/provider";
 import { appUrl, applicationRef, audit } from "@/lib/utils";
+import { logServerError } from "@/lib/observability/logger";
 
 // Private CV uploads: the previous object remains until replacement metadata
 // commits. Submitted replacements create a revision and require admin re-review.
@@ -154,9 +155,10 @@ export async function POST(request: Request) {
     if (error instanceof AuthError) {
       return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     }
+    const incidentId = logServerError("document.upload.failed", error);
     return NextResponse.json(
-      { ok: false, error: "Could not upload CV. Please try again." },
-      { status: 400 },
+      { ok: false, error: "Could not upload CV. Please try again.", incidentId },
+      { status: 503 },
     );
   }
 }

@@ -4,6 +4,7 @@ import { db } from "@/lib/db/client";
 import { adminUsers } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { cookies, headers } from "next/headers";
+import { logServerError } from "@/lib/observability/logger";
 
 export interface SessionUser {
   id: string;
@@ -72,7 +73,13 @@ export async function getSessionUser(): Promise<SessionUser | null> {
       email: data.user.email ?? null,
       emailConfirmed: (data.user.confirmed_at ?? null) !== null,
     };
-  } catch {
+  } catch (error) {
+    // CI's explicitly gated test sessions intentionally run without hosted
+    // Supabase. Do not turn expected anonymous lookups into noisy errors.
+    if (!isE2EMode() ||
+        (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)) {
+      logServerError("auth.session.lookup.failed", error);
+    }
     return null;
   }
 }

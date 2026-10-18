@@ -5,10 +5,12 @@ import { enqueueEmail } from "@/lib/email/outbox";
 import { adminAlertRecipients } from "@/lib/email/provider";
 import { clientIp, rateLimit, verifyTurnstile } from "@/lib/security/ratelimit";
 import { contactInputSchema } from "@/lib/validation/schemas";
+import { logServerError } from "@/lib/observability/logger";
 
 // Public contact intake (COM-*): validate → Turnstile → store → notify.
 // Rate-limited per IP. Failures never expose internals.
 export async function POST(request: Request) {
+  try {
   const ip = clientIp(request.headers);
   const limit = await rateLimit(`contact:${ip}`, 10, 10 * 60 * 1000);
   if (!limit.ok) {
@@ -66,4 +68,11 @@ export async function POST(request: Request) {
   });
 
   return NextResponse.json({ ok: true });
+  } catch (error) {
+    const incidentId = logServerError("contact.submit.failed", error);
+    return NextResponse.json(
+      { ok: false, error: "We could not send your message. Please try again later.", incidentId },
+      { status: 503 },
+    );
+  }
 }

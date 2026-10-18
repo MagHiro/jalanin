@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { requireAdmin, AuthError } from "@/lib/auth/require";
-import { getAdminOverview } from "@/features/admin/service";
+import { db } from "@/lib/db/client";
+import { adminNotifications } from "@/lib/db/schema";
+import { count, eq } from "drizzle-orm";
 import { WorkspaceShell } from "@/components/layout/workspace-shell";
 
 // Admin shell: every page under /admin re-verifies the admin role
@@ -19,8 +21,12 @@ export default async function AdminLayout({
     if (err instanceof AuthError && err.status === 401) redirect("/auth/login?next=/admin");
     redirect("/");
   }
-  const overview = await getAdminOverview();
-  const unread = overview.unreadNotifications;
+  // The sidebar only needs one indexed unread count. Avoid re-running the
+  // full multi-table admin overview aggregation on every nested navigation.
+  const unreadRows = await db.select({ n: count() })
+    .from(adminNotifications)
+    .where(eq(adminNotifications.isRead, false));
+  const unread = Number(unreadRows[0]?.n ?? 0);
 
   return (
       <WorkspaceShell

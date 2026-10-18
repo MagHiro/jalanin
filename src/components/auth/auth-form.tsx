@@ -15,6 +15,7 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
   const requestedNext = params.get("next") ?? "/dashboard";
   // Reject protocol-relative or backslash redirects. This value is used by
   // both the browser router and the email verification callback.
@@ -45,6 +46,13 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
               },
             });
       if (result.error) throw new Error(result.error.message);
+      // Email-confirmation accounts have a user but no active session.
+      // Do not redirect them into a protected dashboard/login loop.
+      if (mode === "sign-up" && !result.data.session) {
+        setConfirmationEmail(email);
+        setBusy(false);
+        return;
+      }
       // E2E/dev seam: mirror the session into a signed test cookie ONLY when
       // explicitly enabled (NEXT_PUBLIC_E2E=1, local/CI runs). The endpoint
       // itself 404s unless E2E_MODE=1 server-side, so this is doubly gated.
@@ -82,7 +90,16 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
             <>Already have an account? <Link href={next !== "/dashboard" ? `/auth/login?next=${encodeURIComponent(next)}` : "/auth/login"} className="font-semibold text-primary hover:underline">Log in</Link></>
           )}
         </p>
-        <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate={false}>
+        {confirmationEmail ? (
+          <div className="mt-6 rounded-xl border border-border bg-secondary p-6" role="status">
+            <h2 className="text-lg font-semibold text-foreground">Check your email</h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              If confirmation is required, we sent a verification link to <strong className="break-all text-foreground">{confirmationEmail}</strong>.
+              Open the link before logging in. Check your spam folder if it does not arrive.
+            </p>
+            <Link href="/auth/login" className="btn btn-primary mt-5">Go to log in</Link>
+          </div>
+        ) : <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate={false}>
           <label className="field-label">
             <span>Email</span>
             <input name="email" type="email" required autoComplete="email" placeholder="you@example.com" className="field" />
@@ -117,7 +134,7 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
           <button type="submit" disabled={busy} className="btn btn-primary w-full">
             {busy ? "Please wait…" : mode === "login" ? "Log in" : "Sign up"}
           </button>
-        </form>
+        </form>}
         {mode === "login" ? (
           <p className="mt-4 text-center text-sm">
             <Link href="/auth/forgot-password" className="inline-flex min-h-10 items-center font-medium text-primary hover:underline">Forgot your password?</Link>
