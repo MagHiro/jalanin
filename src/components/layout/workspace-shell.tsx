@@ -90,7 +90,7 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
     const node = root.current;
     if (!node || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const context = gsap.context(() => {
-      const sections = gsap.utils.toArray<HTMLElement>(".workspace-content .workspace-page-heading, .workspace-content .workspace-welcome, .workspace-content .workspace-stat, .workspace-content .workspace-data-card, .workspace-content .page-heading, .workspace-content .table-shell, .workspace-content .toolbar, .workspace-content .form-section");
+      const sections = gsap.utils.toArray<HTMLElement>(".workspace-content .workspace-page-heading, .workspace-content .workspace-welcome, .workspace-content .workspace-stat, .workspace-content .workspace-data-card, .workspace-content .page-heading, .workspace-content .table-shell, .workspace-content .crm-records, .workspace-content .workspace-record-section, .workspace-content .toolbar, .workspace-content .form-section");
       gsap.fromTo(sections.slice(0, 18), { opacity: 0, y: 9 }, { opacity: 1, y: 0, duration: 0.36, ease: "power2.out", stagger: 0.027, clearProps: "all", overwrite: "auto" });
     }, node);
     return () => context.revert();
@@ -112,7 +112,7 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
       <p className="workspace-nav-label">{group.label}</p>
       {group.items.map(item => {
         const active = item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
-        return <Link key={item.href} href={item.href} className="workspace-nav-item" aria-current={active ? "page" : undefined} onClick={() => mobile.current?.close()}>
+        return <Link key={item.href} href={item.href} className="workspace-nav-item" title={item.label} aria-label={item.label} aria-current={active ? "page" : undefined} onClick={() => mobile.current?.close()}>
           <span className="workspace-nav-icon"><DomainIcon name={item.icon} size={18} /></span>
           <span className="workspace-nav-text">{item.label}</span>
           {!!item.badge && <span className="workspace-nav-count tnum" aria-label={`${item.badge} unread`}>{item.badge}</span>}
