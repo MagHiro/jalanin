@@ -226,3 +226,13 @@
 .workspace-shell .workspace-student-links>a:hover{color:#1d3b7a}
 @media(max-width:1050px){.workspace-shell .workspace-student-record-grid{grid-template-columns:1fr}.workspace-shell .workspace-student-record-side{display:grid;grid-template-columns:1fr 1fr}}
 @media(max-width:680px){.workspace-shell .workspace-student-record-stats{width:100%;grid-template-columns:repeat(3,minmax(0,1fr))}.workspace-shell .workspace-student-record-stats>div{min-width:0;padding:11px}.workspace-shell .workspace-student-record-side{display:flex}.workspace-shell .workspace-record-row-actions{gap:5px}.workspace-shell .workspace-record-rows li{align-items:start}.workspace-shell .workspace-record-reference{font-size:10px}}
+
+/* Overflow guard: the rail and interior data scrollers must not expand the page. */
+.workspace-shell{width:100%;max-width:100%;min-width:0;overflow-x:clip}
+.workspace-shell .workspace-body,.workspace-shell .workspace-content{min-width:0;max-width:100%;box-sizing:border-box}
+.workspace-shell .workspace-stat{border-left-width:0!important}
+.workspace-shell .workspace-calendar-day:disabled{cursor:not-allowed}
+@media(max-width:480px){
+.workspace-shell .form-section .grid.grid-cols-2{grid-template-columns:1fr!important}
+.workspace-shell .workspace-date-field .workspace-calendar-popover{left:0;right:auto;width:min(320px,calc(100vw - 38px))}
+}
