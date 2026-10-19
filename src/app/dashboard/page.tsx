@@ -1,85 +1,117 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, BriefcaseBusiness, CheckCircle2, Compass, FilePenLine, MapPin } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, Check, Compass, FilePenLine, MapPin, MoveUpRight, Sparkles } from "lucide-react";
+import { desc, eq } from "drizzle-orm";
 import { getSessionUser } from "@/lib/auth/require";
 import { listStudentApplications } from "@/features/applications/service";
 import { db } from "@/lib/db/client";
 import { placements } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
 import { StatusBadge } from "@/components/ui/status-badge";
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const user = await getSessionUser();
   if (!user) redirect("/auth/login?next=/dashboard");
-  const apps = await listStudentApplications(user.id);
-  const studentPlacements = await db.select().from(placements).where(eq(placements.studentUserId, user.id)).orderBy(desc(placements.updatedAt));
-  const drafts = apps.filter(a => a.application.isDraft);
-  const submitted = apps.filter(a => !a.application.isDraft);
-  const statusCounts = submitted.reduce<Record<string, number>>((counts, { application }) => {
-    counts[application.lifecycleStatus] = (counts[application.lifecycleStatus] ?? 0) + 1;
-    return counts;
-  }, {});
-  const highestStatusCount = Math.max(1, ...Object.values(statusCounts));
-  const statistics = [
-    { label: "Applications", value: submitted.length, caption: "Submitted for review", href: "/dashboard/applications", icon: BriefcaseBusiness },
-    { label: "Saved drafts", value: drafts.length, caption: "Continue when ready", href: "/dashboard/applications", icon: FilePenLine },
-    { label: "Placements", value: studentPlacements.length, caption: "Your recorded placements", href: "/dashboard/placements", icon: CheckCircle2 },
+
+  const [apps, studentPlacements] = await Promise.all([
+    listStudentApplications(user.id),
+    db.select().from(placements).where(eq(placements.studentUserId, user.id)).orderBy(desc(placements.updatedAt)),
+  ]);
+  const drafts = apps.filter(({ application }) => application.isDraft);
+  const submitted = apps.filter(({ application }) => !application.isDraft);
+  const revisions = submitted.filter(({ application }) => application.needsReReview);
+  const leadDraft = drafts[0];
+  const leadRevision = revisions[0];
+
+  const nextMove = leadRevision
+    ? { eyebrow: "A change to revisit", title: "An application needs another look.", description: "Review your updated application details and follow its latest status.", href: `/dashboard/applications/${leadRevision.application.id}`, label: "Review application" }
+    : leadDraft
+      ? { eyebrow: "Pick up where you left off", title: "Your application is waiting for you.", description: `Continue your application for ${leadDraft.internshipTitle}. Your saved draft has not been submitted.`, href: `/apply/${leadDraft.application.internshipId}`, label: "Continue draft" }
+      : studentPlacements.length > 0
+        ? { eyebrow: "Your next destination", title: "Keep your placement in view.", description: "Find your recorded placement details, dates and current status in one place.", href: "/dashboard/placements", label: "View placement" }
+        : submitted.length > 0
+          ? { eyebrow: "Stay in the loop", title: "Your applications are on their way.", description: "Follow each status as the team reviews your submissions. Quotation details arrive by email.", href: "/dashboard/applications", label: "Track applications" }
+          : { eyebrow: "A good place to begin", title: "Find a role worth exploring.", description: "Discover internship opportunities across Southeast Asia and start your journey at your own pace.", href: "/opportunities", label: "Explore internships" };
+
+  const milestones = [
+    { number: "01", title: "Explore", detail: "Find your direction", achieved: apps.length > 0, href: "/opportunities" },
+    { number: "02", title: "Apply", detail: "Put yourself forward", achieved: submitted.length > 0, href: "/dashboard/applications" },
+    { number: "03", title: "Placement", detail: "See what comes next", achieved: studentPlacements.length > 0, href: "/dashboard/placements" },
   ];
-  const nextHref = drafts.length > 0 ? `/apply/${drafts[0].application.internshipId}` : submitted.length > 0 ? "/dashboard/applications" : "/opportunities";
-  const nextLabel = drafts.length > 0 ? "Resume application" : submitted.length > 0 ? "View applications" : "Explore internships";
 
-  return <div className="workspace-overview">
-    <section className="workspace-page-heading workspace-hero workspace-student-hero" aria-labelledby="dashboard-title">
-      <div><p className="workspace-kicker">My workspace / Overview</p><h1 id="dashboard-title">Your next chapter.</h1><p className="workspace-intro">One place for the opportunities you’ve found, the applications you’ve sent, and the steps ahead.</p></div>
-      <div className="workspace-hero-aside"><span>YOUR JOURNEY SO FAR</span><strong className="tnum">{apps.length} {apps.length === 1 ? "application" : "applications"} on file</strong><Link href="/opportunities" className="btn btn-primary"><Compass size={17} /> Browse internships</Link></div>
-    </section>
-
-    <section aria-label="Your journey at a glance" className="workspace-stat-strip workspace-student-stats">
-      {statistics.map(({ label, value, caption, href, icon: Icon }) => <Link key={label} href={href} className="workspace-stat">
-        <div className="workspace-stat-label"><span>{label}</span><span className="workspace-stat-icon"><Icon size={18} strokeWidth={1.8} /></span></div>
-        <strong className="tnum">{value}</strong>
-        <span className="workspace-stat-caption">{caption}</span>
-      </Link>)}
-    </section>
-
-    <div className="workspace-main-grid">
-      <section className="workspace-data-card workspace-recent-applications" aria-labelledby="apps-heading">
-        <div className="workspace-panel-heading"><div><p className="workspace-kicker">Applications</p><h2 id="apps-heading">Recent applications</h2></div><Link href="/dashboard/applications" className="workspace-text-link">View all <ArrowRight size={15} /></Link></div>
-        {submitted.length > 0 ? <ul className="workspace-application-list">
-          {submitted.slice(0, 4).map(({ application, internshipTitle, internshipCity, internshipCountry }) => <li key={application.id}>
-            <span className="workspace-record-icon"><BriefcaseBusiness size={19} /></span>
-            <div className="workspace-record-body"><h3><Link href={`/dashboard/applications/${application.id}`}>{internshipTitle}</Link></h3><p><MapPin size={13} /> {internshipCity}, {internshipCountry}</p>{application.needsReReview && <span className="badge badge-rereview mt-1">Updated — re-review required</span>}</div>
-            <div className="workspace-record-status"><StatusBadge status={application.lifecycleStatus} /><Link href={`/dashboard/applications/${application.id}`} className="workspace-text-link">Details</Link></div>
-          </li>)}
-        </ul> : <div className="workspace-inline-empty"><FilePenLine size={22} /><strong>{drafts.length ? "Your applications are in progress" : "Ready to get started?"}</strong><p>{drafts.length ? "Complete a saved draft to submit it for review." : "Find an internship that feels right, then track every step here."}</p><Link href={nextHref} className="workspace-text-link">{nextLabel} <ArrowRight size={14} /></Link></div>}
-        {drafts.length > 0 && <div className="workspace-drafts"><p><FilePenLine size={16} /> {drafts.length} saved draft{drafts.length === 1 ? "" : "s"}</p><Link className="workspace-text-link" href={`/apply/${drafts[0].application.internshipId}`}>Continue <ArrowRight size={14} /></Link></div>}
-      </section>
-
-      <section className="workspace-data-card workspace-queue-card" aria-labelledby="next-heading">
-        <div className="workspace-panel-heading"><div><p className="workspace-kicker">Next steps</p><h2 id="next-heading">What’s next?</h2></div><span className="workspace-panel-icon"><Compass size={20} /></span></div>
-        <p className="workspace-queue-title">{drafts.length > 0 ? "You have a draft to finish" : submitted.length > 0 ? "Keep track of your progress" : "Start your internship journey"}</p>
-        <p className="workspace-panel-copy">{drafts.length > 0 ? "Your saved application is ready. Finish the details and submit when you’re comfortable." : submitted.length > 0 ? "Check application statuses here. Quotations are sent by email when prepared." : "Explore available opportunities across Southeast Asia and apply to a role that fits your goals."}</p>
-        <div className="workspace-queue-actions"><Link href={nextHref} className="btn btn-primary">{nextLabel} <ArrowRight size={15} /></Link></div>
-      </section>
-    </div>
-
-    {submitted.length > 0 && <section className="workspace-data-card workspace-progress-card" aria-labelledby="status-heading">
-      <div className="workspace-panel-heading"><div><p className="workspace-kicker">Your progress</p><h2 id="status-heading">Application status</h2></div><Link href="/dashboard/applications" className="workspace-text-link">All applications <ArrowRight size={15} /></Link></div>
-      <div className="workspace-progress-grid">
-        {Object.entries(statusCounts).map(([status, value]) => <div key={status} className="workspace-progress-item">
-          <div className="workspace-progress-item-top"><StatusBadge status={status} /><strong className="tnum">{value}</strong></div>
-          <div className="workspace-progress-track" role="img" aria-label={`${value} applications are ${status}`}><span style={{ width: `${(value / highestStatusCount) * 100}%` }} /></div>
-        </div>)}
+  return <div className="journey-overview">
+    <section className="journey-masthead" aria-labelledby="dashboard-title">
+      <div className="journey-introduction">
+        <div className="journey-eyebrow"><span className="journey-eyebrow-line" /> YOUR JALANIN JOURNEY</div>
+        <h1 id="dashboard-title">The next chapter<br /><em>starts here.</em></h1>
+        <p>From the first opportunity to your placement, everything you need to keep moving is right here.</p>
+        <Link href="/opportunities" className="journey-quiet-link">Discover opportunities <MoveUpRight size={17} aria-hidden="true" /></Link>
       </div>
-    </section>}
-
-    <section className="workspace-data-card workspace-placements-card" aria-labelledby="placements-heading">
-      <div className="workspace-panel-heading"><div><p className="workspace-kicker">Placements</p><h2 id="placements-heading">Placement updates</h2></div><Link href="/dashboard/placements" className="workspace-text-link">View all <ArrowRight size={15} /></Link></div>
-      {studentPlacements.length > 0 ? <ul className="workspace-placement-list">
-        {studentPlacements.slice(0, 4).map(p => <li key={p.id}><div><h3>{p.role}</h3><p>{p.organization}{p.startDate && ` · ${p.startDate}`}</p></div><StatusBadge status={p.placementStatus} /></li>)}
-      </ul> : <div className="workspace-inline-empty workspace-inline-empty-horizontal"><BriefcaseBusiness size={21} /><div><strong>Placements will appear here</strong><p>Your team-managed placement details will be available as soon as a placement is arranged.</p></div><Link href="/dashboard/applications" className="workspace-text-link">View applications <ArrowRight size={14} /></Link></div>}
+      <div className="journey-focus">
+        <div className="journey-focus-top"><span className="journey-focus-marker"><Sparkles size={17} aria-hidden="true" /></span><span>YOUR NEXT MOVE</span><span className="journey-focus-index">01 / 03</span></div>
+        <span className="journey-focus-eyebrow">{nextMove.eyebrow}</span>
+        <h2>{nextMove.title}</h2>
+        <p>{nextMove.description}</p>
+        <Link href={nextMove.href} className="journey-primary-link">{nextMove.label}<ArrowRight size={18} aria-hidden="true" /></Link>
+        <div className="journey-focus-decoration" aria-hidden="true"><span /><span /><span /></div>
+      </div>
     </section>
+
+    <section className="journey-path-panel" aria-labelledby="journey-path-title">
+      <div className="journey-section-top">
+        <div><span className="journey-label">THE BIG PICTURE</span><h2 id="journey-path-title">Your journey, in motion.</h2></div>
+        <span className="journey-caption">Every step counts.</span>
+      </div>
+      <ol className="journey-path">
+        {milestones.map((step, index) => <li key={step.number} className={step.achieved ? "is-reached" : ""}>
+          <Link href={step.href} className="journey-path-step">
+            <span className="journey-path-marker" aria-hidden="true">{step.achieved ? <Check size={18} strokeWidth={2.5} /> : step.number}</span>
+            <span className="journey-path-text"><strong>{step.title}</strong><small>{step.detail}</small></span>
+            <span className="journey-path-state">{step.achieved ? "On record" : index === 0 && apps.length === 0 ? "Start here" : "Ahead"}</span>
+          </Link>
+        </li>)}
+      </ol>
+      <div className="journey-metrics" aria-label="Your activity at a glance">
+        <Link href="/dashboard/applications?view=submitted" className="journey-metric"><strong className="tnum">{submitted.length}</strong><span>Applications sent</span><ArrowRight size={15} aria-hidden="true" /></Link>
+        <Link href="/dashboard/applications?view=drafts" className="journey-metric"><strong className="tnum">{drafts.length}</strong><span>Saved drafts</span><ArrowRight size={15} aria-hidden="true" /></Link>
+        <Link href="/dashboard/placements" className="journey-metric"><strong className="tnum">{studentPlacements.length}</strong><span>Placements</span><ArrowRight size={15} aria-hidden="true" /></Link>
+      </div>
+    </section>
+
+    <div className="journey-content-grid">
+      <section className="journey-paper-card journey-applications" aria-labelledby="journey-applications-title">
+        <div className="journey-section-top"><div><span className="journey-label">IN YOUR CORNER</span><h2 id="journey-applications-title">Applications in progress</h2></div><Link href="/dashboard/applications" className="journey-view-all">View all <ArrowRight size={16} aria-hidden="true" /></Link></div>
+        {apps.length > 0 ? <ul className="journey-records">
+          {apps.slice(0, 4).map(({ application, internshipTitle, internshipCity, internshipCountry }) => {
+            const href = application.isDraft ? `/apply/${application.internshipId}` : `/dashboard/applications/${application.id}`;
+            return <li key={application.id}>
+              <Link href={href} className="journey-record">
+                <span className="journey-record-symbol" aria-hidden="true">{application.isDraft ? <FilePenLine size={19} /> : <BriefcaseBusiness size={19} />}</span>
+                <span className="journey-record-main"><strong>{internshipTitle}</strong><small><MapPin size={13} aria-hidden="true" /> {internshipCity}, {internshipCountry}</small></span>
+                <span className="journey-record-end"><StatusBadge status={application.isDraft ? "Draft" : application.lifecycleStatus} />{application.needsReReview && <small className="journey-review-note">Re-review needed</small>}</span>
+                <ArrowRight className="journey-record-arrow" size={17} aria-hidden="true" />
+              </Link>
+            </li>;
+          })}
+        </ul> : <div className="journey-empty">
+          <span className="journey-empty-icon"><Compass size={24} /></span>
+          <h3>No applications yet. That’s okay.</h3>
+          <p>Your first opportunity is out there. When you apply, you’ll be able to follow it here.</p>
+          <Link href="/opportunities">Browse internships <ArrowRight size={15} aria-hidden="true" /></Link>
+        </div>}
+      </section>
+
+      <aside className="journey-side-column">
+        <section className="journey-destination-card" aria-labelledby="journey-destination-title">
+          <div className="journey-destination-art" aria-hidden="true"><span className="journey-art-orbit journey-art-orbit-one" /><span className="journey-art-orbit journey-art-orbit-two" /><span className="journey-art-pin"><MapPin size={23} /></span><span className="journey-art-star">✳</span></div>
+          <span className="journey-label">WHERE YOU'RE HEADED</span>
+          <h2 id="journey-destination-title">{studentPlacements.length > 0 ? "Your placement story." : "Good things take shape."}</h2>
+          {studentPlacements.length > 0 ? <><p>Here’s the latest placement recorded for you.</p><div className="journey-destination-record"><strong>{studentPlacements[0].role}</strong><span>{studentPlacements[0].organization}</span><StatusBadge status={studentPlacements[0].placementStatus} /></div></> : <p>When your team arranges a placement, the details and next steps will appear here.</p>}
+          <Link href="/dashboard/placements">View placements <ArrowRight size={16} aria-hidden="true" /></Link>
+        </section>
+        <div className="journey-help"><span>NEED A HAND?</span><p>Questions along the way? We’re here to help you figure out your next step.</p><Link href="/contact">Get in touch <MoveUpRight size={16} aria-hidden="true" /></Link></div>
+      </aside>
+    </div>
   </div>;
 }
-
-export const dynamic = "force-dynamic";

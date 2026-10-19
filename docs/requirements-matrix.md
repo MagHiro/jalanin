@@ -149,3 +149,8 @@ UI-only refinement of existing ADM-APP, ADM-JOB, ADM-STU, D11 placement, COM-04 
 ### Authenticated workspace presentation — 2026-10-19
 - Shared admin/student navigation and mobile shortcuts, accessible calendar controls, searchable dropdown improvements, contextual empty-state guidance, richer profile detail and truthful lifecycle counts; presentation-layer implementation, preserving existing server-side authorization, validation and workflows.
 - QA: GitHub CI (lint, typecheck, tests, build, Playwright) triggered by commits to main. Populated-record visual signoff remains an explicit release check. Design notes: docs/design/workspace-overhaul-2026-10-19.md.
+
+### Authenticated overview design update — 2026-10-19
+
+- **Student dashboard / application lifecycle:** Existing server-scoped applications, drafts and placements power a journey-specific overview with an accurate prioritized next action, status badges and linked milestone summaries. No lifecycle or authorization semantics changed. UI regression: `tests/e2e/workspaces.spec.ts`, `tests/e2e/workspace-replica.spec.ts`.
+- **Admin overview / operations visibility:** Existing authorized aggregates, audit feed, recent submissions and unread notifications power the review-priority overview and pipeline stage distribution. No new metrics, schema, permissions or transitions. UI regression: `tests/e2e/workspaces.spec.ts`, `tests/e2e/workspace-replica.spec.ts`.

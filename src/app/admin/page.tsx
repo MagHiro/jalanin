@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowRight, Bell, BriefcaseBusiness, CheckCircle2, ClipboardList, Clock3, FileText, Plus, Users } from "lucide-react";
+import { Activity, ArrowRight, Bell, BriefcaseBusiness, CheckCircle2, ChevronRight, CircleDot, ClipboardList, Clock3, FileText, Plus, Users } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
 import { getAdminOverview, listAdminApplications, recentAudit } from "@/features/admin/service";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -8,113 +8,130 @@ import { StatusBadge } from "@/components/ui/status-badge";
 export const metadata: Metadata = { title: "Admin overview", robots: "noindex" };
 export const dynamic = "force-dynamic";
 
-const STATUS_LINKS: Array<[string, string]> = [
-  ["New", "/admin/applications?status=New"],
-  ["In Review", "/admin/applications?status=In+Review"],
-  ["Quotation Sent", "/admin/applications?status=Quotation+Sent"],
-  ["Accepted", "/admin/applications?status=Accepted"],
-  ["Rejected", "/admin/applications?status=Rejected"],
-  ["Completed", "/admin/applications?status=Completed"],
-];
+const stages = [
+  { label: "New", href: "/admin/applications?status=New", color: "new" },
+  { label: "In Review", href: "/admin/applications?status=In+Review", color: "review" },
+  { label: "Quotation Sent", href: "/admin/applications?status=Quotation+Sent", color: "quotation" },
+  { label: "Accepted", href: "/admin/applications?status=Accepted", color: "accepted" },
+  { label: "Rejected", href: "/admin/applications?status=Rejected", color: "rejected" },
+  { label: "Completed", href: "/admin/applications?status=Completed", color: "completed" },
+] as const;
 
 export default async function AdminOverviewPage() {
   await requireAdmin();
-  const overview = await getAdminOverview();
-  const [audit, recentApplications] = await Promise.all([recentAudit(8), listAdminApplications({ page: 1, pageSize: 5, sort: "newest" })]);
-  const totalPlacements = Object.values(overview.placementCounts).reduce((a, b) => a + b, 0);
-  const totalApplications = Object.values(overview.statusCounts).reduce((a, b) => a + b, 0);
-  const statistics = [
-    { label: "Applications", value: totalApplications, caption: "Across all statuses", href: "/admin/applications", icon: FileText },
-    { label: "Published internships", value: overview.publishedInternships, caption: "Visible opportunities", href: "/admin/internships?status=Published", icon: BriefcaseBusiness },
-    { label: "Students", value: overview.totalStudents, caption: "Registered profiles", href: "/admin/students", icon: Users },
-    { label: "Placements", value: totalPlacements, caption: "Recorded outcomes", href: "/admin/placements", icon: CheckCircle2 },
+  const [overview, audit, recentApplications] = await Promise.all([
+    getAdminOverview(),
+    recentAudit(6),
+    listAdminApplications({ page: 1, pageSize: 5, sort: "newest" }),
+  ]);
+  const totalApplications = Object.values(overview.statusCounts).reduce((sum, value) => sum + value, 0);
+  const totalPlacements = Object.values(overview.placementCounts).reduce((sum, value) => sum + value, 0);
+  const newCount = overview.statusCounts.New ?? 0;
+  const inReviewCount = overview.statusCounts["In Review"] ?? 0;
+  const maxStage = Math.max(1, ...stages.map(({ label }) => overview.statusCounts[label] ?? 0));
+  const metrics = [
+    { title: "Total applications", value: totalApplications, href: "/admin/applications", icon: FileText, detail: "Submitted records" },
+    { title: "Live opportunities", value: overview.publishedInternships, href: "/admin/internships?status=Published", icon: BriefcaseBusiness, detail: "Published internships" },
+    { title: "Student profiles", value: overview.totalStudents, href: "/admin/students", icon: Users, detail: "Registered students" },
+    { title: "Placements", value: totalPlacements, href: "/admin/placements", icon: CheckCircle2, detail: "Recorded placements" },
   ];
 
-  return <div className="workspace-overview">
-    <section className="workspace-page-heading workspace-hero workspace-admin-hero" aria-labelledby="overview-title">
-      <div>
-        <p className="workspace-kicker">Administration / Overview</p>
-        <h1 id="overview-title">Overview</h1>
-        <p className="workspace-intro">Track decisions, focus the review queue, and keep every placement moving.</p>
+  return <div className="ops-overview">
+    <section className="ops-masthead" aria-labelledby="overview-title">
+      <div className="ops-heading">
+        <p className="ops-eyebrow"><span className="ops-live-dot" /> JALANIN / OPERATIONS</p>
+        <h1 id="overview-title">Make every move<br /><em>count.</em></h1>
+        <p>Your command center for applications, people, and the decisions that keep opportunities moving.</p>
+        <div className="ops-heading-actions">
+          <Link href="/admin/applications" className="ops-button-light">Open applications <ArrowRight size={17} aria-hidden="true" /></Link>
+          <Link href="/admin/internships/new" className="ops-button-outline"><Plus size={16} aria-hidden="true" /> New internship</Link>
+        </div>
       </div>
-      <div className="workspace-hero-aside"><span>READY FOR REVIEW</span><strong className="tnum">{overview.statusCounts.New ?? 0} new applications</strong><Link href="/admin/internships/new" className="btn btn-primary"><Plus size={17} /> New internship</Link></div>
+      <div className="ops-priority">
+        <div className="ops-priority-top"><span><CircleDot size={15} aria-hidden="true" /> ACTION REQUIRED</span><span>01 / REVIEW QUEUE</span></div>
+        <strong className="ops-priority-number tnum">{newCount.toLocaleString("en-SG")}</strong>
+        <h2>New {newCount === 1 ? "application" : "applications"} waiting</h2>
+        <p>{newCount > 0 ? "Fresh submissions are ready for your team's first review." : "No new submissions to review right now."}</p>
+        <Link href="/admin/applications?status=New">Go to review queue <ArrowRight size={18} aria-hidden="true" /></Link>
+        <div className="ops-priority-foot"><span>{inReviewCount.toLocaleString("en-SG")} in review</span><Link href="/admin/applications?rereview=1">Re-review requests <ChevronRight size={15} aria-hidden="true" /></Link></div>
+      </div>
+      <div className="ops-masthead-orbit" aria-hidden="true" />
     </section>
 
-    <section aria-label="Platform at a glance" className="workspace-stat-strip">
-      {statistics.map(({ label, value, caption, href, icon: Icon }) => <Link key={label} href={href} className="workspace-stat">
-        <div className="workspace-stat-label"><span>{label}</span><span className="workspace-stat-icon"><Icon size={18} strokeWidth={1.8} /></span></div>
-        <strong className="tnum">{value.toLocaleString("en-SG")}</strong>
-        <span className="workspace-stat-caption">{caption}</span>
-      </Link>)}
+    <section className="ops-metrics-section" aria-labelledby="ops-pulse-heading">
+      <div className="ops-section-line"><div><span className="ops-label">THE PLATFORM AT A GLANCE</span><h2 id="ops-pulse-heading">Platform pulse</h2></div><span className="ops-context">Live from your records</span></div>
+      <div className="ops-metrics">
+        {metrics.map(({ title, value, href, icon: Icon, detail }) => <Link href={href} key={title} className="ops-metric">
+          <div className="ops-metric-head"><span>{title}</span><Icon size={18} strokeWidth={1.7} aria-hidden="true" /></div>
+          <strong className="tnum">{value.toLocaleString("en-SG")}</strong>
+          <div className="ops-metric-foot"><span>{detail}</span><ArrowRight size={15} aria-hidden="true" /></div>
+        </Link>)}
+      </div>
     </section>
 
-    <div className="workspace-main-grid">
-      <section className="workspace-data-card" aria-labelledby="pipeline-heading">
-        <div className="workspace-panel-heading">
-          <div><p className="workspace-kicker">Application insights</p><h2 id="pipeline-heading">Pipeline overview</h2></div>
-          <Link href="/admin/applications" className="workspace-text-link">View all <ArrowRight size={15} /></Link>
+    <div className="ops-main-grid">
+      <section className="ops-panel ops-pipeline" aria-labelledby="ops-pipeline-title">
+        <div className="ops-panel-head"><div><span className="ops-label">FROM SUBMISSION TO OUTCOME</span><h2 id="ops-pipeline-title">Application pipeline</h2></div><Link href="/admin/applications" className="ops-text-link">All records <ArrowRight size={16} aria-hidden="true" /></Link></div>
+        <div className="ops-pipeline-total"><strong className="tnum">{totalApplications.toLocaleString("en-SG")}</strong><span>submitted applications across the six lifecycle stages</span></div>
+        <div className="ops-stage-list">
+          {stages.map(({ label, href, color }) => {
+            const value = overview.statusCounts[label] ?? 0;
+            return <Link key={label} href={href} className="ops-stage">
+              <span className="ops-stage-name"><span className={`ops-stage-dot ops-stage-${color}`} />{label}</span>
+              <span className="ops-stage-track" role="img" aria-label={`${value} applications in ${label}`}><span className={`ops-stage-fill ops-stage-${color}`} style={{ width: `${(value / maxStage) * 100}%` }} /></span>
+              <strong className="tnum">{value}</strong><ChevronRight size={15} aria-hidden="true" />
+            </Link>;
+          })}
         </div>
-        <div className="workspace-pipeline-visual">
-          <div className="workspace-pipeline-meter" role="img" aria-label={`Distribution of ${totalApplications} applications across six statuses`}>
-            {STATUS_LINKS.map(([status]) => <span key={status} style={{ width: `${((overview.statusCounts[status] ?? 0) / Math.max(totalApplications, 1)) * 100}%` }} title={`${status}: ${overview.statusCounts[status] ?? 0}`} />)}
-          </div>
-          <div className="workspace-pipeline-context"><span>Applications by lifecycle status</span><span className="tnum">{totalApplications.toLocaleString("en-SG")} total</span></div>
-        </div>
-        <div className="workspace-status-grid">
-          {STATUS_LINKS.map(([status, href]) => <Link key={status} href={href} className="workspace-status-item">
-            <StatusBadge status={status} />
-            <strong className="tnum">{overview.statusCounts[status] ?? 0}</strong>
-          </Link>)}
-        </div>
+        {totalApplications === 0 && <p className="ops-empty-note">The pipeline will populate as students submit applications.</p>}
       </section>
 
-      <section className="workspace-data-card workspace-queue-card" aria-labelledby="review-heading">
-        <div className="workspace-panel-heading"><div><p className="workspace-kicker">Action center</p><h2 id="review-heading">Needs your attention</h2></div><span className="workspace-panel-icon"><ClipboardList size={20} /></span></div>
-        <div className="workspace-queue-number tnum">{overview.statusCounts.New ?? 0}</div>
-        <p className="workspace-queue-title">New applications to review</p>
-        <p className="workspace-panel-copy">Start with the newest submissions, or revisit changes that students have made.</p>
-        <div className="workspace-queue-actions">
-          <Link href="/admin/applications?status=New" className="btn btn-primary">Open review queue <ArrowRight size={16} /></Link>
-          <Link href="/admin/applications?rereview=1" className="workspace-text-link">Re-review submissions</Link>
-        </div>
-      </section>
+      <aside className="ops-side-stack">
+        <section className="ops-briefing" aria-labelledby="ops-briefing-title">
+          <div className="ops-briefing-icon"><Bell size={20} aria-hidden="true" /></div>
+          <span className="ops-label">STAY IN THE KNOW</span>
+          <h2 id="ops-briefing-title">Your briefing</h2>
+          <div className="ops-briefing-count"><strong className="tnum">{overview.unreadNotifications}</strong><span>unread {overview.unreadNotifications === 1 ? "notification" : "notifications"}</span></div>
+          <p>{overview.unreadNotifications > 0 ? "There are new updates in your notification inbox." : "All caught up. New updates will appear as they arrive."}</p>
+          <Link href="/admin/notifications?unread=1">Open notifications <ArrowRight size={16} aria-hidden="true" /></Link>
+        </section>
+        <section className="ops-shortcuts" aria-label="Common tasks">
+          <div className="ops-shortcuts-heading"><ClipboardList size={18} aria-hidden="true" /><span>QUICK PATHS</span></div>
+          <Link href="/admin/applications?rereview=1">Applications needing re-review <ArrowRight size={16} aria-hidden="true" /></Link>
+          <Link href="/admin/placements/new">Record a placement <ArrowRight size={16} aria-hidden="true" /></Link>
+          <Link href="/admin/contacts">Open contact inbox <ArrowRight size={16} aria-hidden="true" /></Link>
+        </section>
+      </aside>
     </div>
 
-    <section className="workspace-data-card workspace-recent-records" aria-labelledby="recent-records-heading">
-      <div className="workspace-panel-heading">
-        <div><p className="workspace-kicker">Application records</p><h2 id="recent-records-heading">Recent submissions</h2></div>
-        <Link href="/admin/applications" className="workspace-text-link">All applications <ArrowRight size={15}/></Link>
-      </div>
-      {recentApplications.rows.length ? <>
-        <div className="crm-table-scroll hidden md:block">
-          <table className="crm-table" aria-label="Recent application submissions">
-            <thead><tr><th scope="col">Applicant</th><th scope="col">Internship</th><th scope="col">Stage</th><th scope="col">Submitted</th><th scope="col" className="crm-col-action">Review</th></tr></thead>
+    <section className="ops-panel ops-submissions" aria-labelledby="ops-submissions-title">
+      <div className="ops-panel-head"><div><span className="ops-label">THE LATEST ARRIVALS</span><h2 id="ops-submissions-title">Recent submissions</h2></div><Link href="/admin/applications" className="ops-text-link">View applications <ArrowRight size={16} aria-hidden="true" /></Link></div>
+      {recentApplications.rows.length > 0 ? <>
+        <div className="ops-table-scroll">
+          <table className="ops-table" aria-label="Recent application submissions">
+            <thead><tr><th scope="col">Applicant</th><th scope="col">Opportunity</th><th scope="col">Current stage</th><th scope="col">Submitted</th><th scope="col"><span className="sr-only">Open</span></th></tr></thead>
             <tbody>{recentApplications.rows.map(({ application, internshipTitle }) => <tr key={application.id}>
-              <td><Link className="crm-record-name" href={`/admin/applications/${application.id}`}>{application.firstName} {application.lastName}</Link><span className="crm-record-sub">{application.email}</span></td>
-              <td className="crm-record-secondary">{internshipTitle}</td>
-              <td><StatusBadge status={application.lifecycleStatus}/></td>
-              <td className="crm-date tnum">{application.submittedAt ? new Date(application.submittedAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short" }) : "—"}</td>
-              <td className="crm-col-action"><Link href={`/admin/applications/${application.id}`} className="crm-row-link">Open record</Link></td>
+              <td><div className="ops-applicant"><span className="ops-applicant-avatar" aria-hidden="true">{application.firstName.slice(0, 1)}{application.lastName.slice(0, 1)}</span><span><Link href={`/admin/applications/${application.id}`}>{application.firstName} {application.lastName}</Link><small>{application.email}</small></span></div></td>
+              <td className="ops-table-opportunity">{internshipTitle}</td>
+              <td><StatusBadge status={application.lifecycleStatus} /></td>
+              <td className="ops-table-date tnum">{application.submittedAt ? new Date(application.submittedAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" }) : "—"}</td>
+              <td><Link href={`/admin/applications/${application.id}`} className="ops-table-action" aria-label={`Open ${application.firstName} ${application.lastName}'s application`}><ArrowRight size={17} /></Link></td>
             </tr>)}</tbody>
           </table>
         </div>
-        <ul className="crm-mobile-records md:hidden">{recentApplications.rows.map(({ application, internshipTitle }) => <li key={application.id}><div className="crm-mobile-top"><Link className="crm-record-name" href={`/admin/applications/${application.id}`}>{application.firstName} {application.lastName}</Link><StatusBadge status={application.lifecycleStatus}/></div><p>{internshipTitle}</p><Link href={`/admin/applications/${application.id}`} className="crm-row-link">Review application</Link></li>)}</ul>
-      </> : <div className="workspace-recent-records-guide"><p>No applications submitted yet. New student submissions will appear here automatically.</p><Link href="/admin/internships">View internship listings <ArrowRight size={15}/></Link></div>}
+      </> : <div className="ops-records-empty"><FileText size={25} aria-hidden="true" /><div><h3>No submissions just yet</h3><p>As students apply, their newest submissions will land here for review.</p></div><Link href="/admin/internships">Manage internships <ArrowRight size={15} aria-hidden="true" /></Link></div>}
     </section>
 
-    <div className="workspace-bottom-grid">
-      <section className="workspace-data-card workspace-activity-card" aria-labelledby="activity-heading">
-        <div className="workspace-panel-heading"><div><p className="workspace-kicker">Operations log</p><h2 id="activity-heading">Recent activity</h2></div><Clock3 size={18} className="workspace-panel-muted-icon" /></div>
-        {audit.length === 0
-          ? <div className="workspace-inline-empty"><ClipboardList size={21} /><strong>No recorded changes yet</strong><p>New updates will be logged here as your team reviews applications.</p><Link className="workspace-text-link" href="/admin/applications">Open applications <ArrowRight size={14} /></Link></div>
-          : <ol className="workspace-activity">{audit.map(a => <li key={a.id}><span className="workspace-activity-dot" aria-hidden="true" /><div><p>{a.action}</p><span>{a.entityType} · {String(a.entityId).slice(0, 8)}</span></div><time className="tnum" dateTime={new Date(a.createdAt).toISOString()}>{new Date(a.createdAt).toLocaleString("en-SG")}</time></li>)}</ol>}
+    <div className="ops-bottom-grid">
+      <section className="ops-panel ops-activity" aria-labelledby="ops-activity-title">
+        <div className="ops-panel-head"><div><span className="ops-label">THE OPERATIONS TRAIL</span><h2 id="ops-activity-title">Recent activity</h2></div><Activity size={18} aria-hidden="true" /></div>
+        {audit.length > 0 ? <ol className="ops-activity-list">{audit.map(event => <li key={event.id}><span className="ops-activity-dot" aria-hidden="true" /><div><strong>{event.action}</strong><span>{event.entityType} · {String(event.entityId).slice(0, 8)}</span></div><time dateTime={new Date(event.createdAt).toISOString()} className="tnum">{new Date(event.createdAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short" })}</time></li>)}</ol> : <div className="ops-activity-empty"><Clock3 size={21} aria-hidden="true" /><p>Changes to applications and records will show up here.</p></div>}
       </section>
-      <section className="workspace-data-card workspace-alert-card" aria-labelledby="alerts-heading">
-        <div className="workspace-panel-heading"><div><p className="workspace-kicker">Notifications</p><h2 id="alerts-heading">Inbox summary</h2></div><span className="workspace-panel-icon"><Bell size={19} /></span></div>
-        <strong className="workspace-alert-count tnum">{overview.unreadNotifications}</strong>
-        <p className="workspace-queue-title">Unread alerts</p>
-        <p className="workspace-panel-copy">{overview.unreadNotifications > 0 ? "New submission updates are ready for review." : "You’re all caught up. New submission alerts will appear here."}</p>
-        <Link href="/admin/notifications?unread=1" className="workspace-text-link">Go to notifications <ArrowRight size={15} /></Link>
+      <section className="ops-panel ops-placement-summary" aria-labelledby="ops-placements-title">
+        <div className="ops-panel-head"><div><span className="ops-label">BEYOND THE APPLICATION</span><h2 id="ops-placements-title">Placements</h2></div><Link href="/admin/placements" className="ops-text-link">Manage <ArrowRight size={16} aria-hidden="true" /></Link></div>
+        <div className="ops-placement-total"><strong className="tnum">{totalPlacements}</strong><span>recorded placements</span></div>
+        {Object.keys(overview.placementCounts).length > 0 ? <ul className="ops-placement-statuses">{Object.entries(overview.placementCounts).map(([status, value]) => <li key={status}><StatusBadge status={status} /><strong className="tnum">{value}</strong></li>)}</ul> : <p className="ops-empty-note">Placement status details will appear as records are added.</p>}
+        <Link href="/admin/placements/new" className="ops-placement-action"><Plus size={16} aria-hidden="true" /> New placement <ArrowRight size={16} aria-hidden="true" /></Link>
       </section>
     </div>
   </div>;

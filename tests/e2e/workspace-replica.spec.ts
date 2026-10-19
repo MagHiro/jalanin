@@ -8,14 +8,32 @@ test.describe("Mobbin-derived workspace structure", () => {
     expect(response.ok()).toBeTruthy();
   });
 
-  test("admin overview uses genuine records and divided metric ribbon", async ({ page }) => {
+  test("admin overview prioritizes review queue and genuine operational records", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/admin");
-    await expect(page.locator(".workspace-stat-strip .workspace-stat")).toHaveCount(4);
-    await expect(page.locator(".workspace-recent-records")).toBeVisible();
+    await expect(page.locator(".ops-metrics .ops-metric")).toHaveCount(4);
+    await expect(page.locator(".ops-stage")).toHaveCount(6);
+    await expect(page.getByRole("link", { name: /Go to review queue/ })).toHaveAttribute("href", "/admin/applications?status=New");
+    await expect(page.locator(".ops-submissions")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Recent submissions" })).toBeVisible();
     await expect(page.locator(".workspace-sidebar")).toBeVisible();
     await expect(page.locator(".workspace-topbar")).toBeVisible();
+  });
+
+  test("student overview provides genuine journey milestones and next action", async ({ page }) => {
+    const response = await page.request.post("/api/dev/session", {
+      data: { userId: "00000000-0000-0000-0000-000000000091" },
+    });
+    expect(response.ok()).toBeTruthy();
+    await page.setViewportSize({ width: 375, height: 850 });
+    await page.goto("/dashboard");
+    await expect(page.getByRole("heading", { name: /The next chapter/ })).toBeVisible();
+    await expect(page.locator(".journey-path > li")).toHaveCount(3);
+    await expect(page.locator(".journey-metrics .journey-metric")).toHaveCount(3);
+    const action = page.locator(".journey-primary-link");
+    await expect(action).toBeVisible();
+    expect(await action.getAttribute("href")).toMatch(new RegExp("^/(?:apply|dashboard|opportunities)"));
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
   });
 
   test("admin list screens share authentic CRM views and metadata", async ({ page }) => {

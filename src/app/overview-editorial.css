@@ -1,0 +1,322 @@
+/* Overview editorial system: student journey + admin operations.
+   Scoped to these two routes; shared forms, records, rail and workflow pages are unchanged. */
+.workspace-shell .journey-overview,
+.workspace-shell .ops-overview { width: 100%; max-width: 1440px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+.workspace-shell .journey-overview *,
+.workspace-shell .ops-overview * { box-sizing: border-box; }
+.workspace-shell .journey-overview :is(a,button):focus-visible,
+.workspace-shell .ops-overview :is(a,button):focus-visible { outline: 3px solid #7892ed; outline-offset: 4px; }
+.workspace-shell .journey-overview a,
+.workspace-shell .ops-overview a { text-decoration: none; }
+.workspace-shell .journey-overview h1,
+.workspace-shell .ops-overview h1 { margin: 0; font-weight: 500; line-height: 1.035; letter-spacing: -.064em; }
+.workspace-shell .journey-overview h2,
+.workspace-shell .ops-overview h2 { margin: 0; font-weight: 540; letter-spacing: -.045em; }
+.workspace-shell .journey-overview p,
+.workspace-shell .ops-overview p { margin-top: 0; }
+.workspace-shell .journey-label,
+.workspace-shell .ops-label { font-size: 10px; letter-spacing: .15em; font-weight: 720; line-height: 1.4; }
+.workspace-shell .journey-caption,
+.workspace-shell .ops-context { color: #868b8e; font-size: 12px; }
+.workspace-shell .journey-section-top,
+.workspace-shell .ops-section-line { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 12px; }
+.workspace-shell .journey-section-top h2,
+.workspace-shell .ops-section-line h2 { font-size: clamp(23px,2.4vw,30px); margin-top: 7px; color: #27324f; }
+.workspace-shell .journey-view-all,
+.workspace-shell .ops-text-link { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 660; color: #3c5287; white-space: nowrap; }
+.workspace-shell .journey-view-all:hover,
+.workspace-shell .ops-text-link:hover { color: #182a5c; text-decoration: underline; text-underline-offset: 4px; }
+
+/* Student: warm editorial surface with a clear, prioritized next step. */
+.workspace-shell .journey-masthead { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(300px,.9fr); overflow: hidden; background: #eceee6; min-height: 380px; border-radius: 22px; }
+.workspace-shell .journey-introduction { padding: clamp(30px,3.6vw,59px); display: flex; align-items: flex-start; flex-direction: column; justify-content: center; min-width: 0; background: radial-gradient(circle at 6% 100%,#e2e8c9 0,transparent 58%); }
+.workspace-shell .journey-eyebrow { color: #476049; letter-spacing: .145em; font-size: 10px; font-weight: 750; display: flex; align-items: center; gap: 11px; margin-bottom: 26px; }
+.workspace-shell .journey-eyebrow-line { display: block; width: 31px; height: 1px; background: #476049; }
+.workspace-shell .journey-masthead h1 { color: #233043; font-size: clamp(41px,4.7vw,69px); max-width: 690px; }
+.workspace-shell .journey-masthead h1 em { font-style: normal; color: #6b8066; }
+.workspace-shell .journey-introduction > p { max-width: 435px; color: #57645c; font-size: 15px; line-height: 1.65; margin: 22px 0 25px; }
+.workspace-shell .journey-quiet-link { display: inline-flex; align-items: center; gap: 10px; border-bottom: 1px solid #495d4b; padding-bottom: 7px; color: #2a4536; font-size: 13px; font-weight: 700; }
+.workspace-shell .journey-quiet-link:hover { gap: 15px; }
+.workspace-shell .journey-focus { position: relative; overflow: hidden; background: #2b3755; color: #f8f8f1; padding: clamp(28px,3.5vw,48px); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; isolation: isolate; }
+.workspace-shell .journey-focus-top { display: flex; align-items: center; gap: 11px; width: 100%; margin-bottom: 35px; font-size: 10px; font-weight: 730; letter-spacing: .14em; color: #dbe4c5; }
+.workspace-shell .journey-focus-marker { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; color: #253657; background: #d5e39e; }
+.workspace-shell .journey-focus-index { margin-left: auto; color: #adbad3; font-variant-numeric: tabular-nums; }
+.workspace-shell .journey-focus-eyebrow { color: #bfceb5; font-size: 12px; font-weight: 650; margin-bottom: 12px; }
+.workspace-shell .journey-focus h2 { color: #fffefa; font-size: clamp(25px,2.7vw,38px); line-height: 1.13; max-width: 390px; position: relative; z-index: 1; }
+.workspace-shell .journey-focus > p { color: #d1d9e2; font-size: 13px; line-height: 1.65; max-width: 390px; margin: 15px 0 24px; position: relative; z-index: 1; }
+.workspace-shell .journey-primary-link { display: inline-flex; justify-content: space-between; align-items: center; gap: 26px; min-height: 47px; padding: 12px 15px 12px 20px; background: #d8e5aa; border-radius: 8px; color: #25334d; font-size: 13px; font-weight: 750; position: relative; z-index: 1; }
+.workspace-shell .journey-primary-link:hover { background: #e8f2c4; }
+.workspace-shell .journey-focus-decoration { position: absolute; inset: auto -80px -145px auto; width: 325px; height: 325px; border: 1px solid rgba(231,239,255,.1); border-radius: 50%; pointer-events: none; z-index: -1; }
+.workspace-shell .journey-focus-decoration span { position: absolute; border: 1px solid rgba(231,239,255,.11); border-radius: 50%; inset: 33px; }
+.workspace-shell .journey-focus-decoration span:nth-child(2) { inset: 70px; }
+.workspace-shell .journey-focus-decoration span:nth-child(3) { inset: 105px; background: rgba(222,234,183,.04); }
+
+.workspace-shell .journey-path-panel { padding: 32px clamp(22px,3vw,42px) 0; background: #fffefa; border: 1px solid #e7e8e0; border-radius: 18px; overflow: hidden; }
+.workspace-shell .journey-label { color: #6d826a; }
+.workspace-shell .journey-path { list-style: none; margin: 34px 0 31px; padding: 0; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); }
+.workspace-shell .journey-path > li { min-width: 0; position: relative; }
+.workspace-shell .journey-path > li:not(:last-child)::after { content: ""; position: absolute; width: calc(100% - 59px); top: 24px; left: 54px; border-top: 1px dashed #bbc8b6; pointer-events: none; }
+.workspace-shell .journey-path-step { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 13px; color: #536071; padding-right: 12px; }
+.workspace-shell .journey-path-marker { display: inline-grid; flex: none; place-items: center; width: 48px; height: 48px; border: 1px solid #d8dddc; border-radius: 50%; background: #f3f4ef; color: #8b9495; font-size: 11px; font-weight: 700; position: relative; z-index: 1; font-variant-numeric: tabular-nums; }
+.workspace-shell .journey-path .is-reached .journey-path-marker { background: #2f4c41; color: white; border-color: #2f4c41; }
+.workspace-shell .journey-path-text { display: flex; flex-direction: column; gap: 3px; padding-top: 3px; }
+.workspace-shell .journey-path-text strong { font-size: 15px; font-weight: 650; color: #2a3b41; }
+.workspace-shell .journey-path-text small { font-size: 12px; color: #848d8e; }
+.workspace-shell .journey-path-state { display: block; flex-basis: 100%; margin-left: 61px; margin-top: -6px; color: #76847d; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; }
+.workspace-shell .journey-metrics { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); margin: 0 calc(-1 * clamp(22px,3vw,42px)); background: #e9eee0; border-top: 1px solid #e1e6d9; }
+.workspace-shell .journey-metric { min-width: 0; display: flex; align-items: baseline; gap: 12px; padding: 22px clamp(14px,2.4vw,35px); color: #263c37; }
+.workspace-shell .journey-metric + .journey-metric { border-left: 1px solid #cfdacb; }
+.workspace-shell .journey-metric strong { font-size: 33px; line-height: 1; letter-spacing: -.06em; font-weight: 560; }
+.workspace-shell .journey-metric span { font-size: 12px; line-height: 1.4; font-weight: 620; }
+.workspace-shell .journey-metric svg { margin-left: auto; align-self: center; color: #758578; flex: none; }
+.workspace-shell .journey-metric:hover { background: #dfe9d5; }
+
+.workspace-shell .journey-content-grid { display: grid; grid-template-columns: minmax(0,1.65fr) minmax(280px,.9fr); gap: 22px; align-items: start; }
+.workspace-shell .journey-paper-card { min-width: 0; padding: 29px clamp(20px,2.7vw,35px); background: #fffefa; border: 1px solid #e7e8e0; border-radius: 18px; }
+.workspace-shell .journey-records { list-style: none; padding: 0; margin: 25px 0 0; }
+.workspace-shell .journey-records li { border-top: 1px solid #ebece7; }
+.workspace-shell .journey-record { display: flex; align-items: center; gap: 15px; padding: 18px 2px; min-width: 0; color: #303b40; }
+.workspace-shell .journey-record-symbol { display: inline-grid; place-items: center; flex: none; width: 43px; height: 43px; background: #edf1e6; border-radius: 11px; color: #61755e; }
+.workspace-shell .journey-record-main { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.workspace-shell .journey-record-main strong { font-size: 14px; font-weight: 680; line-height: 1.35; overflow-wrap: anywhere; }
+.workspace-shell .journey-record-main small { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 12px; color: #858a88; }
+.workspace-shell .journey-record-end { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.workspace-shell .journey-review-note { font-size: 10px; color: #9b5e2f; font-weight: 650; }
+.workspace-shell .journey-record-arrow { flex: none; color: #8c9790; }
+.workspace-shell .journey-record:hover .journey-record-main strong { color: #526d44; }
+.workspace-shell .journey-empty { display: flex; flex-direction: column; align-items: flex-start; padding: 32px 0 8px; }
+.workspace-shell .journey-empty-icon { display: inline-grid; place-items: center; height: 49px; width: 49px; border-radius: 14px; color: #537359; background: #e9f0e3; margin-bottom: 17px; }
+.workspace-shell .journey-empty h3 { color: #2e3f38; font-size: 21px; letter-spacing: -.04em; font-weight: 550; }
+.workspace-shell .journey-empty p { max-width: 450px; font-size: 13px; line-height: 1.65; color: #818983; margin: 8px 0 17px; }
+.workspace-shell .journey-empty a { display: inline-flex; gap: 7px; align-items: center; color: #375c43; font-size: 13px; font-weight: 700; }
+.workspace-shell .journey-side-column { display: flex; flex-direction: column; gap: 17px; min-width: 0; }
+.workspace-shell .journey-destination-card { position: relative; overflow: hidden; min-height: 316px; padding: 30px; background: #e7e8ef; border-radius: 18px; }
+.workspace-shell .journey-destination-card > :not(.journey-destination-art) { position: relative; z-index: 1; }
+.workspace-shell .journey-destination-card .journey-label { color: #6b728a; }
+.workspace-shell .journey-destination-card h2 { font-size: 27px; line-height: 1.12; color: #283557; margin: 17px 0 11px; max-width: 250px; }
+.workspace-shell .journey-destination-card p { color: #5d6984; font-size: 13px; line-height: 1.6; max-width: 250px; margin-bottom: 25px; }
+.workspace-shell .journey-destination-card > a { display: inline-flex; align-items: center; gap: 9px; color: #2c416f; font-size: 13px; font-weight: 730; }
+.workspace-shell .journey-destination-record { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; margin: 0 0 20px; }
+.workspace-shell .journey-destination-record strong { font-size: 14px; font-weight: 680; }
+.workspace-shell .journey-destination-record > span:not(.badge) { color: #64708a; font-size: 12px; }
+.workspace-shell .journey-destination-art { position: absolute; top: 0; right: 0; width: 180px; height: 100%; opacity: .7; pointer-events: none; }
+.workspace-shell .journey-art-orbit { position: absolute; width: 230px; height: 230px; border-radius: 50%; border: 1px solid #b2bad0; top: -87px; right: -130px; }
+.workspace-shell .journey-art-orbit-two { top: -44px; right: -83px; width: 150px; height: 150px; }
+.workspace-shell .journey-art-pin { position: absolute; top: 47px; right: 39px; display: grid; place-items: center; width: 46px; height: 46px; background: #d1d8ed; color: #435d89; border-radius: 50%; transform: rotate(16deg); }
+.workspace-shell .journey-art-star { position: absolute; top: 125px; right: 18px; font-size: 35px; color: #9aa9ce; }
+.workspace-shell .journey-help { padding: 22px 28px; border: 1px solid #dde6da; border-radius: 15px; background: #f5f7f0; }
+.workspace-shell .journey-help > span { font-size: 10px; letter-spacing: .13em; font-weight: 750; color: #6c846e; }
+.workspace-shell .journey-help p { margin: 8px 0 13px; color: #596b5b; font-size: 13px; line-height: 1.6; }
+.workspace-shell .journey-help a { color: #355b45; display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 720; }
+
+/* Admin: a focused operations room, not a second student dashboard. */
+.workspace-shell .ops-masthead { display: grid; grid-template-columns: minmax(0,1.08fr) minmax(310px,.78fr); gap: clamp(25px,4vw,72px); position: relative; isolation: isolate; overflow: hidden; padding: clamp(30px,3.5vw,52px); background: #222e4e; border-radius: 21px; color: #f7f8ff; }
+.workspace-shell .ops-heading { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; position: relative; z-index: 1; }
+.workspace-shell .ops-eyebrow { color: #ccd6eb; display: flex; align-items: center; gap: 9px; font-size: 10px; font-weight: 740; letter-spacing: .15em; margin: 0 0 31px; }
+.workspace-shell .ops-live-dot { width: 7px; height: 7px; border-radius: 50%; background: #c6d9aa; box-shadow: 0 0 0 4px rgba(206,233,174,.13); }
+.workspace-shell .ops-masthead h1 { color: #fffefa; font-size: clamp(43px,4.4vw,68px); }
+.workspace-shell .ops-masthead h1 em { font-style: normal; color: #cddcb7; }
+.workspace-shell .ops-heading > p:not(.ops-eyebrow) { max-width: 450px; margin: 18px 0 27px; color: #c5ccda; font-size: 14px; line-height: 1.65; }
+.workspace-shell .ops-heading-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.workspace-shell .ops-button-light,
+.workspace-shell .ops-button-outline { display: inline-flex; justify-content: center; align-items: center; gap: 13px; border-radius: 8px; min-height: 44px; padding: 11px 15px; font-size: 12px; font-weight: 730; }
+.workspace-shell .ops-button-light { background: #e4e9d8; color: #263850; }
+.workspace-shell .ops-button-light:hover { background: #f4f7ec; }
+.workspace-shell .ops-button-outline { color: #f2f5fc; border: 1px solid #66748d; }
+.workspace-shell .ops-button-outline:hover { background: #384767; }
+.workspace-shell .ops-priority { position: relative; z-index: 1; background: #faf9f3; border-radius: 14px; padding: clamp(22px,2.5vw,32px); color: #25314b; min-width: 0; }
+.workspace-shell .ops-priority-top { display: flex; justify-content: space-between; gap: 8px; align-items: center; color: #657270; font-size: 9px; font-weight: 750; letter-spacing: .12em; }
+.workspace-shell .ops-priority-top > span:first-child { display: inline-flex; align-items: center; gap: 8px; color: #6d7a58; }
+.workspace-shell .ops-priority-number { display: block; font-size: clamp(64px,7vw,112px); font-weight: 500; letter-spacing: -.075em; line-height: 1; margin-top: 22px; }
+.workspace-shell .ops-priority h2 { font-size: 23px; color: #283651; line-height: 1.2; margin: 8px 0 9px; }
+.workspace-shell .ops-priority > p { font-size: 12px; line-height: 1.5; color: #747d82; margin-bottom: 18px; }
+.workspace-shell .ops-priority > a { display: inline-flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 43px; padding: 11px 14px; background: #283657; color: #fff; border-radius: 7px; font-size: 12px; font-weight: 730; }
+.workspace-shell .ops-priority > a:hover { background: #40547e; }
+.workspace-shell .ops-priority-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 9px; align-items: center; border-top: 1px solid #e6e6e1; margin-top: 20px; padding-top: 14px; font-size: 11px; color: #74817d; }
+.workspace-shell .ops-priority-foot a { display: inline-flex; align-items: center; color: #34558a; font-weight: 660; }
+.workspace-shell .ops-masthead-orbit { position: absolute; z-index: 0; left: 22%; bottom: -225px; width: 480px; height: 480px; border: 1px solid rgba(240,249,255,.06); border-radius: 50%; box-shadow: 0 0 0 65px rgba(240,249,255,.018),0 0 0 132px rgba(240,249,255,.012); pointer-events: none; }
+.workspace-shell .ops-metrics-section { display: flex; flex-direction: column; gap: 18px; }
+.workspace-shell .ops-label { color: #7b8b9a; }
+.workspace-shell .ops-metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border: 1px solid #e2e5ea; border-radius: 15px; overflow: hidden; background: #fffefa; }
+.workspace-shell .ops-metric { display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 22px clamp(15px,2vw,29px); color: #25344f; }
+.workspace-shell .ops-metric + .ops-metric { border-left: 1px solid #e7e9ee; }
+.workspace-shell .ops-metric:hover { background: #f5f7fb; }
+.workspace-shell .ops-metric-head,
+.workspace-shell .ops-metric-foot { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.workspace-shell .ops-metric-head { font-size: 12px; font-weight: 650; color: #68788e; }
+.workspace-shell .ops-metric-head svg { color: #9ca7b4; flex: none; }
+.workspace-shell .ops-metric strong { font-size: 37px; line-height: 1; font-weight: 530; letter-spacing: -.06em; }
+.workspace-shell .ops-metric-foot { color: #85909c; font-size: 11px; }
+.workspace-shell .ops-metric-foot svg { flex: none; color: #506a95; }
+
+.workspace-shell .ops-main-grid { display: grid; grid-template-columns: minmax(0,1.5fr) minmax(260px,.74fr); gap: 20px; align-items: stretch; }
+.workspace-shell .ops-panel { min-width: 0; padding: clamp(20px,2.4vw,30px); background: #fffefa; border: 1px solid #e1e5e9; border-radius: 16px; }
+.workspace-shell .ops-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.workspace-shell .ops-panel-head h2 { margin-top: 6px; font-size: clamp(21px,2.2vw,27px); color: #283650; }
+.workspace-shell .ops-panel-head > svg { color: #909caf; }
+.workspace-shell .ops-pipeline-total { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; padding: 24px 0 19px; }
+.workspace-shell .ops-pipeline-total strong { color: #273756; font-size: 45px; line-height: 1; font-weight: 520; letter-spacing: -.065em; }
+.workspace-shell .ops-pipeline-total span { font-size: 12px; color: #88919c; }
+.workspace-shell .ops-stage-list { display: flex; flex-direction: column; border-top: 1px solid #eef0f2; }
+.workspace-shell .ops-stage { display: grid; grid-template-columns: minmax(95px,1fr) minmax(45px,1.4fr) 35px 15px; align-items: center; gap: 12px; padding: 14px 1px; border-bottom: 1px solid #eef0f2; color: #3b4a63; }
+.workspace-shell .ops-stage:hover { background: #f8f9fb; }
+.workspace-shell .ops-stage-name { display: inline-flex; align-items: center; gap: 9px; font-size: 12px; font-weight: 640; }
+.workspace-shell .ops-stage-dot { flex: none; display: block; width: 9px; height: 9px; border-radius: 3px; background: #6075a1; }
+.workspace-shell .ops-stage-track { display: block; min-width: 0; height: 7px; border-radius: 99px; background: #eff1f5; overflow: hidden; }
+.workspace-shell .ops-stage-fill { display: block; height: 100%; border-radius: inherit; background: #6075a1; }
+.workspace-shell .ops-stage-dot.ops-stage-new,
+.workspace-shell .ops-stage-fill.ops-stage-new { background: #bd9473; }
+.workspace-shell .ops-stage-dot.ops-stage-review,
+.workspace-shell .ops-stage-fill.ops-stage-review { background: #6885ba; }
+.workspace-shell .ops-stage-dot.ops-stage-quotation,
+.workspace-shell .ops-stage-fill.ops-stage-quotation { background: #9782b2; }
+.workspace-shell .ops-stage-dot.ops-stage-accepted,
+.workspace-shell .ops-stage-fill.ops-stage-accepted { background: #689781; }
+.workspace-shell .ops-stage-dot.ops-stage-rejected,
+.workspace-shell .ops-stage-fill.ops-stage-rejected { background: #b77e7e; }
+.workspace-shell .ops-stage-dot.ops-stage-completed,
+.workspace-shell .ops-stage-fill.ops-stage-completed { background: #457660; }
+.workspace-shell .ops-stage > strong { text-align: right; color: #2d3e56; font-size: 13px; font-weight: 720; }
+.workspace-shell .ops-stage > svg { color: #98a2af; }
+.workspace-shell .ops-empty-note { margin: 15px 0 0; font-size: 12px; line-height: 1.6; color: #89939e; }
+.workspace-shell .ops-side-stack { min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+.workspace-shell .ops-briefing { position: relative; overflow: hidden; flex: 1; padding: clamp(23px,2.5vw,31px); background: #e8ede6; border-radius: 16px; }
+.workspace-shell .ops-briefing-icon { display: inline-grid; place-items: center; width: 43px; height: 43px; border-radius: 13px; background: #d9e4d4; color: #597c63; margin-bottom: 28px; }
+.workspace-shell .ops-briefing .ops-label { display: block; color: #708675; }
+.workspace-shell .ops-briefing h2 { font-size: 27px; color: #2c4b41; margin: 7px 0 18px; }
+.workspace-shell .ops-briefing-count { display: flex; align-items: baseline; gap: 10px; color: #2d5042; }
+.workspace-shell .ops-briefing-count strong { font-size: 53px; letter-spacing: -.07em; line-height: 1; font-weight: 530; }
+.workspace-shell .ops-briefing-count span { font-size: 12px; font-weight: 660; }
+.workspace-shell .ops-briefing > p { color: #6c7b70; font-size: 12px; line-height: 1.55; margin: 12px 0 21px; }
+.workspace-shell .ops-briefing > a { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: #355a47; font-weight: 730; }
+.workspace-shell .ops-shortcuts { padding: 20px 23px; border-radius: 15px; background: #f0f2f7; }
+.workspace-shell .ops-shortcuts-heading { display: flex; align-items: center; gap: 9px; color: #657796; font-size: 10px; letter-spacing: .12em; font-weight: 730; margin-bottom: 10px; }
+.workspace-shell .ops-shortcuts a { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 0; border-top: 1px solid #dfe4ed; color: #405276; font-size: 12px; font-weight: 600; }
+.workspace-shell .ops-shortcuts a:hover { color: #233558; }
+
+.workspace-shell .ops-submissions { padding: 0; overflow: hidden; }
+.workspace-shell .ops-submissions > .ops-panel-head { padding: 27px 30px 21px; }
+.workspace-shell .ops-table-scroll { width: 100%; overflow-x: auto; }
+.workspace-shell .ops-table { border-collapse: collapse; min-width: 650px; width: 100%; text-align: left; }
+.workspace-shell .ops-table thead { background: #f6f7fa; }
+.workspace-shell .ops-table th { font-size: 10px; letter-spacing: .07em; font-weight: 720; color: #7e899a; white-space: nowrap; padding: 13px 19px; }
+.workspace-shell .ops-table td { padding: 17px 19px; border-top: 1px solid #edf0f3; color: #526078; font-size: 12px; vertical-align: middle; }
+.workspace-shell .ops-table tbody tr:hover { background: #fbfcfe; }
+.workspace-shell .ops-applicant { display: flex; align-items: center; gap: 11px; min-width: 165px; }
+.workspace-shell .ops-applicant-avatar { display: inline-grid; place-items: center; width: 37px; height: 37px; border-radius: 11px; flex: none; background: #e6eaf3; color: #53678f; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+.workspace-shell .ops-applicant > span:last-child { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.workspace-shell .ops-applicant a { color: #2c3c59; font-weight: 700; font-size: 13px; }
+.workspace-shell .ops-applicant a:hover { text-decoration: underline; }
+.workspace-shell .ops-applicant small { color: #929bab; font-size: 11px; overflow-wrap: anywhere; }
+.workspace-shell .ops-table-opportunity { max-width: 230px; }
+.workspace-shell .ops-table-date { white-space: nowrap; color: #798599; }
+.workspace-shell .ops-table-action { display: inline-grid; place-items: center; width: 32px; height: 32px; border: 1px solid #e0e6ee; border-radius: 9px; color: #516588; }
+.workspace-shell .ops-table-action:hover { background: #eef1f8; }
+.workspace-shell .ops-records-empty { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; margin: 0 30px 28px; padding: 28px 22px; background: #f6f7f8; border-radius: 12px; color: #758296; }
+.workspace-shell .ops-records-empty > div { min-width: 0; flex: 1 1 190px; }
+.workspace-shell .ops-records-empty h3 { color: #3c4e6a; font-weight: 650; font-size: 16px; }
+.workspace-shell .ops-records-empty p { color: #8b95a4; font-size: 12px; margin: 5px 0 0; }
+.workspace-shell .ops-records-empty a { display: inline-flex; align-items: center; gap: 7px; color: #4a6494; font-weight: 690; font-size: 12px; }
+.workspace-shell .ops-bottom-grid { display: grid; grid-template-columns: minmax(0,1.3fr) minmax(260px,.9fr); gap: 20px; }
+.workspace-shell .ops-activity-list { list-style: none; padding: 0; margin: 20px 0 0; }
+.workspace-shell .ops-activity-list li { display: flex; align-items: center; gap: 13px; padding: 12px 0; border-top: 1px solid #edf0f2; }
+.workspace-shell .ops-activity-dot { flex: none; width: 8px; height: 8px; background: #87a19a; border-radius: 50%; }
+.workspace-shell .ops-activity-list li > div { min-width: 0; flex: 1; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.workspace-shell .ops-activity-list strong { font-size: 13px; font-weight: 690; color: #364760; text-transform: capitalize; overflow-wrap: anywhere; }
+.workspace-shell .ops-activity-list li > div > span { color: #8b97a5; font-size: 11px; }
+.workspace-shell .ops-activity-list time { color: #8994a5; white-space: nowrap; font-size: 11px; }
+.workspace-shell .ops-activity-empty { display: flex; align-items: center; gap: 12px; padding: 30px 0 5px; color: #8593a5; font-size: 13px; }
+.workspace-shell .ops-activity-empty p { margin: 0; }
+.workspace-shell .ops-placement-total { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; padding: 22px 0; }
+.workspace-shell .ops-placement-total strong { color: #273b55; font-size: 49px; line-height: 1; font-weight: 520; letter-spacing: -.06em; }
+.workspace-shell .ops-placement-total span { color: #8390a0; font-size: 12px; }
+.workspace-shell .ops-placement-statuses { list-style: none; padding: 0; margin: 0 0 15px; }
+.workspace-shell .ops-placement-statuses li { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid #edf0f2; padding: 10px 0; }
+.workspace-shell .ops-placement-statuses strong { color: #405372; font-size: 13px; }
+.workspace-shell .ops-placement-action { display: flex; justify-content: space-between; align-items: center; gap: 11px; padding: 12px 15px; border-radius: 9px; color: #405785; background: #edf0f6; font-size: 12px; font-weight: 720; }
+.workspace-shell .ops-placement-action svg:last-child { margin-left: auto; }
+.workspace-shell .ops-placement-action:hover { background: #e0e7f4; }
+
+/* Overview-only responsive layout. Protect 320px screens from horizontal scroll. */
+@media (max-width: 1199px) {
+  .workspace-shell .journey-masthead { grid-template-columns: minmax(0,1fr) minmax(275px,1fr); }
+  .workspace-shell .journey-record { gap: 10px; }
+  .workspace-shell .journey-content-grid { grid-template-columns: minmax(0,1.4fr) minmax(245px,.8fr); gap: 14px; }
+  .workspace-shell .ops-masthead { grid-template-columns: minmax(0,1fr) minmax(280px,.9fr); gap: 23px; }
+  .workspace-shell .ops-main-grid { grid-template-columns: minmax(0,1.3fr) minmax(235px,.8fr); gap: 14px; }
+  .workspace-shell .ops-bottom-grid { gap: 14px; }
+}
+@media (max-width: 1023px) {
+  .workspace-shell .journey-masthead, .workspace-shell .ops-masthead { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+  .workspace-shell .journey-content-grid, .workspace-shell .ops-main-grid { grid-template-columns: 1fr; }
+  .workspace-shell .journey-side-column { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .workspace-shell .ops-side-stack { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .workspace-shell .ops-bottom-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .workspace-shell .ops-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .workspace-shell .ops-metric:nth-child(3) { border-left: 0; }
+  .workspace-shell .ops-metric:nth-child(n+3) { border-top: 1px solid #e7e9ee; }
+}
+@media (max-width: 767px) {
+  .workspace-shell .journey-overview, .workspace-shell .ops-overview { gap: 16px; }
+  .workspace-shell .journey-masthead, .workspace-shell .ops-masthead { grid-template-columns: minmax(0,1fr); border-radius: 15px; }
+  .workspace-shell .journey-introduction { padding: 29px 24px 34px; min-height: 270px; }
+  .workspace-shell .journey-eyebrow { margin-bottom: 19px; }
+  .workspace-shell .journey-masthead h1 { font-size: clamp(40px,10vw,55px); }
+  .workspace-shell .journey-introduction > p { font-size: 13px; margin: 14px 0 19px; }
+  .workspace-shell .journey-focus { padding: 28px 24px 30px; }
+  .workspace-shell .journey-focus-top { margin-bottom: 23px; }
+  .workspace-shell .journey-focus h2 { font-size: 28px; }
+  .workspace-shell .journey-path-panel { padding: 24px 20px 0; border-radius: 14px; }
+  .workspace-shell .journey-path { display: flex; flex-direction: column; gap: 13px; margin: 23px 0 25px; }
+  .workspace-shell .journey-path > li:not(:last-child)::after { height: 20px; width: 1px; border-top: 0; border-left: 1px dashed #bbc8b6; top: 45px; left: 22px; }
+  .workspace-shell .journey-path-step { flex-wrap: nowrap; align-items: center; }
+  .workspace-shell .journey-path-marker { width: 45px; height: 45px; }
+  .workspace-shell .journey-path-text { flex: 1; }
+  .workspace-shell .journey-path-state { margin: 0; flex-basis: auto; font-size: 9px; }
+  .workspace-shell .journey-metrics { margin: 0 -20px; }
+  .workspace-shell .journey-metric { flex-direction: column; align-items: flex-start; gap: 5px; padding: 18px 12px; }
+  .workspace-shell .journey-metric strong { font-size: 29px; }
+  .workspace-shell .journey-metric span { font-size: 10px; }
+  .workspace-shell .journey-metric svg { display: none; }
+  .workspace-shell .journey-side-column { grid-template-columns: 1fr; }
+  .workspace-shell .journey-paper-card { padding: 24px 19px; }
+  .workspace-shell .journey-destination-card { min-height: 245px; padding: 26px 23px; }
+  .workspace-shell .journey-record-end { max-width: 110px; }
+  .workspace-shell .journey-record-arrow { display: none; }
+  .workspace-shell .journey-record-symbol { width: 36px; height: 36px; }
+  .workspace-shell .ops-masthead { padding: 29px 22px 21px; gap: 26px; }
+  .workspace-shell .ops-masthead h1 { font-size: clamp(43px,10vw,55px); }
+  .workspace-shell .ops-eyebrow { margin-bottom: 22px; }
+  .workspace-shell .ops-heading > p:not(.ops-eyebrow) { font-size: 13px; margin: 13px 0 23px; }
+  .workspace-shell .ops-priority { padding: 22px; }
+  .workspace-shell .ops-priority-number { font-size: 75px; margin-top: 15px; }
+  .workspace-shell .ops-priority h2 { font-size: 21px; }
+  .workspace-shell .ops-metrics-section { gap: 13px; }
+  .workspace-shell .ops-metric { padding: 19px 15px; gap: 11px; }
+  .workspace-shell .ops-metric strong { font-size: 31px; }
+  .workspace-shell .ops-metric-head { font-size: 11px; }
+  .workspace-shell .ops-metric-head svg { width: 15px; }
+  .workspace-shell .ops-metric-foot { font-size: 10px; }
+  .workspace-shell .ops-side-stack, .workspace-shell .ops-bottom-grid { grid-template-columns: 1fr; }
+  .workspace-shell .ops-panel { padding: 23px 19px; }
+  .workspace-shell .ops-stage { grid-template-columns: minmax(92px,.9fr) minmax(32px,1.1fr) 22px 13px; gap: 7px; }
+  .workspace-shell .ops-stage-name { font-size: 11px; gap: 6px; }
+  .workspace-shell .ops-stage > strong { font-size: 12px; }
+  .workspace-shell .ops-submissions { padding: 0; }
+  .workspace-shell .ops-submissions > .ops-panel-head { padding: 23px 19px; }
+  .workspace-shell .ops-records-empty { margin: 0 19px 19px; padding: 22px 18px; }
+}
+@media (max-width: 359px) {
+  .workspace-shell .journey-section-top h2, .workspace-shell .ops-section-line h2 { font-size: 22px; }
+  .workspace-shell .journey-metric span { font-size: 9px; }
+  .workspace-shell .journey-record { gap: 8px; }
+  .workspace-shell .journey-record-end { max-width: 94px; }
+  .workspace-shell .ops-priority-top { font-size: 8px; letter-spacing: .08em; }
+  .workspace-shell .ops-button-light, .workspace-shell .ops-button-outline { flex: 1 1 auto; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .workspace-shell .journey-primary-link,
+  .workspace-shell .journey-metric,
+  .workspace-shell .ops-stage,
+  .workspace-shell .ops-metric { transition: background-color .18s ease,color .18s ease; }
+}

@@ -18,16 +18,21 @@ for (const role of ["admin", "student"] as const) {
       await page.setViewportSize({ width, height: 960 });
       await page.goto(route);
       await expect(page.locator("main#main h1")).toBeVisible();
+      await expect(page.locator(role === "admin" ? ".ops-priority > a" : ".journey-primary-link")).toBeVisible();
       if (width === 1440) await expect(page.locator("main#main h1")).toHaveCSS("font-weight", "500");
       await expect(page.locator(".public-header")).toHaveCount(0);
       await expect(page.locator("main#main")).toHaveCount(1);
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
       if (width === 1440) {
-        const stat = page.locator(".workspace-stat").first();
-        await expect(stat).toHaveCSS("border-left-width", "0px");
-        await expect(stat).toHaveCSS("border-top-left-radius", "0px");
-        await expect(stat).toHaveCSS("box-shadow", "none");
-        await expect(page.locator(".workspace-stat-strip")).toHaveCSS("background-color", "rgb(233, 238, 246)");
+        if (role === "admin") {
+          await expect(page.locator(".ops-masthead")).toBeVisible();
+          await expect(page.locator(".ops-metrics .ops-metric")).toHaveCount(4);
+          await expect(page.locator(".ops-stage-list .ops-stage")).toHaveCount(6);
+        } else {
+          await expect(page.locator(".journey-masthead")).toBeVisible();
+          await expect(page.locator(".journey-path > li")).toHaveCount(3);
+          await expect(page.locator(".journey-metrics .journey-metric")).toHaveCount(3);
+        }
         await expect(page.locator(".workspace-sidebar .workspace-nav-label").first()).toBeVisible();
         await expect(page.locator(".workspace-quick-card")).toHaveCount(0);
       }
