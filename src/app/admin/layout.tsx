@@ -7,7 +7,7 @@ import { WorkspaceShell } from "@/components/layout/workspace-shell";
 
 // Admin shell: every page under /admin re-verifies the admin role
 // server-side (never middleware/UI-only). Private: noindex.
-// Dark workspace rail (incident.io-informed geometry, Jalanin indigo).
+// Shared compact product navigation with Jalanin indigo accents.
 export default async function AdminLayout({
   children,
 }: {

@@ -31,3 +31,11 @@ GitHub CI on main checks TypeScript, ESLint, unit tests, Next.js production buil
 ## Requirements traceability
 
 Related existing scopes: admin overview/review queue, internship management, placements, student application list, notifications and role-specific navigation. No API, database schema, payment, authorization or lifecycle changes. This update is presentation-layer only.
+
+## Visual refinement — 19 October 2026 (second pass)
+
+The first pass was too ornamental. This pass closely follows the UI composition of the [Stripe dashboard reference](https://mobbin.com/screens/673e89af-fe9e-4ab9-ac27-435dedf21888): a slim pale navigation column, grouped small-icon labels, quiet selected-row fill, an unobtrusive utility header, prominent summary metrics, and compact structured operational panels. Also reviewed [Midday's accounting dashboard](https://mobbin.com/screens/647eb31b-b5b8-4af5-bc99-0dab7dfc5d03) as an alternate navigation treatment. Jalanin's own brand name, icons, colors and application-specific data are retained.
+
+Changes: removed the redundant sidebar marketing card, replaced the dark admin rail with a shared light indigo-tinted rail, removed KPI left-side accent stripes and decorative diagonal-arrow affordances, reduced ornamental headings, and used a reusable layered-shadow elevation system for cards, toolbars, tables and forms. Main overviews now use a data-first grid with real application counts, statuses and recent actions. A Playwright assertion checks that overview cards have no left border and do have a shadow.
+
+This is a presentation redesign; there are no fabricated records, no new permissions, and no new lifecycle transitions.

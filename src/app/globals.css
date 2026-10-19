@@ -1400,3 +1400,13 @@ html { scroll-padding-top: 116px; }
 @media (prefers-reduced-motion: reduce) {
   .workspace-shell * { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Explicitly neutralize the former admin-only dark rail specificity. */
+@media (min-width: 1024px) {
+  .workspace-shell .workspace-sidebar .workspace-brand-mark { background: var(--jalanin-900); color: #fff; }
+  .workspace-shell .workspace-sidebar .workspace-nav-count { background: #e5e9f4; color: #40517d; }
+  .workspace-shell .workspace-sidebar .workspace-nav-item .workspace-nav-icon { color: #8791a8; }
+  .workspace-shell .workspace-sidebar .workspace-nav-item[aria-current="page"] .workspace-nav-icon { color: var(--jalanin-900); }
+}
+/* Prevent the prior dashboard accent stripe from returning in any state. */
+.workspace-shell .workspace-stat::before { content: none !important; display: none !important; }

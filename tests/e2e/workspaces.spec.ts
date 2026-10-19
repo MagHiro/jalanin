@@ -21,6 +21,13 @@ for (const role of ["admin", "student"] as const) {
       await expect(page.locator(".public-header")).toHaveCount(0);
       await expect(page.locator("main#main")).toHaveCount(1);
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+      if (width === 1440) {
+        const stat = page.locator(".workspace-stat").first();
+        await expect(stat).toHaveCSS("border-left-width", "0px");
+        await expect(stat).not.toHaveCSS("box-shadow", "none");
+        await expect(page.locator(".workspace-sidebar .workspace-nav-label").first()).toBeVisible();
+        await expect(page.locator(".workspace-quick-card")).toHaveCount(0);
+      }
       if (width < 1024) {
         await page.getByRole("button", { name: "Open workspace navigation" }).click();
         await expect(page.getByRole("dialog", { name: "Workspace navigation" })).toBeVisible();
