@@ -48,4 +48,13 @@ jobs:
       - run: pnpm exec playwright install chromium
       - run: pnpm test:e2e
       - name: Validate production compose config
-        run: docker compose -f compose.prod.yml config --quiet
+        run: |
+          # Only for static Compose interpolation. Never use or commit real production secrets.
+          cat > .env.prod <<'EOF'
+          POSTGRES_USER=jalanin
+          POSTGRES_PASSWORD=ci-placeholder-not-production
+          POSTGRES_DB=jalanin
+          DATABASE_URL=postgresql://jalanin:ci-placeholder-not-production@postgres:5432/jalanin
+          EOF
+          trap 'rm -f .env.prod' EXIT
+          docker compose --env-file .env.prod -f compose.prod.yml config --quiet
