@@ -383,7 +383,7 @@
   min-height: 154px;
   padding: 24px 24px 20px !important;
   border: 1px solid var(--studio-border) !important;
-  border-radius: 16px;
+  border-radius: 16px !important;
   background: var(--studio-paper);
   box-shadow: var(--studio-shadow) !important;
   transition: transform .22s, border-color .22s, box-shadow .22s;
