@@ -31,13 +31,13 @@ export default async function AdminOverviewPage() {
   ];
 
   return <div className="workspace-overview">
-    <section className="workspace-page-heading" aria-labelledby="overview-title">
+    <section className="workspace-page-heading workspace-hero workspace-admin-hero" aria-labelledby="overview-title">
       <div>
         <p className="workspace-kicker">Administration / Overview</p>
         <h1 id="overview-title">Overview</h1>
-        <p className="workspace-intro">A single place to track applications, manage opportunities, and keep student placements moving.</p>
+        <p className="workspace-intro">Track decisions, focus the review queue, and keep every placement moving.</p>
       </div>
-      <Link href="/admin/internships/new" className="btn btn-primary"><Plus size={17} /> New internship</Link>
+      <div className="workspace-hero-aside"><span>READY FOR REVIEW</span><strong className="tnum">{overview.statusCounts.New ?? 0} new applications</strong><Link href="/admin/internships/new" className="btn btn-primary"><Plus size={17} /> New internship</Link></div>
     </section>
 
     <section aria-label="Platform at a glance" className="workspace-stat-strip">

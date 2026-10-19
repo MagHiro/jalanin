@@ -4,9 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, ArrowUpRight, BriefcaseBusiness, ChevronDown, Info, ListOrdered, Mail, Menu, X } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, ChevronDown, Info, ListOrdered, Mail, Menu, X } from "lucide-react";
 import { SignOutButton } from "./sign-out-button";
-import logo from "../../../public/logo.png";
 
 const links = [
   { href: "/opportunities", label: "Internships", description: "Find your next opportunity", icon: BriefcaseBusiness },
@@ -66,12 +65,12 @@ export function PublicNavigation({ signedIn, admin }: { signedIn: boolean; admin
         <>
           {admin && <Link href="/admin" className="public-account-link" onClick={closeMenus}>Admin</Link>}
           <SignOutButton />
-          <Link href="/dashboard" className="btn btn-primary public-header-cta" onClick={closeMenus}>Dashboard <ArrowUpRight size={17} strokeWidth={1.6} aria-hidden="true" /></Link>
+          <Link href="/dashboard" className="btn btn-primary public-header-cta" onClick={closeMenus}>Dashboard <ArrowRight size={17} strokeWidth={1.6} aria-hidden="true" /></Link>
         </>
       ) : (
         <>
           <Link href="/auth/login" className="public-account-link" onClick={closeMenus}>Log in</Link>
-          <Link href="/auth/sign-up" className="btn btn-primary public-header-cta" onClick={closeMenus}>Sign up <ArrowUpRight size={17} strokeWidth={1.6} aria-hidden="true" /></Link>
+          <Link href="/auth/sign-up" className="btn btn-primary public-header-cta" onClick={closeMenus}>Sign up <ArrowRight size={17} strokeWidth={1.6} aria-hidden="true" /></Link>
         </>
       )}
     </>
@@ -81,7 +80,7 @@ export function PublicNavigation({ signedIn, admin }: { signedIn: boolean; admin
     <header ref={header} className="public-header sticky z-40" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closeMenus(); }}>
       <div className="public-header-inner mx-auto px-5 md:px-10">
         <Link href="/" aria-label="Jalanin Internships — home" className="public-brand" onClick={closeMenus}>
-          <Image src={logo} alt="Jalanin Internship Program" priority className="h-auto w-[155px] sm:w-[190px]" />
+          <span className="chapters-wordmark"><span className="chapters-wordmark-symbol" aria-hidden="true">j.</span><span>jalanin<span className="chapters-wordmark-dot">.</span></span></span>
         </Link>
         <nav aria-label="Primary" className="hidden items-center gap-1 xl:gap-2 lg:flex">
           <button ref={exploreToggle} type="button" className="public-nav-link" aria-expanded={explore} aria-controls="public-explore-navigation" onClick={() => setExplore(!explore)}>
@@ -125,7 +124,7 @@ export function PublicNavigation({ signedIn, admin }: { signedIn: boolean; admin
           <div className="public-menu-feature-shade" />
           <span className="relative z-10 flex h-full flex-col justify-between p-6">
             <span className="self-start rounded-full border border-white/50 px-3 py-1 text-xs tracking-[.08em]">A new perspective</span>
-            <span><span className="block text-[28px] font-medium leading-[1.1] tracking-[-.045em]">Your next chapter starts here.</span><span className="mt-4 flex items-center gap-3 text-sm">Browse internships <ArrowUpRight size={18} strokeWidth={1.6} aria-hidden="true" /></span></span>
+            <span><span className="block text-[28px] font-medium leading-[1.1] tracking-[-.045em]">Your next chapter starts here.</span><span className="mt-4 flex items-center gap-3 text-sm">Browse internships <ArrowRight size={18} strokeWidth={1.6} aria-hidden="true" /></span></span>
           </span>
         </Link>
       </div>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, Compass } from "lucide-react";
+import { ArrowLeft, ArrowRight, Compass } from "lucide-react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
@@ -108,7 +108,7 @@ export default async function InternshipDetailPage({
             href={`/apply/${internship.id}`}
             className="btn btn-primary mt-4 hidden w-full lg:inline-flex"
           >
-            Apply now <ArrowUpRight size={17} aria-hidden="true" />
+            Apply now <ArrowRight size={17} aria-hidden="true" />
           </Link>
           <p className="mt-3 hidden text-xs leading-5 text-muted-foreground lg:block">
             You will be asked to log in or create an account first.

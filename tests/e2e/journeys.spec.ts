@@ -30,11 +30,10 @@ async function loginAs(request: APIRequestContext, userId: string): Promise<void
 test.describe("public platform (UAT-01…06, UAT-24)", () => {
   test("landing renders all core sections", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: /internships across/i })).toBeVisible();
-    await expect(page.getByRole("heading", { name: /how it works/i })).toBeVisible();
-    await expect(page.getByRole("heading", { name: /featured/i })).toBeVisible();
-    await expect(page.getByRole("heading", { name: /about jalanin/i })).toBeVisible();
-    await expect(page.getByRole("heading", { name: /contact us/i })).toBeVisible();
+    // Core product regions remain semantic even as editorial copy changes.
+    for (const id of ["hero-heading", "featured-heading", "hiw-heading", "about-heading", "contact-heading"]) {
+      await expect(page.locator(`#${id}`)).toBeVisible();
+    }
   });
 
   test("directory search/filter state lives in the URL; bad page degrades", async ({ page }) => {

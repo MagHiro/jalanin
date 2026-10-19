@@ -40,12 +40,12 @@ export function DateInput({ name, defaultValue, required, disabled, min, max, ty
     }
     document.addEventListener("pointerdown", closeOutside);
     document.addEventListener("keydown", escape);
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && window.matchMedia("(min-width: 768px)").matches && panel.current) {
-      gsap.fromTo(panel.current, { opacity: 0, y: -6, scale: .985 }, {
-        opacity: 1, y: 0, scale: 1, duration: .18, ease: "power2.out", clearProps: "all",
-      });
-    }
-    return () => { document.removeEventListener("pointerdown", closeOutside); document.removeEventListener("keydown", escape); };
+    const tween = !window.matchMedia("(prefers-reduced-motion: reduce)").matches && window.matchMedia("(min-width: 768px)").matches && panel.current
+      ? gsap.fromTo(panel.current, { opacity: 0, y: -6, scale: .985 }, {
+          opacity: 1, y: 0, scale: 1, duration: .2, ease: "power2.out", clearProps: "all",
+        })
+      : null;
+    return () => { tween?.kill(); document.removeEventListener("pointerdown", closeOutside); document.removeEventListener("keydown", escape); };
   }, [open]);
 
   // Reset custom control state along with the parent HTML form.
@@ -120,7 +120,7 @@ export function DateInput({ name, defaultValue, required, disabled, min, max, ty
         {["Mo","Tu","We","Th","Fr","Sa","Su"].map(day => <span className="workspace-calendar-weekday" key={day}>{day}</span>)}
         {days.map(day => {
           const date = isoDate(day);
-          return <button type="button" key={date} disabled={!bounded(date)} data-outside={day.getMonth() !== month.getMonth() ? "true" : undefined} aria-pressed={date === selectedDay} aria-label={day.toLocaleDateString("en", { day: "numeric", month: "long", year: "numeric" })} className="workspace-calendar-day" onClick={() => choose(date)}>{day.getDate()}</button>;
+          return <button type="button" key={date} disabled={!bounded(date)} data-outside={day.getMonth() !== month.getMonth() ? "true" : undefined} aria-pressed={date === selectedDay} aria-current={date === isoDate(new Date()) ? "date" : undefined} aria-label={day.toLocaleDateString("en", { day: "numeric", month: "long", year: "numeric" })} className="workspace-calendar-day" onClick={() => choose(date)}>{day.getDate()}</button>;
         })}
       </div>
       {isDateTime && <div className="workspace-calendar-time">

@@ -1,24 +1,27 @@
 import { expect, test } from "@playwright/test";
 
-test("public shell and every landing section share the 1440px desktop boundary", async ({ page }) => {
+test("editorial shell respects the 1560px content boundary and full-bleed navigation", async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  for (const selector of [".public-header", ".public-main", ".learn-footer-heading", ".learn-footer-content"]) {
+  for (const selector of [".public-main", ".learn-footer-heading", ".learn-footer-content"]) {
     const box = await page.locator(selector).boundingBox();
-    expect(box?.width, selector).toBe(1440);
-    expect(box?.x, selector).toBe(240);
+    expect(box?.width, selector).toBe(1560);
+    expect(box?.x, selector).toBe(180);
   }
+  const header = await page.locator(".public-header").boundingBox();
+  expect(header?.width).toBe(1920);
+  expect(header?.x).toBe(0);
   for (const selector of [".learn-hero", ".learn-intro-strip", ".learn-section", ".learn-about"]) {
     for (const section of await page.locator(selector).all()) {
       const box = await section.boundingBox();
-      expect(box!.x).toBeGreaterThanOrEqual(280);
-      expect(box!.x + box!.width).toBeLessThanOrEqual(1640);
+      expect(box!.x).toBeGreaterThanOrEqual(232);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(1688);
     }
   }
   await page.goto("/missing-public-page");
   await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
-  await expect(page.locator(".public-state")).toHaveCSS("border-radius", "16px");
+  await expect(page.locator(".public-state")).toHaveCSS("border-radius", "24px");
 });
 
 test("public motion survives navigation and respects live reduced-motion changes", async ({ page }) => {
@@ -80,13 +83,13 @@ test("mobile navigation dismisses with Escape and landing sections render", asyn
   await page.screenshot({ path: "/tmp/opencode/jalanin-g-desktop.png", fullPage: true });
 });
 
-test("editorial sections retain functional links, labels and responsive image layout", async ({ page }) => {
+test("editorial sections retain functional links, labels and the original SVG art", async ({ page }) => {
   for (const width of [320, 375, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
-    await expect(page.locator(".learn-intro-image img")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "How It Works" })).toBeVisible();
+    await expect(page.getByRole("img", { name: "Find your path" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "One step at a time." })).toBeVisible();
     await expect(page.getByRole("form", { name: "Contact Jalanin" })).toBeVisible();
     await expect(page.getByRole("link", { name: /Browse internships/ }).first()).toHaveAttribute("href", "/opportunities");
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), `landing width ${width}`).toBeLessThanOrEqual(1);

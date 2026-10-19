@@ -29,9 +29,9 @@ export default async function DashboardPage() {
   const nextLabel = drafts.length > 0 ? "Resume application" : submitted.length > 0 ? "View applications" : "Explore internships";
 
   return <div className="workspace-overview">
-    <section className="workspace-page-heading" aria-labelledby="dashboard-title">
-      <div><p className="workspace-kicker">My workspace / Overview</p><h1 id="dashboard-title">My dashboard</h1><p className="workspace-intro">Stay up to date with your applications, saved drafts, and placements.</p></div>
-      <Link href="/opportunities" className="btn btn-primary"><Compass size={17} /> Browse internships</Link>
+    <section className="workspace-page-heading workspace-hero workspace-student-hero" aria-labelledby="dashboard-title">
+      <div><p className="workspace-kicker">My workspace / Overview</p><h1 id="dashboard-title">My dashboard</h1><p className="workspace-intro">One place for the opportunities you’ve found, the applications you’ve sent, and the steps ahead.</p></div>
+      <div className="workspace-hero-aside"><span>YOUR JOURNEY SO FAR</span><strong className="tnum">{apps.length} {apps.length === 1 ? "application" : "applications"} on file</strong><Link href="/opportunities" className="btn btn-primary"><Compass size={17} /> Browse internships</Link></div>
     </section>
 
     <section aria-label="Your journey at a glance" className="workspace-stat-strip workspace-student-stats">

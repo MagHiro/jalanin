@@ -1,5 +1,13 @@
-import Image from "next/image";
+import { JourneyIllustration } from "@/components/graphics/journey-illustration";
 
+/** The same original pathway graphic supports public discovery and sign-in. */
 export function AuthStory() {
-  return <aside className="learn-auth-story"><Image src="/images/work-together.jpg" alt="People working together around a table with laptops" fill sizes="(min-width: 768px) 540px, 100vw" className="object-cover" /><div className="learn-auth-story-copy"><p className="learn-kicker">Your next chapter</p><h2>A world of possibilities.<br />A place to begin.</h2><p>Real-world experience. Personal guidance.<br />Your journey starts with a little curiosity.</p></div></aside>;
+  return <aside className="learn-auth-story chapters-auth-story">
+    <div className="chapters-auth-art" aria-hidden="true"><JourneyIllustration /></div>
+    <div className="learn-auth-story-copy">
+      <p className="learn-kicker">Begin your next chapter</p>
+      <h2>There is more<br />ahead of you.</h2>
+      <p>Find an internship that moves you forward.<br />Your journey starts here.</p>
+    </div>
+  </aside>;
 }

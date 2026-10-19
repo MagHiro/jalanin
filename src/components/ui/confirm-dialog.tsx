@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef } from "react";
+import { gsap } from "gsap";
 
 /**
  * Accessible confirmation dialog (incident.io confirm geometry):
@@ -39,7 +40,11 @@ export function ConfirmDialog({
     const previousFocus = document.activeElement as HTMLElement | null;
     dialog.showModal();
     cancelRef.current?.focus();
+    const tween = !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? gsap.fromTo(dialog, { opacity: 0, y: 12, scale: .985 }, { opacity: 1, y: 0, scale: 1, duration: .26, ease: "power3.out", clearProps: "all" })
+      : null;
     return () => {
+      tween?.kill();
       dialog.close();
       if (previousFocus?.isConnected) previousFocus.focus();
     };
@@ -60,7 +65,7 @@ export function ConfirmDialog({
       aria-describedby={body ? bodyId : undefined}
       aria-busy={busy}
       tabIndex={-1}
-      className="fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border border-border bg-surface p-6 text-foreground shadow-modal backdrop:bg-black/40"
+      className="fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl bg-surface p-6 text-foreground shadow-modal backdrop:bg-black/40"
       onKeyDown={(e) => {
         if (e.key !== "Tab") return;
         // Native modal dialogs can still Tab into browser chrome in Chromium.

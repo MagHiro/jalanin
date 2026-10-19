@@ -99,7 +99,9 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
   useEffect(() => {
     if (!searchOpen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const node = palette.current?.querySelector(".workspace-command-inner");
-    if (node) gsap.fromTo(node, { opacity: 0, y: -9 }, { opacity: 1, y: 0, duration: 0.18, ease: "power2.out" });
+    if (!node) return;
+    const tween = gsap.fromTo(node, { opacity: 0, y: -9 }, { opacity: 1, y: 0, duration: 0.18, ease: "power2.out", clearProps: "all" });
+    return () => { tween.kill(); };
   }, [searchOpen]);
 
   const brand = <Link href={home} className="workspace-brand" aria-label="Jalanin workspace home">
