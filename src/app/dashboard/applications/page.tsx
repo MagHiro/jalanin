@@ -1,106 +1,55 @@
 import Link from "next/link";
+import { ArrowRight, Compass } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth/require";
 import { listStudentApplications } from "@/features/applications/service";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { CrmViews, CrmTableMeta, listHref } from "@/components/ui/crm-list";
 
 export const metadata = { title: "My applications" };
+export const dynamic = "force-dynamic";
+const path = "/dashboard/applications";
 
-export default async function StudentApplicationsPage({
-  searchParams,
-}: {
-  searchParams: { draft?: string };
-}) {
+export default async function StudentApplicationsPage({ searchParams }: { searchParams: { draft?: string; view?: string } }) {
   const user = await getSessionUser();
   if (!user) redirect("/auth/login?next=/dashboard/applications");
   const apps = await listStudentApplications(user.id);
-  const drafts = apps.filter((a) => a.application.isDraft);
-  const submitted = apps.filter((a) => !a.application.isDraft);
+  const drafts = apps.filter(item => item.application.isDraft);
+  const submitted = apps.filter(item => !item.application.isDraft);
+  const view = searchParams.view === "drafts" ? "drafts" : searchParams.view === "submitted" ? "submitted" : "all";
+  const visible = view === "drafts" ? drafts : view === "submitted" ? submitted : apps;
 
-  return (
-    <div className="space-y-6">
-      {searchParams.draft && (
-        <div role="status" className="alert alert-success">
-          <b>Draft saved.</b> Resume it any time — nothing is sent until you submit.
+  return <div className="crm-list-page">
+    {searchParams.draft && <div role="status" className="alert alert-success"><strong>Draft saved.</strong> You can resume it any time. It has not been submitted.</div>}
+    <PageHeader eyebrow="My workspace / Applications" title="My applications" description="Track your submissions and continue drafts without losing your progress." actions={<Link href="/opportunities" className="btn btn-primary btn-sm"><Compass size={16} /> Browse internships</Link>} />
+    <CrmViews label="Application views" items={[
+      { label: "All", href: listHref(path, searchParams, { view: null, draft: null }), active: view === "all", count: apps.length },
+      { label: "Submitted", href: listHref(path, searchParams, { view: "submitted", draft: null }), active: view === "submitted", count: submitted.length },
+      { label: "Drafts", href: listHref(path, searchParams, { view: "drafts", draft: null }), active: view === "drafts", count: drafts.length },
+    ]} />
+    <section className="crm-records" aria-label="Your application records">
+      <CrmTableMeta total={visible.length} page={1} pageSize={visible.length || 1} noun="applications" note="Drafts are not submitted for review." />
+      {visible.length > 0 ? <>
+        <div className="crm-table-scroll hidden md:block">
+          <table className="crm-table"><thead><tr><th scope="col">Internship</th><th scope="col">Location</th><th scope="col">Lifecycle stage</th><th scope="col">Submitted</th><th scope="col" className="crm-col-action">Action</th></tr></thead>
+            <tbody>{visible.map(({ application, internshipTitle, internshipCity, internshipCountry, internshipSlug }) => <tr key={application.id}>
+              <td><Link href={application.isDraft ? `/apply/${application.internshipId}` : `/dashboard/applications/${application.id}`} className="crm-record-name">{internshipTitle}</Link><Link href={`/opportunities/${internshipSlug}`} className="crm-record-sub crm-email">View listing</Link></td>
+              <td className="crm-record-secondary">{internshipCity}, {internshipCountry}</td>
+              <td><div className="crm-badge-stack"><StatusBadge status={application.isDraft ? "Draft" : application.lifecycleStatus} />{application.needsReReview && <span className="badge badge-rereview">Re-review</span>}</div></td>
+              <td className="crm-date">{application.submittedAt ? new Date(application.submittedAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" }) : "Not submitted"}</td>
+              <td className="crm-col-action"><Link className="crm-row-link" href={application.isDraft ? `/apply/${application.internshipId}` : `/dashboard/applications/${application.id}`}>{application.isDraft ? "Resume draft" : "View details"}</Link></td>
+            </tr>)}</tbody>
+          </table>
         </div>
-      )}
-      <PageHeader
-        icon="☰"
-        eyebrow="Your history"
-        title="My applications"
-        description={`${submitted.length} submitted · ${drafts.length} draft${drafts.length === 1 ? "" : "s"}`}
-      />
-      {apps.length === 0 ? (
-        <EmptyState
-          icon="☰"
-          title="Nothing here yet."
-          body="Browse internships and start an application — your progress saves as a draft."
-          actionHref="/opportunities"
-          actionLabel="Browse internships"
-        />
-      ) : (
-        <div className="space-y-6">
-          {drafts.length > 0 && (
-            <section aria-labelledby="drafts-h">
-              <h2 id="drafts-h" className="text-sm font-semibold uppercase tracking-[.12em] text-muted-foreground">
-                Drafts ({drafts.length})
-              </h2>
-              <ul className="mt-2 space-y-2">
-                {drafts.map(({ application, internshipTitle, internshipCity, internshipCountry }) => (
-                  <li key={application.id} className="surface-card flex flex-wrap items-center justify-between gap-3 p-4 md:p-5">
-                    <div>
-                      <p className="font-semibold text-foreground">{internshipTitle}</p>
-                      <p className="mt-0.5 text-xs text-muted-foreground">{internshipCity}, {internshipCountry} · draft, not submitted</p>
-                    </div>
-                    <Link href={`/apply/${application.internshipId}`} className="btn btn-outline btn-sm">
-                      Resume draft
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-          <section aria-labelledby="submitted-h">
-            <h2 id="submitted-h" className="text-sm font-semibold uppercase tracking-[.12em] text-muted-foreground">
-              Submitted ({submitted.length})
-            </h2>
-            {submitted.length === 0 ? (
-              <p className="mt-2 text-sm text-muted-foreground">No submitted applications yet — drafts appear above.</p>
-            ) : (
-              <ul className="mt-2 space-y-2">
-                {submitted.map(({ application, internshipTitle, internshipCity, internshipCountry, internshipSlug }) => (
-                  <li key={application.id} className="surface-card surface-card-hover flex flex-wrap items-center justify-between gap-4 p-4 md:p-5">
-                    <div className="min-w-0">
-                      <p className="font-semibold text-foreground">{internshipTitle}</p>
-                      <p className="mt-0.5 text-xs text-muted-foreground">
-                        {internshipCity}, {internshipCountry} ·
-                        {` submitted ${application.submittedAt ? new Date(application.submittedAt).toLocaleDateString("en-SG") : ""}`}
-                      </p>
-                      <p className="mt-2 flex flex-wrap gap-1.5">
-                        <StatusBadge status={application.lifecycleStatus} />
-                        {application.needsReReview && (
-                          <span className="badge badge-rereview">
-                            <span aria-hidden="true" className="badge-dot" />
-                            Updated — re-review required
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 flex-wrap gap-2 text-sm">
-                      <Link href={`/dashboard/applications/${application.id}`} className="btn btn-outline btn-sm">Details</Link>
-                      <Link href={`/opportunities/${internshipSlug}`} className="btn btn-ghost btn-sm">Listing</Link>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        </div>
-      )}
-    </div>
-  );
+        <ul className="crm-mobile-records md:hidden">{visible.map(({ application, internshipTitle, internshipCity, internshipCountry }) => <li key={application.id}>
+          <div className="crm-mobile-top"><Link className="crm-record-name" href={application.isDraft ? `/apply/${application.internshipId}` : `/dashboard/applications/${application.id}`}>{internshipTitle}</Link><StatusBadge status={application.isDraft ? "Draft" : application.lifecycleStatus} /></div>
+          <p>{internshipCity}, {internshipCountry}</p>{application.needsReReview && <span className="badge badge-rereview">Re-review required</span>}
+          <div className="crm-mobile-bottom"><span className="crm-record-sub">{application.submittedAt ? new Date(application.submittedAt).toLocaleDateString("en-SG") : "Not submitted"}</span><Link className="crm-row-link" href={application.isDraft ? `/apply/${application.internshipId}` : `/dashboard/applications/${application.id}`}>{application.isDraft ? "Resume draft" : "View details"}</Link></div>
+        </li>)}</ul>
+      </> : <div className="crm-empty"><EmptyState icon="☰" title={view === "drafts" ? "No saved drafts" : view === "submitted" ? "No submitted applications" : "No applications yet"} body={view === "drafts" ? "Drafts appear here after you save an application." : "Explore internships and apply when you find a good fit."} actionHref="/opportunities" actionLabel="Browse internships" /></div>}
+      {visible.length > 0 && <div className="crm-student-help">Your application status updates here as the team reviews it. Quotation terms are sent by email. <Link href="/contact">Need help? <ArrowRight size={13} /></Link></div>}
+    </section>
+  </div>;
 }
-
-export const dynamic = "force-dynamic";
