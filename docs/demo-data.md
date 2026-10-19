@@ -9,10 +9,10 @@ pnpm admin:grant 00000000-0000-0000-0000-00000000ad01
 pnpm db:seed:demo
 ```
 
-Use a local `DATABASE_URL` (or `SUPABASE_DB_URL`) and `STORAGE_BACKEND=local`.
-Scripts load the project's environment files automatically. Start the app with
-`E2E_MODE=1 pnpm dev`, open `/dev/login`, and enter as the student or admin.
-The developer login is only available in the existing development/test mode.
+Use a local `DATABASE_URL`. Scripts load the project's environment files
+automatically. Start the app with `E2E_MODE=1 pnpm dev`, open `/dev/login`,
+and enter as the student or admin. The developer login is only available
+in the existing development/test mode (never production).
 
 ## Included scenarios
 
@@ -31,8 +31,8 @@ The developer login is only available in the existing development/test mode.
 - UI Design in Singapore: rejected with coordinator feedback.
 - Finance in Penang: saved draft.
 
-Submitted applications include real, readable fictional PDF CVs stored through
-the private local document adapter, policy-version consent records, dated status
+Submitted applications include real, readable fictional PDF CVs stored in the
+private filesystem document store, policy-version consent records, dated status
 histories and audit records. Quotations distinguish student-facing terms from
 internal notes. Notifications include unread submission and re-review scenarios.
 The previous intake is unpublished and stays out of the public directory.
@@ -45,6 +45,7 @@ Re-running adds no duplicate history or documents and preserves edits made while
 demonstrating the product. Newly uploaded documents are removed if the transaction
 fails. Existing test fixtures and student applications are retained.
 
-Demo identities are fictional fixed IDs for the existing developer session seam;
-they are not Supabase Auth accounts. The command requires a local development
-database and a separately provisioned admin. Demo seeding does not send emails.
+Demo identities are fictional fixed IDs with login-disabled placeholder
+password hashes in the native `users` table (the E2E session seam mints real
+sessions for them). The command requires a local development database and a
+separately provisioned admin. Demo seeding does not send emails.

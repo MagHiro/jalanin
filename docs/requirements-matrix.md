@@ -28,6 +28,23 @@ Student application presentation data (2026-10-12, D04/D10/D11/D12 / APP-01…16
 
 Presentation workflow check (2026-10-12, APP-01…16 / D10): fixed partial browser draft saves (blank fields omitted; consent validated on submission) and refreshed the router after submission so editing uses current application state. Added `tests/e2e/application-form.spec.ts` covering partial draft → new session/resume → missing-CV validation → upload/submit → submitted edit/re-review. Local isolated PostgreSQL migrations and all 42 unit/integration checks pass; 23 Chromium workflow/accessibility/workspace checks pass. Authentication uses the test session seam and documents use local storage; hosted Supabase sign-in/reset, hosted storage, and actual email delivery are not verified by this run.
 
+## Supabase removal → standalone PostgreSQL + native auth + filesystem (2026-10-19)
+
+| ID | Requirement | Implementation | Verify | Status |
+|---|---|---|---|---|
+| D20 | Standalone PG + native auth + filesystem (was: Supabase PG + Auth + Storage) | `db/migrations/0005_remove_rls.sql` (zero policies) + `0006_native_auth.sql` (`users`/`user_sessions`/`user_tokens`); bcrypt sessions via `/api/auth/*`; filesystem `DocumentStore` under `PRIVATE_UPLOAD_DIR`/`PUBLIC_UPLOAD_DIR`; `Dockerfile` + `compose.prod.yml` (app + postgres + migrate + volumes); `docs/migration-cutover.md` + `docs/runbook.md` | U/I/E/M | Implemented |
+| D14 | Edit lock at Quotation Sent+ | Server + application-level authz + UI rejection (RLS retired) | U/E | Verified |
+| D19 | Single admin role, privileged provisioning | `admin_users` + `pnpm admin:grant <email-or-uuid>`; server-only enforcement | I/E | Verified |
+
+Verification: typecheck + lint clean; 179/179 unit+integration pass against
+live PostgreSQL; production build passes; Docker image builds and the full
+`compose.prod.yml` stack verified healthy (migrate → app + postgres,
+signup/login/dashboard, CV upload → admin 200 / student 403 / anon 401,
+app rebuild + postgres restart preserved data and files); data + storage
+migration scripts validated against fixtures with counts + FK + size checks;
+backup (`pg_dump`) + restore into scratch DB verified. Live production data
+has NOT been migrated — see `docs/migration-cutover.md` §7 blockers.
+
 ## Decisions D01–D20 (all Confirmed)
 
 | ID | Requirement | Implementation | Acceptance | Verify | Status |

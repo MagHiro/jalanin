@@ -6,9 +6,13 @@ on:
   pull_request:
 
 env:
-  DATABASE_URL: postgresql://jalanin:jalanin@localhost:54322/jalanin
+  DATABASE_URL: postgresql://jalanin:local_password@localhost:5432/jalanin
   E2E_MODE: "1"
   EMAIL_PROVIDER: log
+  NEXT_PUBLIC_APP_URL: http://localhost:3000
+  CRON_SECRET: ci-test-secret
+  PRIVATE_UPLOAD_DIR: storage/private
+  PUBLIC_UPLOAD_DIR: storage/public
 
 jobs:
   checks:
@@ -18,10 +22,10 @@ jobs:
         image: postgres:16-alpine
         env:
           POSTGRES_USER: jalanin
-          POSTGRES_PASSWORD: jalanin
+          POSTGRES_PASSWORD: local_password
           POSTGRES_DB: jalanin
         ports:
-          - 54322:5432
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U jalanin -d jalanin"
           --health-interval 5s --health-timeout 3s --health-retries 10
@@ -43,3 +47,5 @@ jobs:
       - run: pnpm build
       - run: pnpm exec playwright install chromium
       - run: pnpm test:e2e
+      - name: Validate production compose config
+        run: docker compose -f compose.prod.yml config --quiet
