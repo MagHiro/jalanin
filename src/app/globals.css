@@ -1734,3 +1734,8 @@ html { scroll-padding-top: 116px; }
 @media (prefers-reduced-motion: reduce) {
   .workspace-shell .crm-view, .workspace-shell .crm-row-link { transition: none; }
 }
+
+/* Filter dropdowns must escape the records surface; only the table itself scrolls. */
+.workspace-shell .crm-records { overflow: visible; }
+.workspace-shell .crm-toolbar { position: relative; z-index: 5; }
+.workspace-shell .crm-views { position: relative; z-index: 1; }
