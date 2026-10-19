@@ -40,8 +40,9 @@ for (const role of ["admin", "student"] as const) {
       await expect(page.getByRole("textbox", { name: "Title *", exact: true })).toBeVisible();
       await page.getByRole("textbox", { name: "Title *", exact: true }).fill("Workspace input QA");
       await expect(page.getByRole("textbox", { name: "Title *", exact: true })).toHaveValue("Workspace input QA");
-      await page.getByRole("combobox", { name: "Publication status *", exact: true }).selectOption("Unpublished");
-      await expect(page.getByRole("combobox", { name: "Publication status *", exact: true })).toHaveValue("Unpublished");
+      await page.getByRole("combobox", { name: "Publication status", exact: true }).click();
+      await page.getByRole("option", { name: "Unpublished" }).click();
+      await expect(page.locator('input[name="publicationStatus"]')).toHaveValue("Unpublished");
       await page.getByRole("textbox", { name: "Description *", exact: true }).fill("Form component verification");
       await page.getByLabel("Featured on landing").check();
       await expect(page.getByLabel("Featured on landing")).toBeChecked();
@@ -65,6 +66,12 @@ for (const role of ["admin", "student"] as const) {
     }
     await page.goto(route);
     await expect(page.locator("main h1")).toBeVisible();
+    await page.keyboard.press("Control+k");
+    await expect(page.getByRole("dialog", { name: "Quick navigation" })).toBeVisible();
+    await page.getByRole("textbox", { name: "Search destinations" }).fill("Applications");
+    await expect(page.getByRole("dialog", { name: "Quick navigation" }).getByText("Applications")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog", { name: "Quick navigation" })).not.toBeVisible();
     expect(errors).toEqual([]);
   });
 }

@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   if (existing.length === 0) {
     await db.insert(users).values({
       id: body.userId,
-      email: `e2e-${body.userId.slice(0, 8)}@example.com`,
+      email: `e2e-${body.userId}@example.com`,
       // Random 60-char bcrypt-shaped placeholder; never used for login.
       passwordHash: `$2b$12$e2eprovisioned${"x".repeat(38)}`,
       emailVerifiedAt: new Date(),

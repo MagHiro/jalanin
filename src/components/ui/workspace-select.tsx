@@ -37,7 +37,7 @@ export function WorkspaceSelect({ name, options, defaultValue, placeholder, aria
   }
   return <div ref={root} className="workspace-select" onKeyDown={onKeyDown}>
     {multiple ? selected.map(v => <input key={v} type="hidden" name={name} value={v} />) : <input type="hidden" name={name} value={selected[0] ?? ""} />}
-    <button ref={trigger} type="button" disabled={disabled} className="workspace-select-trigger" aria-label={ariaLabel} aria-expanded={open} aria-haspopup="listbox" aria-controls={id} onClick={() => { setOpen(v => !v); setQuery(""); setActive(0); }}><span className="min-w-0 truncate">{label}</span><ChevronDown size={16} aria-hidden="true" /></button>
+    <button ref={trigger} type="button" disabled={disabled} className="workspace-select-trigger" role="combobox" aria-label={ariaLabel} aria-expanded={open} aria-haspopup="listbox" aria-controls={id} onClick={() => { setOpen(v => !v); setQuery(""); setActive(0); }}><span className="min-w-0 truncate">{label}</span><ChevronDown size={16} aria-hidden="true" /></button>
     {open && <div className="workspace-select-popover">
       {options.length > 5 && <div className="workspace-select-search"><Search size={14} /><input ref={search} aria-label={`Search ${ariaLabel.toLowerCase()}`} placeholder="Search options…" value={query} onChange={e => { setQuery(e.target.value); setActive(0); }} /></div>}
       <div id={id} role="listbox" aria-label={ariaLabel} aria-multiselectable={multiple || undefined} className="workspace-select-options">
