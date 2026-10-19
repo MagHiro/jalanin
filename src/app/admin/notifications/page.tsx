@@ -1,21 +1,17 @@
-import { requireAdmin } from "@/lib/auth/require";
-import {
-  listAdminNotifications,
-  markNotificationRead,
-} from "@/features/admin/service";
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/auth/require";
+import { listAdminNotifications, markNotificationRead } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
+import { CrmViews, CrmTableMeta, listHref } from "@/components/ui/crm-list";
 
 export const metadata = { title: "Notifications", robots: "noindex" };
 export const dynamic = "force-dynamic";
+const path = "/admin/notifications";
 
-// Durable admin alerts (D08): new-application + re-review indicators with
-// persisted read state — never client-only.
-export default async function AdminNotificationsPage({
-  searchParams,
-}: {
+export default async function AdminNotificationsPage({ searchParams }: {
   searchParams: Record<string, string | undefined>;
 }) {
   await requireAdmin();
@@ -24,21 +20,9 @@ export default async function AdminNotificationsPage({
   const page = Number.isSafeInteger(rawPage) ? Math.max(1, Math.min(100000, rawPage)) : 1;
   const pageSize = 50;
   const { rows, total } = await listAdminNotifications({
-    unreadOnly: unreadOnly ? true : undefined,
-    page,
-    pageSize,
+    unreadOnly: unreadOnly ? true : undefined, page, pageSize,
   });
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(searchParams)) {
-    if (value) params.set(key, value);
-  }
-  const returnHref = `/admin/notifications${params.size ? `?${params}` : ""}`;
-  const filterParams = new URLSearchParams(params);
-  filterParams.delete("page");
-  if (unreadOnly) filterParams.delete("unread");
-  else filterParams.set("unread", "1");
-  const filterHref = `/admin/notifications${filterParams.size ? `?${filterParams}` : ""}`;
+  const returnHref = listHref(path, searchParams, { page: searchParams.page ?? null });
 
   async function markRead(formData: FormData) {
     "use server";
@@ -48,62 +32,35 @@ export default async function AdminNotificationsPage({
     redirect(returnHref);
   }
 
-  return (
-    <div className="space-y-5">
-      <PageHeader
-        icon="●"
-        eyebrow="Alerts"
-        title={`Notifications (${total})`}
-        description="New submissions and student revisions — persisted, with read state."
-        actions={
-          unreadOnly ? (
-              <a href={filterHref} className="btn btn-outline btn-sm">Show all</a>
-          ) : (
-              <a href={filterHref} className="btn btn-outline btn-sm">Unread only</a>
-          )
-        }
-      />
-      {rows.length === 0 ? (
-        <EmptyState
-          icon="●"
-          title={unreadOnly ? "No unread alerts." : "No alerts."}
-          body="New submissions and student revisions will appear here and by email."
-          actionHref="/admin/notifications"
-          actionLabel="Show all"
-        />
-      ) : (
-        <ul className="space-y-2.5">
-          {rows.map(({ notification, applicationEmail, internshipTitle }) => (
-            <li
-              key={notification.id}
-              className={`rounded-2xl border p-4 text-sm md:p-5 ${notification.isRead ? "border-border bg-surface" : "notification-unread"}`}
-            >
-              <p className="flex flex-wrap items-center gap-2 font-semibold text-foreground">
-                {notification.eventType === "new_application" ? "New application" : "Re-review required"}
-                {!notification.isRead && <span className="badge badge-rereview"><span aria-hidden="true" className="badge-dot" />unread</span>}
-              </p>
-              <p className="tnum mt-1 text-muted-foreground">
-                {applicationEmail ?? "—"} · {internshipTitle ?? "—"} ·
-                {" "}<time>{new Date(notification.createdAt).toLocaleString("en-SG")}</time>
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {notification.applicationId && (
-                  <a href={`/admin/applications/${notification.applicationId}`} className="btn btn-outline btn-sm !bg-surface">
-                    Open application
-                  </a>
-                )}
-                {!notification.isRead && (
-                  <form action={markRead}>
-                    <input type="hidden" name="id" value={notification.id} />
-                    <button className="btn btn-outline btn-sm !bg-surface">Mark read</button>
-                  </form>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-      <Pagination page={page} totalPages={totalPages} pathname="/admin/notifications" searchParams={searchParams} />
-    </div>
-  );
+  return <div className="crm-list-page">
+    <PageHeader eyebrow="Communication / Alerts" title="Notifications" description="Application submissions and revisions requiring team attention." />
+    <CrmViews label="Notification views" items={[
+      { label: "All notifications", href: listHref(path, searchParams, { unread: null }), active: !unreadOnly },
+      { label: "Unread", href: listHref(path, searchParams, { unread: "1" }), active: unreadOnly },
+    ]} />
+    <section className="crm-records" aria-label="Admin notifications">
+      <CrmTableMeta total={total} page={page} pageSize={pageSize} noun="notifications" note="Read state is stored and persists across sessions." />
+      {rows.length ? <>
+        <div className="crm-table-scroll hidden md:block"><table className="crm-table">
+          <thead><tr><th scope="col">Event</th><th scope="col">Application</th><th scope="col">Received</th><th scope="col">State</th><th scope="col" className="crm-col-action">Action</th></tr></thead>
+          <tbody>{rows.map(({ notification, applicationEmail, internshipTitle }) => <tr key={notification.id} className={!notification.isRead ? "crm-row-unread" : undefined}>
+            <td><span className="crm-record-name">{notification.eventType === "new_application" ? "New application" : "Student revision"}</span><span className="crm-record-sub">{notification.eventType === "new_application" ? "Submission received" : "Re-review required"}</span></td>
+            <td><span className="crm-record-secondary">{internshipTitle ?? "—"}</span><span className="crm-record-sub">{applicationEmail ?? "—"}</span></td>
+            <td className="crm-date"><time dateTime={new Date(notification.createdAt).toISOString()}>{new Date(notification.createdAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" })}</time></td>
+            <td><span className={notification.isRead ? "crm-read-state" : "crm-unread-state"}>{notification.isRead ? "Read" : "Unread"}</span></td>
+            <td className="crm-col-action"><div className="crm-notification-actions">
+              {notification.applicationId && <Link className="crm-row-link" href={`/admin/applications/${notification.applicationId}`}>Open record</Link>}
+              {!notification.isRead && <form action={markRead}><input type="hidden" name="id" value={notification.id} /><button type="submit" className="crm-row-link">Mark read</button></form>}
+            </div></td>
+          </tr>)}</tbody>
+        </table></div>
+        <ul className="crm-mobile-records md:hidden">{rows.map(({ notification, applicationEmail, internshipTitle }) => <li key={notification.id}>
+          <div className="crm-mobile-top"><span className="crm-record-name">{notification.eventType === "new_application" ? "New application" : "Student revision"}</span><span className={notification.isRead ? "crm-read-state" : "crm-unread-state"}>{notification.isRead ? "Read" : "Unread"}</span></div>
+          <p>{internshipTitle ?? "—"}</p><span className="crm-record-sub">{applicationEmail ?? "—"} · {new Date(notification.createdAt).toLocaleDateString("en-SG")}</span>
+          <div className="crm-mobile-bottom">{notification.applicationId && <Link href={`/admin/applications/${notification.applicationId}`} className="crm-row-link">Open record</Link>}{!notification.isRead && <form action={markRead}><input type="hidden" name="id" value={notification.id} /><button type="submit" className="crm-row-link">Mark read</button></form>}</div>
+        </li>)}</ul>
+      </> : <div className="crm-empty"><EmptyState icon="●" title={unreadOnly ? "No unread alerts" : "No notifications yet"} body="New applications and revision events appear here when there is something to review." actionHref={path} actionLabel="Show all notifications" /></div>}
+      <Pagination page={page} totalPages={Math.max(1, Math.ceil(total / pageSize))} pathname={path} searchParams={searchParams} total={total} pageSize={pageSize} />
+    </section>
+  </div>;
 }
