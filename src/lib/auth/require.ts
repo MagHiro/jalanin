@@ -1,10 +1,12 @@
+import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { createSupabaseServerClient, isE2EMode } from "@/lib/supabase/server";
 import { db } from "@/lib/db/client";
 import { adminUsers } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { cookies, headers } from "next/headers";
 import { logServerError } from "@/lib/observability/logger";
+import { readSessionCookie } from "./session";
+import { validateSessionToken, type AuthUser } from "./service";
 
 export interface SessionUser {
   id: string;
@@ -19,6 +21,11 @@ export class AuthError extends Error {
     super(message);
     this.status = status;
   }
+}
+
+/** Whether the E2E/test session seam is active (local/CI only, never prod). */
+export function isE2EMode(): boolean {
+  return process.env.NODE_ENV !== "production" && process.env.E2E_MODE === "1";
 }
 
 const E2E_COOKIE = "e2e_session";
@@ -60,31 +67,26 @@ async function devSession(): Promise<SessionUser | null> {
   return null;
 }
 
+function toSessionUser(user: AuthUser): SessionUser {
+  return { id: user.id, email: user.email, emailConfirmed: user.emailVerified };
+}
+
 /** Resolve the current session user, or null when unauthenticated. */
 export async function getSessionUser(): Promise<SessionUser | null> {
   const dev = await devSession();
   if (dev) return dev;
   try {
-    const supabase = createSupabaseServerClient();
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) return null;
-    return {
-      id: data.user.id,
-      email: data.user.email ?? null,
-      emailConfirmed: (data.user.confirmed_at ?? null) !== null,
-    };
+    const token = readSessionCookie();
+    if (!token) return null;
+    const user = await validateSessionToken(token);
+    return user ? toSessionUser(user) : null;
   } catch (error) {
     // Next's static-render probe intentionally throws when cookies are read.
     // Re-throw its control signal so rendering becomes dynamic, not an incident.
     if (error instanceof Error && "digest" in error && error.digest === "DYNAMIC_SERVER_USAGE") {
       throw error;
     }
-    // CI's explicitly gated test sessions intentionally run without hosted
-    // Supabase. Do not turn expected anonymous lookups into noisy errors.
-    if (!isE2EMode() ||
-        (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)) {
-      logServerError("auth.session.lookup.failed", error);
-    }
+    logServerError("auth.session.lookup.failed", error);
     return null;
   }
 }

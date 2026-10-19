@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function ForgotPasswordPage() {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -14,10 +13,13 @@ export default function ForgotPasswordPage() {
     setError(null);
     const email = String(new FormData(e.currentTarget).get("email") ?? "");
     try {
-      const { error } = await createSupabaseBrowserClient().auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email }),
       });
-      if (error) throw new Error(error.message);
+      const data = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
+      if (!res.ok || !data?.ok) throw new Error(data?.error ?? "Request failed.");
       setState("sent");
     } catch (err) {
       setState("error");

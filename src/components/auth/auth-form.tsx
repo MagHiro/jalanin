@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { safeNext } from "@/lib/auth/safe-next";
 import { AuthStory } from "./auth-story";
 
@@ -27,39 +26,25 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
     const email = String(form.get("email") ?? "");
     const password = String(form.get("password") ?? "");
     try {
-      const supabase = createSupabaseBrowserClient();
-      const result =
-        mode === "login"
-          ? await supabase.auth.signInWithPassword({ email, password })
-          : await supabase.auth.signUp({
-              email,
-              password,
-              options: {
-                emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
-              },
-            });
-      if (result.error) throw new Error(result.error.message);
-      // Email-confirmation accounts have a user but no active session.
-      // Do not redirect them into a protected dashboard/login loop.
-      if (mode === "sign-up" && !result.data.session) {
+      const res = await fetch(mode === "login" ? "/api/auth/login" : "/api/auth/signup", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = (await res.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+        emailVerified?: boolean;
+      } | null;
+      if (!res.ok || !data?.ok) throw new Error(data?.error ?? "Authentication failed.");
+      if (mode === "sign-up" && !data.emailVerified) {
         setConfirmationEmail(email);
         setBusy(false);
         return;
       }
-      // E2E/dev seam: mirror the session into a signed test cookie ONLY when
-      // explicitly enabled (NEXT_PUBLIC_E2E=1, local/CI runs). The endpoint
-      // itself 404s unless E2E_MODE=1 server-side, so this is doubly gated.
-      if (process.env.NEXT_PUBLIC_E2E === "1") {
-        try {
-          await fetch("/api/dev/session", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ userId: result.data.user?.id ?? result.data.session?.user.id }),
-          });
-        } catch {
-          // Non-fatal: Supabase cookies remain the primary session.
-        }
-      }
+      // The native session cookie is set by the API response above; no
+      // client-side session mirroring is needed.
+      void next;
       router.push(next);
       router.refresh();
     } catch (err) {
@@ -87,8 +72,8 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
           <div className="mt-6 rounded-xl border border-border bg-secondary p-6" role="status">
             <h2 className="text-lg font-semibold text-foreground">Check your email</h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              If confirmation is required, we sent a verification link to <strong className="break-all text-foreground">{confirmationEmail}</strong>.
-              Open the link before logging in. Check your spam folder if it does not arrive.
+              We sent a verification link to <strong className="break-all text-foreground">{confirmationEmail}</strong>.
+              Open the link to verify your account, then log in. Check your spam folder if it does not arrive.
             </p>
             <Link href="/auth/login" className="btn btn-primary mt-5">Go to log in</Link>
           </div>

@@ -2,8 +2,10 @@ import { emailReplyTo } from "./provider";
 import {
   adminAlertEmail,
   esc,
+  passwordResetEmail,
   quotationEmail,
   statusChangeEmail,
+  verifyEmail,
 } from "./templates";
 
 /**
@@ -55,6 +57,10 @@ export function buildEmail(
               : "revision_re_review",
         }),
       };
+    case "verify-email":
+      return verifyEmail({ verifyUrl: str("verifyUrl") });
+    case "password-reset":
+      return passwordResetEmail({ resetUrl: str("resetUrl") });
     case "contact-notify": {
       // Visitor-supplied content: escape for HTML, keep plain text raw.
       const name = esc(str("name"));

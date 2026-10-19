@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter();
+  const params = useSearchParams();
+  const token = params.get("token") ?? "";
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -17,8 +18,14 @@ export default function ResetPasswordPage() {
     setError(null);
     const password = String(new FormData(e.currentTarget).get("password") ?? "");
     try {
-      const { error } = await createSupabaseBrowserClient().auth.updateUser({ password });
-      if (error) throw new Error(error.message);
+      if (!token) throw new Error("The reset link is invalid. Request a new one.");
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ token, password }),
+      });
+      const data = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
+      if (!res.ok || !data?.ok) throw new Error(data?.error ?? "Reset failed — the link may have expired. Request a new one.");
       router.push("/auth/login");
     } catch (err) {
       setError(
@@ -35,6 +42,11 @@ export default function ResetPasswordPage() {
       <p className="eyebrow">Account recovery</p>
       <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">Set a new password</h1>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">Choose a password of at least 8 characters.</p>
+      {!token && (
+        <p role="alert" className="alert alert-error mt-4">
+          This reset link is missing its token. Request a new link below.
+        </p>
+      )}
       <form onSubmit={onSubmit} className="mt-5 space-y-4">
         <div>
           <label className="field-label" htmlFor="reset-password">
@@ -71,5 +83,13 @@ export default function ResetPasswordPage() {
         <Link href="/auth/forgot-password" className="inline-flex min-h-10 items-center font-medium text-primary hover:underline">Request a new link</Link>
       </p>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

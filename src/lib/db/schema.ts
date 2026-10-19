@@ -1,9 +1,10 @@
 // Canonical Drizzle schema for the Jalanin Internship Platform.
-// Source of truth for DDL is version-controlled SQL in supabase/migrations
-// (0001_init.sql generated from this file, 0002_rls.sql hand-written RLS).
-// This module provides typed server-side access. The privileged server client
-// (src/lib/db/client.ts) bypasses RLS by design — every caller MUST enforce
-// authorization explicitly via src/lib/auth/require.ts before querying.
+// Source of truth for DDL is version-controlled SQL in db/migrations
+// (0001_init.sql for the domain, 0005_remove_rls.sql retiring Supabase RLS,
+// 0006_native_auth.sql for application-managed authentication).
+// The privileged server client (src/lib/db/client.ts) connects as the table
+// owner — every caller MUST enforce authorization explicitly via
+// src/lib/auth/require.ts before querying.
 import {
   boolean,
   date,
@@ -15,9 +16,11 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -38,6 +41,70 @@ export const profiles = pgTable("profiles", {
     .defaultNow()
     .notNull(),
 });
+
+// Native application identity (db/migrations/0006_native_auth.sql).
+// Passwords are bcrypt hashes — never plaintext. Email compare is
+// case-insensitive via the lower(email) unique index; legacyAuthId exists
+// ONLY for the one-time Supabase cutover import.
+export const users = pgTable(
+  "users",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: varchar("email", { length: 320 }).notNull(),
+    passwordHash: text("password_hash").notNull(),
+    emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
+    legacyAuthId: uuid("legacy_auth_id").unique(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [uniqueIndex("users_email_lower_uq").on(sql`lower(${t.email})`)],
+);
+
+export const userSessions = pgTable(
+  "user_sessions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull().unique(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    userAgent: text("user_agent"),
+  },
+  (t) => [
+    index("user_sessions_user_idx").on(t.userId),
+    index("user_sessions_expires_idx").on(t.expiresAt),
+  ],
+);
+
+export const userTokens = pgTable(
+  "user_tokens",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    purpose: varchar("purpose", { length: 20 }).notNull(),
+    tokenHash: text("token_hash").notNull().unique(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    consumedAt: timestamp("consumed_at", { withTimezone: true }),
+  },
+  (t) => [index("user_tokens_user_idx").on(t.userId)],
+);
 
 export const adminUsers = pgTable("admin_users", {
   userId: uuid("user_id").primaryKey(),
