@@ -92,7 +92,7 @@ export default async function AdminInternshipsPage({
                     </span>
                   </td>
                   <td className="text-right">
-                    <RecordActions primary={{ href: `/admin/internships/${r.id}/edit`, label: "Edit" }} items={[{ href: `/opportunities/${r.slug}`, label: "View public listing", external: true }]} />
+                    {r.publicationStatus === "Published" ? <RecordActions primary={{ href: `/admin/internships/${r.id}/edit`, label: "Edit" }} items={[{ href: `/opportunities/${r.slug}`, label: "View public listing", external: true }]} /> : <Link href={`/admin/internships/${r.id}/edit`} className="btn btn-outline btn-sm">Edit</Link>}
                   </td>
                 </tr>
               ))}

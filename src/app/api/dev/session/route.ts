@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       // Random 60-char bcrypt-shaped placeholder; never used for login.
       passwordHash: `$2b$12$e2eprovisioned${"x".repeat(38)}`,
       emailVerifiedAt: new Date(),
-    });
+    }).onConflictDoNothing();
   }
   const session = await createSession(body.userId, {});
   cookies().set(SESSION_COOKIE, session.token, {
