@@ -40,12 +40,12 @@ export function DateInput({ name, defaultValue, required, disabled, min, max, ty
     }
     document.addEventListener("pointerdown", closeOutside);
     document.addEventListener("keydown", escape);
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && window.matchMedia("(min-width: 768px)").matches && panel.current) {
-      gsap.fromTo(panel.current, { opacity: 0, y: -6, scale: .985 }, {
-        opacity: 1, y: 0, scale: 1, duration: .18, ease: "power2.out", clearProps: "all",
-      });
-    }
-    return () => { document.removeEventListener("pointerdown", closeOutside); document.removeEventListener("keydown", escape); };
+    const tween = !window.matchMedia("(prefers-reduced-motion: reduce)").matches && window.matchMedia("(min-width: 768px)").matches && panel.current
+      ? gsap.fromTo(panel.current, { opacity: 0, y: -6, scale: .985 }, {
+          opacity: 1, y: 0, scale: 1, duration: .2, ease: "power2.out", clearProps: "all",
+        })
+      : null;
+    return () => { tween?.kill(); document.removeEventListener("pointerdown", closeOutside); document.removeEventListener("keydown", escape); };
   }, [open]);
 
   // Reset custom control state along with the parent HTML form.
