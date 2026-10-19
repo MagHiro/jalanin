@@ -1166,3 +1166,18 @@ html { scroll-padding-top: 116px; }
 .workspace-shell .workspace-progress-item:nth-child(2n) .workspace-progress-track span { background: #a2bfa9; }
 .workspace-shell .workspace-progress-item:nth-child(3n) .workspace-progress-track span { background: #bdafe0; }
 .workspace-shell .workspace-progress-item:nth-child(4n) .workspace-progress-track span { background: #d4b486; }
+
+/* Detailed record screens share the same information architecture and focus styles. */
+.workspace-shell .workspace-content [aria-label="Breadcrumb"] a { gap: 8px; min-height: 34px; border-radius: 7px; font-size: 12px; font-weight: 630; color: #63718b; }
+.workspace-shell .workspace-content [aria-label="Breadcrumb"] a:hover { color: var(--primary); }
+.workspace-shell .workspace-content dl > div { padding-block: 11px; border-color: #edf0f5; column-gap: 15px; }
+.workspace-shell .workspace-content dl dt { font-size: 12px; font-weight: 540; color: #758197; }
+.workspace-shell .workspace-content dl dd { font-size: 12px; font-weight: 670; color: #29334a; }
+.workspace-shell .workspace-content :is(.quote-panel, .revisions-panel) { border: 1px solid var(--ws-line); border-radius: 15px; background: #fff; }
+.workspace-shell .workspace-content :is(.quote-panel, .revisions-panel) h2 { font-size: 16px; font-weight: 720; }
+.workspace-shell .workspace-content ol[aria-label="Application lifecycle"] { border: 1px solid var(--ws-line); background: white; border-radius: 12px; padding: 10px 12px; row-gap: 7px; }
+.workspace-shell .workspace-content ol[aria-label="Application lifecycle"] li { flex-shrink: 0; }
+.workspace-shell .workspace-content .surface-card h2 { font-weight: 720; }
+.workspace-shell .workspace-content details summary { list-style-position: outside; padding: 5px 0; }
+.workspace-shell .workspace-content details[open] summary { margin-bottom: 8px; }
+.workspace-row-menu:focus-within { outline: 2px solid #99a9ca; outline-offset: 1px; }
