@@ -1,19 +1,20 @@
 import Link from "next/link";
+import { ArrowDown, ArrowUp, Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
 import { listAdminApplications } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { WorkspaceSelect } from "@/components/ui/workspace-select";
+import { Pagination } from "@/components/ui/pagination";
+import { CrmViews, CrmFilterChips, CrmTableMeta, listHref } from "@/components/ui/crm-list";
 
 export const metadata = { title: "Applications", robots: "noindex" };
 export const dynamic = "force-dynamic";
-
 const STATUSES = ["New", "In Review", "Quotation Sent", "Accepted", "Rejected", "Completed"];
+const path = "/admin/applications";
 
-export default async function AdminApplicationsPage({
-  searchParams,
-}: {
+export default async function AdminApplicationsPage({ searchParams }: {
   searchParams: { q?: string; status?: string; rereview?: string; sort?: string; page?: string };
 }) {
   await requireAdmin();
@@ -25,138 +26,71 @@ export default async function AdminApplicationsPage({
     status: searchParams.status,
     sort: searchParams.sort === "oldest" ? "oldest" : searchParams.sort === "name" ? "name" : "newest",
     needsReReview: searchParams.rereview === "1" ? true : undefined,
-    page,
-    pageSize,
+    page, pageSize,
   });
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const pageHref = (p: number) => {
-    const params = new URLSearchParams();
-    if (searchParams.q) params.set("q", searchParams.q);
-    if (searchParams.status) params.set("status", searchParams.status);
-    if (searchParams.rereview === "1") params.set("rereview", "1");
-    if (searchParams.sort) params.set("sort", searchParams.sort);
-    params.set("page", String(p));
-    return `/admin/applications?${params}`;
-  };
+  const filterStatus = searchParams.status ?? "";
+  const reReview = searchParams.rereview === "1";
+  const filters = [
+    ...(searchParams.q ? [{ label: `Search: ${searchParams.q}`, href: listHref(path, searchParams, { q: null }) }] : []),
+    ...(filterStatus ? [{ label: `Status: ${filterStatus}`, href: listHref(path, searchParams, { status: null }) }] : []),
+    ...(reReview ? [{ label: "Needs re-review", href: listHref(path, searchParams, { rereview: null }) }] : []),
+  ];
 
-  return (
-    <div className="space-y-5">
-      <PageHeader
-        icon="☰"
-        eyebrow="Review queue"
-        title={`Applications (${total})`}
-        description={
-          searchParams.rereview === "1"
-            ? "Student revisions awaiting explicit admin acknowledgement."
-            : "Search, filter, and open records for review."
-        }
-        actions={
-          searchParams.rereview === "1" ? (
-            <Link href="/admin/applications" className="btn btn-outline btn-sm">Show all</Link>
-          ) : (
-            <Link href="/admin/applications?rereview=1" className="btn btn-outline btn-sm">Re-review only</Link>
-          )
-        }
-      />
-      <form method="get" aria-label="Filter applications" className="toolbar grid gap-3 text-sm md:grid-cols-[1.4fr_1fr_1fr_auto]">
-        <label className="field-label">
+  return <div className="crm-list-page">
+    <PageHeader eyebrow="Applications / Review queue" title="Applications" description="Review submissions, track lifecycle stages, and acknowledge revised records." />
+    <CrmViews label="Application queues" items={[
+      { label: "All applications", href: listHref(path, searchParams, { status: null, rereview: null }), active: !filterStatus && !reReview },
+      { label: "New", href: listHref(path, searchParams, { status: "New", rereview: null }), active: filterStatus === "New" && !reReview },
+      { label: "In review", href: listHref(path, searchParams, { status: "In Review", rereview: null }), active: filterStatus === "In Review" && !reReview },
+      { label: "Quotation sent", href: listHref(path, searchParams, { status: "Quotation Sent", rereview: null }), active: filterStatus === "Quotation Sent" && !reReview },
+      { label: "Completed", href: listHref(path, searchParams, { status: "Completed", rereview: null }), active: filterStatus === "Completed" && !reReview },
+      { label: "Re-review required", href: listHref(path, searchParams, { status: null, rereview: "1" }), active: reReview },
+    ]} />
+    <section className="crm-records" aria-label="Application records">
+      <form method="get" aria-label="Filter applications" className="crm-toolbar">
+        <label className="crm-search">
+          <Search size={17} aria-hidden="true" />
           <span className="sr-only">Search name, email, university</span>
-          <input name="q" defaultValue={searchParams.q ?? ""} placeholder="Search name, email, university" className="field !min-h-11" />
+          <input type="search" name="q" defaultValue={searchParams.q ?? ""} placeholder="Search applicant, email or university" />
         </label>
-        <label className="field-label">
-          <span className="sr-only">Status</span>
-          <WorkspaceSelect name="status" ariaLabel="Filter by application status" defaultValue={searchParams.status ?? ""} options={[{ value: "", label: "All statuses" }, ...STATUSES.map(v => ({ value: v, label: v }))]} />
+        <label className="crm-toolbar-select"><span className="sr-only">Status</span>
+          <WorkspaceSelect name="status" ariaLabel="Filter by application status" defaultValue={filterStatus} options={[{ value: "", label: "All statuses" }, ...STATUSES.map(value => ({ value, label: value }))]} />
         </label>
-        <label className="field-label">
-          <span className="sr-only">Sort applications</span>
-          <WorkspaceSelect name="sort" ariaLabel="Sort applications" defaultValue={searchParams.sort ?? "newest"} options={[{ value: "newest", label: "Newest submitted" }, { value: "oldest", label: "Oldest submitted" }, { value: "name", label: "Applicant surname" }]} />
+        <label className="crm-toolbar-select"><span className="sr-only">Sort applications</span>
+          <WorkspaceSelect name="sort" ariaLabel="Sort applications" defaultValue={searchParams.sort ?? "newest"} options={[{ value: "newest", label: "Newest first" }, { value: "oldest", label: "Oldest first" }, { value: "name", label: "Applicant A–Z" }]} />
         </label>
-        <div className="flex items-end gap-2">
-          <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-border bg-surface px-3 py-1.5 text-[13px]">
-            <input type="checkbox" name="rereview" value="1" defaultChecked={searchParams.rereview === "1"} className="size-4 accent-primary" /> Re-review
-          </label>
-          <button className="btn btn-primary btn-sm min-h-11">Filter</button>
-        </div>
+        <label className="crm-toolbar-check"><input type="checkbox" name="rereview" value="1" defaultChecked={reReview} /> Re-review</label>
+        <button type="submit" className="btn btn-primary crm-apply">Apply</button>
       </form>
-
-      {/* Desktop table */}
-      {rows.length > 0 && (
-        <div className="table-shell hidden md:block">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Applicant</th>
-                <th scope="col">Internship</th>
-                <th scope="col">Status</th>
-                <th scope="col">Submitted</th>
-                <th scope="col"><span className="sr-only">Actions</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(({ application, internshipTitle }) => (
-                <tr key={application.id}>
-                  <td>
-                    <p className="font-semibold text-foreground">{application.firstName} {application.lastName}</p>
-                    <p className="tnum text-xs text-muted-foreground">{application.email} · r{application.revision}</p>
-                  </td>
-                  <td className="text-muted-foreground">{internshipTitle}</td>
-                  <td>
-                    <span className="flex flex-wrap gap-1.5">
-                      <StatusBadge status={application.lifecycleStatus} />
-                      {application.needsReReview && (
-                        <span className="badge badge-rereview"><span aria-hidden="true" className="badge-dot" />Re-review</span>
-                      )}
-                    </span>
-                  </td>
-                  <td className="tnum whitespace-nowrap text-xs text-muted-foreground">
-                    {application.submittedAt ? new Date(application.submittedAt).toLocaleDateString("en-SG") : "—"}
-                  </td>
-                  <td className="text-right">
-                    <Link href={`/admin/applications/${application.id}`} className="btn btn-outline btn-sm">Review</Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+      <CrmFilterChips filters={filters} clearHref={path} />
+      <CrmTableMeta total={total} page={page} pageSize={pageSize} noun="applications" note="Open an applicant to review documents and status history." />
+      {rows.length > 0 ? <>
+        <div className="crm-table-scroll hidden md:block">
+          <table className="crm-table">
+            <thead><tr>
+              <th scope="col"><Link href={listHref(path, searchParams, { sort: "name" })} className="crm-sort">Applicant {searchParams.sort === "name" && <ArrowDown size={13} />}</Link></th>
+              <th scope="col">Internship</th><th scope="col">Lifecycle stage</th>
+              <th scope="col"><Link href={listHref(path, searchParams, { sort: searchParams.sort === "oldest" ? "newest" : "oldest" })} className="crm-sort">Submitted {searchParams.sort === "oldest" ? <ArrowUp size={13} /> : <ArrowDown size={13} />}</Link></th>
+              <th scope="col" className="crm-col-numeric">Revision</th><th scope="col" className="crm-col-action">Action</th>
+            </tr></thead>
+            <tbody>{rows.map(({ application, internshipTitle }) => <tr key={application.id}>
+              <td><Link href={`/admin/applications/${application.id}`} className="crm-record-name">{application.firstName} {application.lastName}</Link><span className="crm-record-sub">{application.email}</span></td>
+              <td><span className="crm-record-secondary">{internshipTitle}</span></td>
+              <td><div className="crm-badge-stack"><StatusBadge status={application.lifecycleStatus} />{application.needsReReview && <span className="badge badge-rereview">Re-review</span>}</div></td>
+              <td className="crm-date">{application.submittedAt ? <time dateTime={new Date(application.submittedAt).toISOString()}>{new Date(application.submittedAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" })}</time> : "—"}</td>
+              <td className="crm-col-numeric tnum">r{application.revision}</td>
+              <td className="crm-col-action"><Link href={`/admin/applications/${application.id}`} className="crm-row-link">Review <span className="sr-only">{application.firstName} {application.lastName}</span></Link></td>
+            </tr>)}</tbody>
           </table>
         </div>
-      )}
-
-      {/* Mobile cards */}
-      <ul className="space-y-2 md:hidden">
-        {rows.map(({ application, internshipTitle }) => (
-          <li key={application.id} className="surface-card flex items-center justify-between gap-3 p-4 text-sm">
-            <div className="min-w-0">
-              <p className="truncate font-semibold text-foreground">
-                {application.firstName} {application.lastName}
-              </p>
-              <p className="tnum mt-0.5 truncate text-xs text-muted-foreground">
-                {internshipTitle} · {application.submittedAt ? new Date(application.submittedAt).toLocaleDateString("en-SG") : "—"} · r{application.revision}
-              </p>
-              <p className="mt-1.5 flex flex-wrap gap-1.5">
-                <StatusBadge status={application.lifecycleStatus} />
-                {application.needsReReview && (
-                  <span className="badge badge-rereview"><span aria-hidden="true" className="badge-dot" />Re-review</span>
-                )}
-              </p>
-            </div>
-            <Link href={`/admin/applications/${application.id}`} className="btn btn-outline btn-sm shrink-0">
-              Review
-            </Link>
-          </li>
-        ))}
-      </ul>
-
-      {rows.length === 0 && (
-        <EmptyState icon="☰" title="No applications match these filters" body="Try another search or return to the full review queue." actionHref="/admin/applications" actionLabel="Clear all filters" />
-      )}
-
-      {totalPages > 1 && (
-        <nav aria-label="Pagination" className="flex items-center justify-center gap-3 text-sm">
-          {page > 1 && <Link href={pageHref(page - 1)} className="btn btn-outline btn-sm">← Previous</Link>}
-          <span className="tnum text-muted-foreground" aria-current="page">Page {page} of {totalPages} · {total} total</span>
-          {page < totalPages && <Link href={pageHref(page + 1)} className="btn btn-outline btn-sm">Next →</Link>}
-        </nav>
-      )}
-    </div>
-  );
+        <ul className="crm-mobile-records md:hidden">{rows.map(({ application, internshipTitle }) => <li key={application.id}>
+          <div className="crm-mobile-top"><Link href={`/admin/applications/${application.id}`} className="crm-record-name">{application.firstName} {application.lastName}</Link><StatusBadge status={application.lifecycleStatus} /></div>
+          <p>{internshipTitle}</p><p className="crm-record-sub">{application.email} · r{application.revision}</p>
+          <div className="crm-mobile-bottom">{application.needsReReview && <span className="badge badge-rereview">Re-review</span>}<Link href={`/admin/applications/${application.id}`} className="crm-row-link">Review record</Link></div>
+        </li>)}</ul>
+      </> : <div className="crm-empty"><EmptyState icon="☰" title="No applications in this view" body="Adjust the search or filters to find an application." actionHref={path} actionLabel="Reset filters" /></div>}
+      <Pagination page={page} totalPages={totalPages} pathname={path} searchParams={searchParams} total={total} pageSize={pageSize} />
+    </section>
+  </div>;
 }

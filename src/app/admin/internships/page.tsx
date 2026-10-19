@@ -1,17 +1,20 @@
 import Link from "next/link";
+import { ArrowDown, ArrowUp, Plus, Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
 import { listAdminInternships } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { WorkspaceSelect } from "@/components/ui/workspace-select";
 import { RecordActions } from "@/components/ui/record-actions";
+import { Pagination } from "@/components/ui/pagination";
+import { CrmViews, CrmFilterChips, CrmTableMeta, listHref } from "@/components/ui/crm-list";
 
 export const metadata = { title: "Manage internships", robots: "noindex" };
 export const dynamic = "force-dynamic";
+const path = "/admin/internships";
+const STATUSES = ["Draft", "Published", "Unpublished"];
 
-export default async function AdminInternshipsPage({
-  searchParams,
-}: {
+export default async function AdminInternshipsPage({ searchParams }: {
   searchParams: { q?: string; status?: string; sort?: string; page?: string };
 }) {
   await requireAdmin();
@@ -19,112 +22,59 @@ export default async function AdminInternshipsPage({
   const page = Number.isSafeInteger(rawPage) ? Math.max(1, Math.min(100000, rawPage)) : 1;
   const pageSize = 20;
   const { rows, total } = await listAdminInternships({
-    q: searchParams.q,
-    status: searchParams.status,
+    q: searchParams.q, status: searchParams.status,
     sort: searchParams.sort === "title" ? "title" : searchParams.sort === "start" ? "start" : "updated",
-    page,
-    pageSize,
+    page, pageSize,
   });
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const pageHref = (p: number) => {
-    const params = new URLSearchParams();
-    if (searchParams.q) params.set("q", searchParams.q);
-    if (searchParams.status) params.set("status", searchParams.status);
-    if (searchParams.sort) params.set("sort", searchParams.sort);
-    params.set("page", String(p));
-    return `/admin/internships?${params}`;
-  };
-  const pubBadge = (s: string) =>
-    s === "Published"
-      ? "badge-published"
-      : s === "Draft"
-        ? "badge-draft"
-        : "badge-unpublished";
+  const badgeClass = (status: string) => status === "Published" ? "badge-published" : status === "Draft" ? "badge-draft" : "badge-unpublished";
+  const filters = [
+    ...(searchParams.q ? [{ label: `Search: ${searchParams.q}`, href: listHref(path, searchParams, { q: null }) }] : []),
+    ...(searchParams.status ? [{ label: `Publication: ${searchParams.status}`, href: listHref(path, searchParams, { status: null }) }] : []),
+  ];
 
-  return (
-    <div className="space-y-5">
-      <PageHeader
-        icon="▤"
-        eyebrow="Listings"
-        title={`Internships (${total})`}
-        actions={<Link href="/admin/internships/new" className="btn btn-primary btn-sm">+ New internship</Link>}
-      />
-      <form method="get" aria-label="Filter internships" className="toolbar grid gap-3 text-sm sm:grid-cols-[1.4fr_1fr_1fr_auto]">
-        <label className="field-label">
-          <span className="sr-only">Search title or city</span>
-          <input name="q" defaultValue={searchParams.q ?? ""} placeholder="Search title or city" className="field !min-h-11" />
-        </label>
-        <label className="field-label">
-          <span className="sr-only">Publication status</span>
-          <WorkspaceSelect name="status" ariaLabel="Filter by publication status" defaultValue={searchParams.status ?? ""} options={[{ value: "", label: "All statuses" }, ...["Draft", "Published", "Unpublished"].map(v => ({ value: v, label: v }))]} />
-        </label>
-        <label className="field-label">
-          <span className="sr-only">Sort internships</span>
-          <WorkspaceSelect name="sort" ariaLabel="Sort internships" defaultValue={searchParams.sort ?? "updated"} options={[{ value: "updated", label: "Recently updated" }, { value: "title", label: "Title A–Z" }, { value: "start", label: "Start date" }]} />
-        </label>
-        <div className="flex items-end">
-          <button className="btn btn-primary btn-sm min-h-11">Filter</button>
-        </div>
+  return <div className="crm-list-page">
+    <PageHeader eyebrow="Catalogue / Listings" title="Internships" description="Manage published opportunities, drafts, and application dates." actions={<Link href="/admin/internships/new" className="btn btn-primary btn-sm"><Plus size={16} /> New internship</Link>} />
+    <CrmViews label="Internship publication views" items={[
+      { label: "All listings", href: listHref(path, searchParams, { status: null }), active: !searchParams.status },
+      ...STATUSES.map(status => ({ label: status, href: listHref(path, searchParams, { status }), active: searchParams.status === status })),
+    ]} />
+    <section className="crm-records" aria-label="Internship records">
+      <form method="get" aria-label="Filter internships" className="crm-toolbar">
+        <label className="crm-search"><Search size={17} aria-hidden="true" /><span className="sr-only">Search title or city</span><input type="search" name="q" defaultValue={searchParams.q ?? ""} placeholder="Search title or location" /></label>
+        <label className="crm-toolbar-select"><span className="sr-only">Publication status</span><WorkspaceSelect name="status" ariaLabel="Filter by publication status" defaultValue={searchParams.status ?? ""} options={[{ value: "", label: "All statuses" }, ...STATUSES.map(status => ({ value: status, label: status }))]} /></label>
+        <label className="crm-toolbar-select"><span className="sr-only">Sort internships</span><WorkspaceSelect name="sort" ariaLabel="Sort internships" defaultValue={searchParams.sort ?? "updated"} options={[{ value: "updated", label: "Recently updated" }, { value: "title", label: "Title A–Z" }, { value: "start", label: "Start date" }]} /></label>
+        <button type="submit" className="btn btn-primary crm-apply">Apply</button>
       </form>
-
-      {rows.length > 0 && (
-        <div className="table-shell hidden md:block">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Title</th>
-                <th scope="col">Location</th>
-                <th scope="col">Status</th>
-                <th scope="col"><span className="sr-only">Actions</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id}>
-                  <td>
-                    <p className="font-semibold text-foreground">{r.title}</p>
-                    <p className="text-xs text-muted-foreground">/{r.slug}</p>
-                  </td>
-                  <td className="text-muted-foreground">{r.city}, {r.countryCode}</td>
-                  <td>
-                    <span className={`badge border ${pubBadge(r.publicationStatus)}`}>
-                      <span aria-hidden="true" className="badge-dot" />{r.publicationStatus}{r.featured ? " · featured" : ""}
-                    </span>
-                  </td>
-                  <td className="text-right">
-                    {r.publicationStatus === "Published" ? <RecordActions primary={{ href: `/admin/internships/${r.id}/edit`, label: "Edit" }} items={[{ href: `/opportunities/${r.slug}`, label: "View public listing", external: true }]} /> : <Link href={`/admin/internships/${r.id}/edit`} className="btn btn-outline btn-sm">Edit</Link>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      <ul className="space-y-2 md:hidden">
-        {rows.map((r) => (
-          <li key={r.id} className="surface-card flex items-center justify-between gap-3 p-4 text-sm">
-            <div className="min-w-0">
-              <p className="truncate font-semibold text-foreground">{r.title}</p>
-              <p className="mt-0.5 truncate text-xs text-muted-foreground">{r.city}, {r.countryCode}</p>
-              <p className="mt-1.5"><span className={`badge border ${pubBadge(r.publicationStatus)}`}><span aria-hidden="true" className="badge-dot" />{r.publicationStatus}</span></p>
-            </div>
-            <Link href={`/admin/internships/${r.id}/edit`} className="btn btn-outline btn-sm shrink-0">Edit</Link>
-          </li>
-        ))}
-      </ul>
-
-      {rows.length === 0 && (
-        <EmptyState icon="▤" title="No internships found." body="Create your first listing to get started." actionHref="/admin/internships/new" actionLabel="New internship" />
-      )}
-
-      {totalPages > 1 && (
-        <nav aria-label="Internship pagination" className="flex items-center justify-center gap-3 text-sm">
-          {page > 1 && <Link href={pageHref(page - 1)} className="btn btn-outline btn-sm">← Previous</Link>}
-          <span className="tnum text-muted-foreground" aria-current="page">Page {page} of {totalPages}</span>
-          {page < totalPages && <Link href={pageHref(page + 1)} className="btn btn-outline btn-sm">Next →</Link>}
-        </nav>
-      )}
-    </div>
-  );
+      <CrmFilterChips filters={filters} clearHref={path} />
+      <CrmTableMeta total={total} page={page} pageSize={pageSize} noun="internships" note="Edit a listing to change publication or dates." />
+      {rows.length ? <>
+        <div className="crm-table-scroll hidden md:block"><table className="crm-table">
+          <thead><tr>
+            <th scope="col"><Link href={listHref(path, searchParams, { sort: "title" })} className="crm-sort">Listing {searchParams.sort === "title" && <ArrowDown size={13} />}</Link></th>
+            <th scope="col">Location</th>
+            <th scope="col"><Link href={listHref(path, searchParams, { sort: "start" })} className="crm-sort">Start date {searchParams.sort === "start" && <ArrowUp size={13} />}</Link></th>
+            <th scope="col">Publication</th>
+            <th scope="col"><Link href={listHref(path, searchParams, { sort: "updated" })} className="crm-sort">Last updated {(!searchParams.sort || searchParams.sort === "updated") && <ArrowDown size={13} />}</Link></th>
+            <th scope="col" className="crm-col-action">Actions</th>
+          </tr></thead>
+          <tbody>{rows.map(row => <tr key={row.id}>
+            <td><Link className="crm-record-name" href={`/admin/internships/${row.id}/edit`}>{row.title}</Link><span className="crm-record-sub">/{row.slug}</span></td>
+            <td className="crm-record-secondary">{row.city}, {row.countryCode}</td>
+            <td className="crm-date tnum">{row.startDate ?? "—"}</td>
+            <td><div className="crm-badge-stack"><span className={`badge ${badgeClass(row.publicationStatus)}`}><span className="badge-dot" aria-hidden="true" />{row.publicationStatus}</span>{row.featured && <span className="crm-featured-label">Featured</span>}</div></td>
+            <td className="crm-date">{new Date(row.updatedAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" })}</td>
+            <td className="crm-col-action">{row.publicationStatus === "Published"
+              ? <RecordActions primary={{ href: `/admin/internships/${row.id}/edit`, label: "Edit" }} items={[{ href: `/opportunities/${row.slug}`, label: "Public listing", external: true }]} />
+              : <Link href={`/admin/internships/${row.id}/edit`} className="crm-row-link">Edit</Link>}</td>
+          </tr>)}</tbody>
+        </table></div>
+        <ul className="crm-mobile-records md:hidden">{rows.map(row => <li key={row.id}>
+          <div className="crm-mobile-top"><Link className="crm-record-name" href={`/admin/internships/${row.id}/edit`}>{row.title}</Link><span className={`badge ${badgeClass(row.publicationStatus)}`}>{row.publicationStatus}</span></div>
+          <p>{row.city}, {row.countryCode}</p><p className="crm-record-sub">Starts {row.startDate ?? "to be confirmed"}</p>
+          <div className="crm-mobile-bottom">{row.featured && <span className="crm-featured-label">Featured</span>}<Link className="crm-row-link" href={`/admin/internships/${row.id}/edit`}>Edit listing</Link></div>
+        </li>)}</ul>
+      </> : <div className="crm-empty"><EmptyState icon="▤" title="No internships in this view" body="Change your filters or create a new internship listing." actionHref="/admin/internships/new" actionLabel="New internship" /></div>}
+      <Pagination page={page} totalPages={Math.max(1,Math.ceil(total/pageSize))} pathname={path} searchParams={searchParams} total={total} pageSize={pageSize} />
+    </section>
+  </div>;
 }
