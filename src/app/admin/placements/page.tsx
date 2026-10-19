@@ -4,6 +4,7 @@ import { listAdminPlacements } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Pagination } from "@/components/ui/pagination";
 
 export const metadata = { title: "Placements", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -16,7 +17,8 @@ export default async function AdminPlacementsPage({
   searchParams: { q?: string; status?: string; page?: string };
 }) {
   await requireAdmin();
-  const page = Math.max(1, Number(searchParams.page ?? 1) || 1);
+  const rawPage = Number(searchParams.page ?? 1);
+  const page = Number.isSafeInteger(rawPage) ? Math.max(1, Math.min(100000, rawPage)) : 1;
   const pageSize = 20;
   const { rows, total } = await listAdminPlacements({
     q: searchParams.q,
@@ -57,7 +59,7 @@ export default async function AdminPlacementsPage({
           {rows.map((p) => (
             <li key={p.id} className="surface-card surface-card-hover flex flex-wrap items-center justify-between gap-3 p-4 text-sm">
               <div className="min-w-0">
-                <p className="font-semibold text-foreground">{p.role} · {p.organization}</p>
+                <p className="font-semibold text-foreground [overflow-wrap:anywhere]">{p.role} · {p.organization}</p>
                 <p className="mt-1.5"><StatusBadge status={p.placementStatus} /></p>
               </div>
               <Link href={`/admin/placements/${p.id}/edit`} className="btn btn-outline btn-sm shrink-0">Manage</Link>
@@ -67,9 +69,7 @@ export default async function AdminPlacementsPage({
       ) : (
         <EmptyState icon="✦" title="No placements found." body="Create placements manually for students — they will see their own records." actionHref="/admin/placements/new" actionLabel="New placement" />
       )}
-      {totalPages > 1 && (
-        <p className="tnum text-center text-sm text-muted-foreground" role="status">Page {page} of {totalPages} — {total} total.</p>
-      )}
+      <Pagination page={page} totalPages={totalPages} pathname="/admin/placements" searchParams={searchParams} />
     </div>
   );
 }

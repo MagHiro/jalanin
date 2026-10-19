@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { requireAdmin, AuthError } from "@/lib/auth/require";
+import { requireAdmin } from "@/lib/auth/require";
+import { z } from "zod";
+import { adminIdSchema, adminMutationError, readAdminBody } from "@/features/admin/request";
+import { PLACEMENT_STATUSES } from "@/lib/workflow/placements";
 import { transitionPlacement } from "@/features/admin/service";
 
 // Admin placement status transition (D17 lifecycle, audited).
@@ -9,23 +12,15 @@ export async function POST(
 ) {
   try {
     const admin = await requireAdmin();
-    const body = (await request.json().catch(() => ({}))) as { to?: string };
-    if (!body.to) {
-      return NextResponse.json({ ok: false, error: "Target status required." }, { status: 400 });
-    }
+    const id = adminIdSchema.parse(params.id);
+    const body = z.object({ to: z.enum(PLACEMENT_STATUSES) }).parse(await readAdminBody(request));
     const result = await transitionPlacement({
       adminId: admin.id,
-      placementId: params.id,
+      placementId: id,
       to: body.to,
     });
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
-    if (err instanceof AuthError) {
-      return NextResponse.json({ ok: false }, { status: err.status });
-    }
-    return NextResponse.json(
-      { ok: false, error: err instanceof Error ? err.message : "Action failed." },
-      { status: 400 },
-    );
+    return adminMutationError("admin.placement.transition.failed", err);
   }
 }

@@ -1,7 +1,9 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db/client";
 import { applications, internships } from "@/lib/db/schema";
-import { getSessionUser } from "@/lib/auth/require";
+import { AuthError, requireStudent } from "@/lib/auth/require";
+import { applicationRequestSchema } from "@/features/applications/request";
+import { logServerError } from "@/lib/observability/logger";
 import { ApplicationForm } from "@/components/applications/application-form";
 import { and, eq } from "drizzle-orm";
 import Link from "next/link";
@@ -17,16 +19,40 @@ export default async function ApplyPage({
 }: {
   params: { internshipId: string };
 }) {
-  const user = await getSessionUser();
-  if (!user) {
-    redirect(`/auth/login?next=${encodeURIComponent(`/apply/${params.internshipId}`)}`);
-  }
+  if (!applicationRequestSchema.shape.internshipId.safeParse(params.internshipId).success) notFound();
+  const user = await requireStudent().catch((error: unknown) => {
+    if (error instanceof AuthError && error.status === 401) {
+      redirect(`/auth/login?next=${encodeURIComponent(`/apply/${params.internshipId}`)}`);
+    }
+    throw error;
+  });
 
-  const listing = await db
+  const data = await (async () => {
+    const existing = await db
+      .select()
+      .from(applications)
+      .where(and(
+        eq(applications.applicantUserId, user.id),
+        eq(applications.internshipId, params.internshipId),
+      ))
+      .limit(1);
+    const listing = await db
     .select()
     .from(internships)
-    .where(eq(internships.id, params.internshipId))
+    .where(and(
+      eq(internships.id, params.internshipId),
+      existing[0] ? undefined : eq(internships.publicationStatus, "Published"),
+    ))
     .limit(1);
+    return { existing, listing };
+  })().catch(() => {
+    const incidentId = logServerError("applications.apply.load.failed", null);
+    return { incidentId };
+  });
+  if ("incidentId" in data) {
+    return <div role="alert" className="alert alert-error">Could not load this application. Please try again. Reference: {data.incidentId}</div>;
+  }
+  const { existing, listing } = data;
   if (listing.length === 0) {
     return (
       <div className="mx-auto max-w-2xl py-10 text-center">
@@ -50,17 +76,6 @@ export default async function ApplyPage({
       </div>
     );
   }
-
-  const existing = await db
-    .select()
-    .from(applications)
-    .where(
-      and(
-        eq(applications.applicantUserId, user.id),
-        eq(applications.internshipId, internship.id),
-      ),
-    )
-    .limit(1);
 
   const state = existing[0]
     ? existing[0].isDraft

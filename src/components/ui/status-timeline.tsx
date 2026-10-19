@@ -21,7 +21,7 @@ export function StatusTimeline({
     return <p className="text-sm text-muted-foreground">{emptyLabel}</p>;
   }
   return (
-    <ol className="relative space-y-0 border-l-2 border-border pl-0">
+    <ol className="relative min-w-0 space-y-0 border-l-2 border-border pl-0 [overflow-wrap:anywhere]">
       {events.map((e, i) => (
         <li
           key={e.id}

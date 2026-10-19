@@ -10,9 +10,10 @@ export function ContactForm() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const formElement = e.currentTarget;
     setState("sending");
     setError(null);
-    const form = new FormData(e.currentTarget);
+    const form = new FormData(formElement);
     // Turnstile widget token: rendered by the widget script when configured.
     const token =
       (document.querySelector<HTMLInputElement>('input[name="cf-turnstile-response"]')?.value) ||
@@ -32,8 +33,8 @@ export function ContactForm() {
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) throw new Error(data.error ?? "Submission failed.");
+      formElement.reset();
       setState("sent");
-      e.currentTarget.reset();
     } catch (err) {
       setState("error");
       setError(err instanceof Error ? err.message : "Submission failed.");

@@ -6,6 +6,8 @@ import { dispatchDueEmails } from "@/lib/email/outbox";
 import { logServerError } from "@/lib/observability/logger";
 
 export const dynamic = "force-dynamic";
+// The worker budgets 45 seconds; leave headroom for DB work and response flush.
+export const maxDuration = 60;
 
 // Vercel Cron invokes GET; external workers may use POST. Both require the
 // exact CRON_SECRET bearer token and never expose email data in the response.

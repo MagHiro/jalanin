@@ -12,8 +12,10 @@ export const dynamic = "force-dynamic";
 
 export default async function EditPlacementPage({
   params,
+  searchParams,
 }: {
   params: { id: string };
+  searchParams: { created?: string };
 }) {
   await requireAdmin();
   const [row] = await db
@@ -23,7 +25,8 @@ export default async function EditPlacementPage({
     .limit(1);
   if (!row) notFound();
   return (
-    <div className="space-y-5">
+    <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
+      {searchParams.created === "1" && <p role="status" className="alert alert-success">Placement created.</p>}
       <div>
         <nav aria-label="Breadcrumb">
           <Link href="/admin/placements" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">

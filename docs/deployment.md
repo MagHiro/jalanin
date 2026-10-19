@@ -13,7 +13,12 @@
   an external worker, both with `Authorization: Bearer <CRON_SECRET>`.
   Configure a 5-minute schedule only on a plan that supports that cadence;
   otherwise schedule a compatible interval with a trusted external worker.
-  The endpoint is deliberately uncached.
+   The endpoint is deliberately uncached.
+
+   Dispatch budgets 45 seconds of work and declares `maxDuration = 60`.
+   Confirm the hosting plan supports that limit. Interrupted claims recover
+   after two minutes on a later invocation; SMTP acceptance is at-least-once,
+   not exactly-once. See `docs/email-outbox-recovery.md`.
 
 ## 1. Supabase project setup
 

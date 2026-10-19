@@ -7,6 +7,9 @@ import {
 import { db } from "@/lib/db/client";
 import { applications } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
+import { submissionRequestSchema } from "@/features/applications/request";
+import { classifyApplicationError } from "@/features/applications/errors";
+import { logServerError } from "@/lib/observability/logger";
 
 // Final submit: full validation, eligibility, CV presence, atomic New row,
 // audit + admin notification + outbox email. Idempotent — the
@@ -23,19 +26,16 @@ export async function POST(request: Request) {
         { status: 403 },
       );
     }
-    const body = (await request.json()) as {
-      internshipId?: string;
-      values?: Record<string, unknown>;
-      idempotencyKey?: string;
-    };
-    if (!body.internshipId || !body.values) {
+    const parsed = submissionRequestSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
       return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400 });
     }
+    const body = parsed.data;
     const idempotencyKey =
       request.headers.get("Idempotency-Key") ??
       body.idempotencyKey ??
       `${user.id}:${body.internshipId}`;
-    if (typeof idempotencyKey !== "string" || idempotencyKey.length > 160) {
+    if (!submissionRequestSchema.shape.idempotencyKey.safeParse(idempotencyKey).success) {
       return NextResponse.json({ ok: false, error: "Invalid idempotency key." }, { status: 400 });
     }
 
@@ -102,9 +102,12 @@ export async function POST(request: Request) {
     if (err instanceof AuthError) {
       return NextResponse.json({ ok: false, error: err.message }, { status: err.status });
     }
+    const message = classifyApplicationError(err);
+    if (message) return NextResponse.json({ ok: false, error: message }, { status: 400 });
+    const incidentId = logServerError("applications.submit.failed", null);
     return NextResponse.json(
-      { ok: false, error: err instanceof Error ? err.message : "Submission failed." },
-      { status: 400 },
+      { ok: false, error: "Submission failed. Please try again.", incidentId },
+      { status: 500 },
     );
   }
 }

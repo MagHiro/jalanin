@@ -6,6 +6,7 @@ import {
 import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Pagination } from "@/components/ui/pagination";
 
 export const metadata = { title: "Notifications", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -15,22 +16,36 @@ export const dynamic = "force-dynamic";
 export default async function AdminNotificationsPage({
   searchParams,
 }: {
-  searchParams: { unread?: string };
+  searchParams: Record<string, string | undefined>;
 }) {
   await requireAdmin();
   const unreadOnly = searchParams.unread === "1";
-  const rows = await listAdminNotifications({
+  const rawPage = Number(searchParams.page ?? 1);
+  const page = Number.isSafeInteger(rawPage) ? Math.max(1, Math.min(100000, rawPage)) : 1;
+  const pageSize = 50;
+  const { rows, total } = await listAdminNotifications({
     unreadOnly: unreadOnly ? true : undefined,
-    page: 1,
-    pageSize: 50,
+    page,
+    pageSize,
   });
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(searchParams)) {
+    if (value) params.set(key, value);
+  }
+  const returnHref = `/admin/notifications${params.size ? `?${params}` : ""}`;
+  const filterParams = new URLSearchParams(params);
+  filterParams.delete("page");
+  if (unreadOnly) filterParams.delete("unread");
+  else filterParams.set("unread", "1");
+  const filterHref = `/admin/notifications${filterParams.size ? `?${filterParams}` : ""}`;
 
   async function markRead(formData: FormData) {
     "use server";
     await requireAdmin();
     const id = String(formData.get("id") ?? "");
     if (id) await markNotificationRead(id);
-    redirect("/admin/notifications");
+    redirect(returnHref);
   }
 
   return (
@@ -38,13 +53,13 @@ export default async function AdminNotificationsPage({
       <PageHeader
         icon="●"
         eyebrow="Alerts"
-        title="Notifications"
+        title={`Notifications (${total})`}
         description="New submissions and student revisions — persisted, with read state."
         actions={
           unreadOnly ? (
-            <a href="/admin/notifications" className="btn btn-outline btn-sm">Show all</a>
+              <a href={filterHref} className="btn btn-outline btn-sm">Show all</a>
           ) : (
-            <a href="/admin/notifications?unread=1" className="btn btn-outline btn-sm">Unread only</a>
+              <a href={filterHref} className="btn btn-outline btn-sm">Unread only</a>
           )
         }
       />
@@ -88,6 +103,7 @@ export default async function AdminNotificationsPage({
           ))}
         </ul>
       )}
+      <Pagination page={page} totalPages={totalPages} pathname="/admin/notifications" searchParams={searchParams} />
     </div>
   );
 }

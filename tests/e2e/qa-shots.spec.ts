@@ -25,6 +25,17 @@ test.describe("viewport QA", () => {
         });
         await page.goto(route);
         await expect(page.locator("main")).toBeVisible();
+        if (route === "/auth/login") {
+          // SSR visibility/load does not prove the Suspense auth form hydrated.
+          // Exercise its React handler and restore the initial screenshot state.
+          const password = page.locator('input[name="password"]');
+          await page.getByRole("button", { name: "Show password", exact: true }).click();
+          await expect(password).toHaveAttribute("type", "text");
+          await expect(page.getByRole("button", { name: "Hide password", exact: true })).toHaveAttribute("aria-pressed", "true");
+          await page.getByRole("button", { name: "Hide password", exact: true }).click();
+          await expect(password).toHaveAttribute("type", "password");
+          await expect(page.getByRole("button", { name: "Show password", exact: true })).toHaveAttribute("aria-pressed", "false");
+        }
         const overflow = await page.evaluate(
           () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
         );
@@ -32,6 +43,9 @@ test.describe("viewport QA", () => {
         await page.screenshot({
           path: `/tmp/opencode/qa-shots/${route.replace(/\//g, "_") || "root"}-${width}.png`,
           fullPage: false,
+          // Playwright's default caret hiding writes inline input styles, which
+          // can race pending hydration (even leaving an empty style attribute).
+          caret: "initial",
         });
         // Known pre-existing: Turnstile <script> inside ContactForm triggers a
         // hydration warning on `/` (present on pristine HEAD). Everything else

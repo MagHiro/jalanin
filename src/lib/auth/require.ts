@@ -74,6 +74,11 @@ export async function getSessionUser(): Promise<SessionUser | null> {
       emailConfirmed: (data.user.confirmed_at ?? null) !== null,
     };
   } catch (error) {
+    // Next's static-render probe intentionally throws when cookies are read.
+    // Re-throw its control signal so rendering becomes dynamic, not an incident.
+    if (error instanceof Error && "digest" in error && error.digest === "DYNAMIC_SERVER_USAGE") {
+      throw error;
+    }
     // CI's explicitly gated test sessions intentionally run without hosted
     // Supabase. Do not turn expected anonymous lookups into noisy errors.
     if (!isE2EMode() ||

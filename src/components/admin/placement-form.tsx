@@ -22,6 +22,7 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [pendingStatus, setPendingStatus] = useState<string | null>(null);
   const v = (k: keyof Initial): string => String(initial?.[k] ?? "");
 
@@ -29,6 +30,7 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
     e.preventDefault();
     setBusy(true);
     setError(null);
+    setSuccess(null);
     const form = new FormData(e.currentTarget);
     const payload = {
       studentUserId: form.get("studentUserId"),
@@ -51,10 +53,12 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
       );
       const data = (await res.json()) as { ok?: boolean; id?: string; error?: string };
       if (!res.ok || !data.ok) throw new Error(data.error ?? "Save failed.");
-      router.push(`/admin/placements/${data.id ?? initial?.id}/edit`);
+      setSuccess(initial?.id ? "Placement saved." : "Placement created.");
+      if (!initial?.id) router.push(`/admin/placements/${data.id}/edit?created=1`);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed.");
+    } finally {
       setBusy(false);
     }
   }
@@ -63,6 +67,7 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
     if (!initial?.id) return;
     setBusy(true);
     setError(null);
+    setSuccess(null);
     try {
       const res = await fetch(`/api/admin/placements/${initial.id}/transition`, {
         method: "POST",
@@ -72,6 +77,7 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) throw new Error(data.error ?? "Transition failed.");
       setPendingStatus(null);
+      setSuccess(`Placement moved to ${to}.`);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Transition failed.");
@@ -116,6 +122,7 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
         </div>
       </form>
       {error && <p role="alert" className="alert alert-error">{error}</p>}
+      {success && <p role="status" className="alert alert-success">{success}</p>}
       {initial?.id && (
         <div className="surface-card p-5">
           <p className="text-sm font-semibold text-foreground">Status: {initial.placementStatus}</p>

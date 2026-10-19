@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { safeNext } from "@/lib/auth/safe-next";
 import { AuthStory } from "./auth-story";
 
 // Centered auth card (PayPal/Krea-inspired, email+password per PRD AUTH-*).
@@ -16,15 +17,7 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
-  const requestedNext = params.get("next") ?? "/dashboard";
-  // Reject protocol-relative or backslash redirects. This value is used by
-  // both the browser router and the email verification callback.
-  const next =
-    requestedNext.startsWith("/") &&
-    !requestedNext.startsWith("//") &&
-    !requestedNext.includes("\\")
-      ? requestedNext
-      : "/dashboard";
+  const next = safeNext(params.get("next"));
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -67,7 +60,7 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
           // Non-fatal: Supabase cookies remain the primary session.
         }
       }
-      router.push(next.startsWith("/") ? next : "/dashboard");
+      router.push(next);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Authentication failed.");
