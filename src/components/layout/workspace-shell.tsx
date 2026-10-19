@@ -101,7 +101,7 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
     const node = palette.current?.querySelector(".workspace-command-inner");
     if (!node) return;
     const tween = gsap.fromTo(node, { opacity: 0, y: -9 }, { opacity: 1, y: 0, duration: 0.18, ease: "power2.out", clearProps: "all" });
-    return () => tween.kill();
+    return () => { tween.kill(); };
   }, [searchOpen]);
 
   const brand = <Link href={home} className="workspace-brand" aria-label="Jalanin workspace home">
