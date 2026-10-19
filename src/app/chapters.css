@@ -532,3 +532,40 @@ dialog::backdrop { background:rgba(15,32,75,.47); backdrop-filter:blur(7px); }
 
 /* GSAP owns reveals; disable older competing keyframes. */
 .public-site [data-scroll-reveal].public-revealed { animation:none; }
+
+
+/* Jalanin wordmark and original visual storytelling for account access. */
+.chapters-wordmark {
+  display:inline-flex;align-items:center;gap:12px;white-space:nowrap;
+  color:var(--jalanin-950);font-size:1.72rem;font-weight:760;
+  letter-spacing:-.088em;line-height:1;
+}
+.chapters-wordmark-symbol {
+  display:grid;place-items:center;width:42px;height:42px;flex-shrink:0;
+  border-radius:12px;background:var(--jalanin-900);color:#dce9ff;
+  font-size:1.35rem;letter-spacing:-.12em;
+}
+.chapters-wordmark-dot { color:#4069c7; }
+.public-site .chapters-auth-story {
+  isolation:isolate;overflow:hidden;position:relative;
+  background:#14295c;color:#fff;min-height:650px;
+}
+.chapters-auth-art {
+  position:absolute;inset:-55px -70px 0 -70px;z-index:-1;
+  display:flex;align-items:flex-start;justify-content:center;pointer-events:none;
+}
+.chapters-auth-art .journey-art { width:min(100%,760px);height:auto;opacity:.85; }
+.chapters-auth-story .learn-auth-story-copy {
+  background:linear-gradient(180deg,rgba(15,32,77,.01) 0%,rgba(15,32,77,.35) 35%,rgba(15,32,77,.96) 100%);
+  padding:clamp(28px,4vw,55px);
+}
+.chapters-auth-story .learn-kicker { color:#bdd4ff; }
+.chapters-auth-story h2 {font-size:clamp(2.65rem,4vw,4.9rem);font-weight:700;letter-spacing:-.068em;line-height:1.03;}
+.chapters-auth-story .learn-auth-story-copy > p:last-child { color:#c7d8f4;font-size:.95rem; }
+@media(max-width:767px) {
+  .chapters-wordmark { font-size:1.48rem;gap:9px; }
+  .chapters-wordmark-symbol { width:37px;height:37px;border-radius:10px; }
+  .public-site .chapters-auth-story { min-height:340px; }
+  .chapters-auth-art { inset:-50px -20px 0 -20px; }
+  .chapters-auth-art .journey-art { width:450px;max-width:none; }
+}
