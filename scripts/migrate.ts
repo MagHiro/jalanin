@@ -1,19 +1,18 @@
-// Applies version-controlled SQL migrations in order (supabase/migrations).
-// Works against the local Docker PostgreSQL and hosted Supabase PostgreSQL.
+// Applies version-controlled SQL migrations in order (db/migrations).
+// Works against local Docker PostgreSQL and production PostgreSQL alike.
 // Usage: pnpm db:migrate
 import "./load-env";
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { Client } from "pg";
 
-const connectionString =
-  process.env.SUPABASE_DB_URL ?? process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
-  console.error("Set SUPABASE_DB_URL or DATABASE_URL. See .env.example.");
+  console.error("Set DATABASE_URL. See .env.example.");
   process.exit(1);
 }
 
-const dir = path.join(process.cwd(), "supabase", "migrations");
+const dir = path.join(process.cwd(), "db", "migrations");
 const files = readdirSync(dir)
   .filter((f) => f.endsWith(".sql"))
   .sort();
