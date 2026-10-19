@@ -33,6 +33,8 @@ export default async function StudentPlacementsPage() {
           icon="✦"
           title="No placements yet."
           body="When our team arranges a placement for you, its organization, role, dates, and progress will appear here."
+          actionHref="/dashboard/applications"
+          actionLabel="View my applications"
         />
       ) : (
         <ul className="grid gap-3 md:grid-cols-2">

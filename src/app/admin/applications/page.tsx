@@ -147,7 +147,7 @@ export default async function AdminApplicationsPage({
       </ul>
 
       {rows.length === 0 && (
-        <EmptyState icon="☰" title="No applications found." body="Try widening the search or clearing the status filter." />
+        <EmptyState icon="☰" title="No applications match these filters" body="Try another search or return to the full review queue." actionHref="/admin/applications" actionLabel="Clear all filters" />
       )}
 
       {totalPages > 1 && (

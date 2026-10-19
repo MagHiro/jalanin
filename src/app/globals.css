@@ -1151,3 +1151,18 @@ html { scroll-padding-top: 116px; }
 .workspace-shell .field-label .workspace-select, .workspace-shell .field-label .workspace-date-field { margin-top: 4px; }
 .workspace-shell .field-label .workspace-date-field input.field { margin-top: 0; }
 @media (max-width: 767px) { .workspace-shell .toolbar label:has(.workspace-select) { width: 100%; } }
+
+/* Overview data visualizations are entirely derived from live application counts. */
+.workspace-shell .workspace-pipeline-visual { padding: 18px 19px 2px; border: 1px solid var(--ws-line); border-bottom: none; border-radius: 14px 14px 0 0; background: white; }
+.workspace-shell .workspace-pipeline-visual + .workspace-pipeline { border-top-left-radius: 0; border-top-right-radius: 0; }
+.workspace-shell .workspace-progress { min-width: 0; }
+.workspace-shell .workspace-progress-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; }
+.workspace-shell .workspace-progress-item { display: block; border: 1px solid var(--ws-line); border-radius: 14px; background: white; padding: 17px 18px; transition: box-shadow 160ms ease, border-color 160ms ease; }
+.workspace-shell .workspace-progress-item:hover { box-shadow: 0 8px 18px rgb(20 33 66 / .06); border-color: #b0bad0; }
+.workspace-shell .workspace-progress-item-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.workspace-shell .workspace-progress-item-top strong { color: #222e51; font-size: 22px; font-weight: 720; letter-spacing: -.04em; }
+.workspace-shell .workspace-progress-track { margin-top: 16px; height: 6px; overflow: hidden; background: #e7ebf2; border-radius: 99px; }
+.workspace-shell .workspace-progress-track span { display: block; height: 100%; border-radius: inherit; background: #899dbe; }
+.workspace-shell .workspace-progress-item:nth-child(2n) .workspace-progress-track span { background: #a2bfa9; }
+.workspace-shell .workspace-progress-item:nth-child(3n) .workspace-progress-track span { background: #bdafe0; }
+.workspace-shell .workspace-progress-item:nth-child(4n) .workspace-progress-track span { background: #d4b486; }

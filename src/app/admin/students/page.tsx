@@ -58,7 +58,7 @@ export default async function AdminStudentsPage({
           ))}
         </ul>
       ) : (
-        <EmptyState icon="○" title="No students found." body="Student profiles appear here once accounts are created." />
+        <EmptyState icon="○" title="No matching student records" body="Student accounts appear here as they join the platform. You can review applications in the meantime." actionHref="/admin/applications" actionLabel="Review applications" />
       )}
       {totalPages > 1 && (
         <nav aria-label="Student pagination" className="flex items-center justify-center gap-3 text-sm">

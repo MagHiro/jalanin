@@ -38,7 +38,7 @@ export default async function AdminContactsPage({
         description="Latest inquiries first. Reply by email — addresses are shown for follow-up."
       />
       {rows.length === 0 ? (
-        <EmptyState icon="✉" title="No inquiries yet." body="Contact form submissions from the landing page will appear here." />
+        <EmptyState icon="✉" title="Your inbox is clear" body="New contact form inquiries will appear here automatically. Explore the public contact experience." actionHref="/contact" actionLabel="View contact page" />
       ) : (
         <ul className="space-y-2.5">
           {rows.map((c) => (

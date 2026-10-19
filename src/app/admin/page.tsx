@@ -47,6 +47,12 @@ export default async function AdminOverviewPage() {
 
     <section aria-labelledby="apps-h" className="workspace-section">
       <div className="workspace-section-heading"><div><p className="workspace-kicker">01 / Application pipeline</p><h2 id="apps-h">Where things stand</h2></div><Link href="/admin/applications" className="workspace-text-link">All applications <ArrowRight size={16} /></Link></div>
+      <div className="workspace-pipeline-visual">
+        <div className="workspace-pipeline-meter" role="img" aria-label={`Distribution of ${totalApplications} applications across six lifecycle statuses`}>
+          {STATUS_LINKS.map(([status]) => <span key={status} style={{ width: `${((overview.statusCounts[status] ?? 0) / Math.max(totalApplications, 1)) * 100}%` }} title={`${status}: ${overview.statusCounts[status] ?? 0}`} />)}
+        </div>
+        <div className="workspace-pipeline-context"><span>Application lifecycle distribution</span><span className="tnum">{totalApplications} total records</span></div>
+      </div>
       <ul className="workspace-pipeline">{STATUS_LINKS.map(([status, href]) => <li key={status}><Link href={href}><StatusBadge status={status} /><strong className="tnum">{overview.statusCounts[status] ?? 0}</strong><span className="workspace-pipeline-link">View records <ArrowUpRight size={15} /></span></Link></li>)}</ul>
     </section>
 
