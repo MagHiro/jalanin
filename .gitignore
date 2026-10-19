@@ -23,6 +23,10 @@ next-env.d.ts
 
 # Local runtime and Docker data
 .storage-local/
+storage/private/*
+storage/public/*
+!storage/private/.gitkeep
+!storage/public/.gitkeep
 supabase/.branches/
 supabase/.temp/
 supabase/.profiles/
