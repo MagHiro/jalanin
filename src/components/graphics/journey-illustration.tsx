@@ -1,7 +1,7 @@
 /** Pure SVG product graphic: a symbolic journey, not a claim about user data. */
 export function JourneyIllustration() {
   return (
-    <svg className="journey-art" viewBox="0 0 640 640" role="img" aria-labelledby="journey-title journey-desc">
+    <svg className="journey-art" viewBox="0 0 640 640" role="img" aria-labelledby="journey-title" aria-describedby="journey-desc">
       <title id="journey-title">Find your path</title>
       <desc id="journey-desc">An abstract route connecting discovery, application, and growth.</desc>
       <g fill="none" stroke="#A9C4F2" strokeOpacity=".20">
