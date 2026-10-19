@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { requireAdmin, AuthError } from "@/lib/auth/require";
+import { requireAdmin } from "@/lib/auth/require";
+import { adminIdSchema, adminMutationError, readAdminBody } from "@/features/admin/request";
 import { saveInternship } from "@/features/admin/service";
 
 export async function PUT(
@@ -8,16 +9,11 @@ export async function PUT(
 ) {
   try {
     const admin = await requireAdmin();
-    const body = await request.json();
-    const result = await saveInternship({ id: admin.id }, body, params.id);
+    const id = adminIdSchema.parse(params.id);
+    const body = await readAdminBody(request);
+    const result = await saveInternship({ id: admin.id }, body, id);
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
-    if (err instanceof AuthError) {
-      return NextResponse.json({ ok: false }, { status: err.status });
-    }
-    return NextResponse.json(
-      { ok: false, error: err instanceof Error ? err.message : "Save failed." },
-      { status: 400 },
-    );
+    return adminMutationError("admin.internship.update.failed", err);
   }
 }

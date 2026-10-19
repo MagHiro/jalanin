@@ -1,4 +1,5 @@
 import { db } from "@/lib/db/client";
+import { DomainError } from "@/lib/errors/domain-error";
 import {
   adminNotifications,
   adminUsers,
@@ -143,47 +144,51 @@ export async function saveInternship(
     updatedAt: now,
   };
 
-  if (id) {
-    // Preserve the original published_at when already published.
-    const [current] = await db
-      .select({ publishedAt: internships.publishedAt })
-      .from(internships)
-      .where(eq(internships.id, id))
-      .limit(1);
-    await db
-      .update(internships)
-      .set({
+  return db.transaction(async (tx) => {
+    if (id) {
+      // Preserve the original published_at when already published.
+      const [current] = await tx
+        .select({ publishedAt: internships.publishedAt })
+        .from(internships)
+        .where(eq(internships.id, id))
+        .limit(1)
+        .for("update");
+      if (!current) throw new DomainError("Internship not found.");
+      await tx
+        .update(internships)
+        .set({
+          ...base,
+          publishedAt:
+            values.publicationStatus === "Published"
+              ? (current.publishedAt ?? now)
+              : null,
+        })
+        .where(eq(internships.id, id));
+      await audit({
+        actorUserId: actor.id,
+        entityType: "internship",
+        entityId: id,
+        action: "updated",
+        changes: { title: values.title, status: values.publicationStatus },
+      }, tx);
+      return { id };
+    }
+    const inserted = await tx
+      .insert(internships)
+      .values({
         ...base,
-        publishedAt:
-          values.publicationStatus === "Published"
-            ? (current?.publishedAt ?? now)
-            : null,
+        publishedAt: values.publicationStatus === "Published" ? now : null,
       })
-      .where(eq(internships.id, id));
+      .returning({ id: internships.id });
     await audit({
       actorUserId: actor.id,
       entityType: "internship",
-      entityId: id,
-      action: "updated",
+      entityId: inserted[0].id,
+      action: "created",
       changes: { title: values.title, status: values.publicationStatus },
-    });
-    return { id };
-  }
-  const inserted = await db
-    .insert(internships)
-    .values({
-      ...base,
-      publishedAt: values.publicationStatus === "Published" ? now : null,
-    })
-    .returning({ id: internships.id });
-  await audit({
-    actorUserId: actor.id,
-    entityType: "internship",
-    entityId: inserted[0].id,
-    action: "created",
-    changes: { title: values.title, status: values.publicationStatus },
+    }, tx);
+    return { id: inserted[0].id };
   });
-  return { id: inserted[0].id };
 }
 
 // -------------------------------------------------------------- applications
@@ -296,9 +301,9 @@ export async function transitionApplication(input: {
       .where(eq(applications.id, input.applicationId))
       .limit(1)
       .for("update");
-    if (rows.length === 0) throw new Error("Application not found.");
+    if (rows.length === 0) throw new DomainError("Application not found.");
     const { application: app, internship } = rows[0];
-    if (app.isDraft) throw new Error("Draft applications cannot transition.");
+    if (app.isDraft) throw new DomainError("Draft applications cannot transition.");
     const from = app.lifecycleStatus as ApplicationStatus;
 
     // Optimistic concurrency: concurrent admins cannot silently overwrite.
@@ -306,7 +311,7 @@ export async function transitionApplication(input: {
       input.expectedRevision !== undefined &&
       input.expectedRevision !== app.revision
     ) {
-      throw new Error(
+      throw new DomainError(
         "This application changed since you opened it. Reload and retry.",
       );
     }
@@ -329,7 +334,7 @@ export async function transitionApplication(input: {
     if (input.to === "Quotation Sent") {
       const q = quotationInputSchema.parse(input.quotation ?? {});
       const minor = parseSgdToMinor(q.amount);
-      if (minor === null) throw new Error("Enter a valid SGD amount.");
+      if (minor === null) throw new DomainError("Enter a valid SGD amount.");
       const nextRev = (existingQuotes[0]?.revision ?? 0) + 1;
       const inserted = await tx
         .insert(quotations)
@@ -364,7 +369,7 @@ export async function transitionApplication(input: {
           : existingQuotes.length > 0 || quoteForEmail !== null,
       revisionReviewed: app.reviewedRevision >= app.revision,
     });
-    if (!check.ok) throw new Error(check.reason);
+    if (!check.ok) throw new DomainError(check.reason ?? "Application transition is not permitted.");
 
     // Race safety: re-review acknowledgement and the transition commit in one
     // tx; a student edit landing here would flip needs_re_review first.
@@ -438,6 +443,7 @@ export async function transitionApplication(input: {
 export async function acknowledgeRevision(input: {
   adminId: string;
   applicationId: string;
+  expectedRevision: number;
 }) {
   return db.transaction(async (tx) => {
     const rows = await tx
@@ -446,8 +452,13 @@ export async function acknowledgeRevision(input: {
       .where(eq(applications.id, input.applicationId))
       .limit(1)
       .for("update");
-    if (rows.length === 0) throw new Error("Application not found.");
+    if (rows.length === 0) throw new DomainError("Application not found.");
     const app = rows[0];
+    if (input.expectedRevision !== app.revision) {
+      throw new DomainError(
+        "This application changed since you opened it. Reload and retry.",
+      );
+    }
     await tx
       .update(applications)
       .set({
@@ -482,13 +493,14 @@ export async function reopenRejected(input: {
       .select()
       .from(applications)
       .where(eq(applications.id, input.applicationId))
-      .limit(1);
-    if (rows.length === 0) throw new Error("Application not found.");
+      .limit(1)
+      .for("update");
+    if (rows.length === 0) throw new DomainError("Application not found.");
     const app = rows[0];
     if (app.lifecycleStatus !== "Rejected") {
-      throw new Error("Only rejected applications can be reopened.");
+      throw new DomainError("Only rejected applications can be reopened.");
     }
-    if (!input.reason.trim()) throw new Error("A reopen reason is required.");
+    if (!input.reason.trim()) throw new DomainError("A reopen reason is required.");
     await tx
       .update(applications)
       .set({
@@ -608,7 +620,7 @@ export async function listAdminPlacements(input: {
     .select()
     .from(placements)
     .where(where)
-    .orderBy(desc(placements.updatedAt))
+    .orderBy(desc(placements.updatedAt), asc(placements.id))
     .limit(input.pageSize)
     .offset((input.page - 1) * input.pageSize);
   const totalPlacementRows = await db.select({ n: count() }).from(placements).where(where);
@@ -622,53 +634,76 @@ export async function savePlacement(
 ) {
   const values = placementInputSchema.parse(input);
   const now = new Date();
-  if (id) {
-    await db
-      .update(placements)
-      .set({
+  return db.transaction(async (tx) => {
+    let studentUserId = values.studentUserId;
+    if (id) {
+      const [current] = await tx.select().from(placements)
+        .where(eq(placements.id, id)).limit(1).for("update");
+      if (!current) throw new DomainError("Placement not found.");
+      studentUserId = current.studentUserId;
+      if (values.studentUserId !== studentUserId) {
+        throw new DomainError("A placement's student cannot be changed.");
+      }
+    } else {
+      const [profile] = await tx.select({ userId: profiles.userId }).from(profiles)
+        .where(eq(profiles.userId, studentUserId)).limit(1);
+      if (!profile) throw new DomainError("Student not found.");
+    }
+    if (values.applicationId) {
+      const [application] = await tx.select().from(applications)
+        .where(eq(applications.id, values.applicationId)).limit(1).for("share");
+      if (!application || application.applicantUserId !== studentUserId || application.isDraft) {
+        throw new DomainError("Select a submitted application belonging to this student.");
+      }
+    }
+    if (id) {
+      await tx
+        .update(placements)
+        .set({
+          organization: values.organization,
+          role: values.role,
+          countryCode: values.countryCode,
+          startDate: values.startDate || null,
+          endDate: values.endDate || null,
+          notes: values.notes || null,
+          applicationId: values.applicationId || null,
+          updatedBy: actor.id,
+          updatedAt: now,
+        })
+        .where(eq(placements.id, id));
+      await audit({
+        actorUserId: actor.id,
+        entityType: "placement",
+        entityId: id,
+        action: "updated",
+        changes: { organization: values.organization, role: values.role },
+      }, tx);
+      return { id };
+    }
+    const inserted = await tx
+      .insert(placements)
+      .values({
+        studentUserId,
+        applicationId: values.applicationId || null,
         organization: values.organization,
         role: values.role,
         countryCode: values.countryCode,
         startDate: values.startDate || null,
         endDate: values.endDate || null,
         notes: values.notes || null,
-        applicationId: values.applicationId || null,
-        updatedBy: actor.id,
-        updatedAt: now,
+        placementStatus: "Preparing",
+        createdBy: actor.id,
       })
-      .where(eq(placements.id, id));
+      .returning({ id: placements.id });
     await audit({
       actorUserId: actor.id,
       entityType: "placement",
-      entityId: id,
-      action: "updated",
-      changes: { organization: values.organization, role: values.role },
-    });
-    return { id };
-  }
-  const inserted = await db
-    .insert(placements)
-    .values({
-      studentUserId: values.studentUserId,
-      applicationId: values.applicationId || null,
-      organization: values.organization,
-      role: values.role,
-      countryCode: values.countryCode,
-      startDate: values.startDate || null,
-      endDate: values.endDate || null,
-      notes: values.notes || null,
-      placementStatus: "Preparing",
-      createdBy: actor.id,
-    })
-    .returning({ id: placements.id });
-  await audit({
-    actorUserId: actor.id,
-    entityType: "placement",
-    entityId: inserted[0].id,
-    action: "created",
-    changes: { studentUserId: values.studentUserId },
+      entityId: inserted[0].id,
+      action: "created",
+      changes: { studentUserId: values.studentUserId },
+    }, tx);
+    return { id: inserted[0].id };
   });
-  return { id: inserted[0].id };
 }
 
 export async function transitionPlacement(input: {
@@ -676,33 +711,36 @@ export async function transitionPlacement(input: {
   placementId: string;
   to: string;
 }) {
-  const rows = await db
-    .select()
-    .from(placements)
-    .where(eq(placements.id, input.placementId))
-    .limit(1);
-  if (rows.length === 0) throw new Error("Placement not found.");
-  const check = canTransitionPlacement(
-    rows[0].placementStatus as never,
-    input.to as never,
-  );
-  if (!check.ok) throw new Error(check.reason);
-  await db
-    .update(placements)
-    .set({
-      placementStatus: input.to,
-      updatedBy: input.adminId,
-      updatedAt: new Date(),
-    })
-    .where(eq(placements.id, input.placementId));
-  await audit({
-    actorUserId: input.adminId,
-    entityType: "placement",
-    entityId: input.placementId,
-    action: `status:${rows[0].placementStatus}->${input.to}`,
-    changes: { from: rows[0].placementStatus, to: input.to },
+  return db.transaction(async (tx) => {
+    const rows = await tx
+      .select()
+      .from(placements)
+      .where(eq(placements.id, input.placementId))
+      .limit(1)
+      .for("update");
+    if (rows.length === 0) throw new DomainError("Placement not found.");
+    const check = canTransitionPlacement(
+      rows[0].placementStatus as never,
+      input.to as never,
+    );
+    if (!check.ok) throw new DomainError(check.reason ?? "Placement transition is not permitted.");
+    await tx
+      .update(placements)
+      .set({
+        placementStatus: input.to,
+        updatedBy: input.adminId,
+        updatedAt: new Date(),
+      })
+      .where(eq(placements.id, input.placementId));
+    await audit({
+      actorUserId: input.adminId,
+      entityType: "placement",
+      entityId: input.placementId,
+      action: `status:${rows[0].placementStatus}->${input.to}`,
+      changes: { from: rows[0].placementStatus, to: input.to },
+    }, tx);
+    return { allowed: allowedNextPlacementStatuses(input.to as never) };
   });
-  return { allowed: allowedNextPlacementStatuses(input.to as never) };
 }
 
 // ------------------------------------------------------------ notifications
@@ -713,7 +751,7 @@ export async function listAdminNotifications(input: {
 }) {
   const where =
     input.unreadOnly === true ? eq(adminNotifications.isRead, false) : undefined;
-  const rows = await db
+  const [rows, counts] = await Promise.all([db
     .select({
       notification: adminNotifications,
       applicationEmail: applications.email,
@@ -726,10 +764,11 @@ export async function listAdminNotifications(input: {
     )
     .leftJoin(internships, eq(applications.internshipId, internships.id))
     .where(where)
-    .orderBy(desc(adminNotifications.createdAt))
+    .orderBy(desc(adminNotifications.createdAt), desc(adminNotifications.id))
     .limit(input.pageSize)
-    .offset((input.page - 1) * input.pageSize);
-  return rows;
+    .offset((input.page - 1) * input.pageSize),
+  db.select({ total: count() }).from(adminNotifications).where(where)]);
+  return { rows, total: counts[0]?.total ?? 0 };
 }
 
 export async function markNotificationRead(id: string) {

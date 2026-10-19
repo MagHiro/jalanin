@@ -1,26 +1,28 @@
 import { NextResponse } from "next/server";
-import { requireAdmin, AuthError } from "@/lib/auth/require";
+import { z } from "zod";
+import { requireAdmin } from "@/lib/auth/require";
 import {
   acknowledgeRevision,
   reopenRejected,
   transitionApplication,
 } from "@/features/admin/service";
-import type { ApplicationStatus } from "@/lib/workflow/transitions";
+import { adminIdSchema, adminMutationError, readAdminBody } from "@/features/admin/request";
+import { APPLICATION_STATUSES } from "@/lib/workflow/transitions";
 
-async function guard<T>(fn: () => Promise<T>): Promise<NextResponse> {
-  try {
-    const result = await fn();
-    return NextResponse.json({ ok: true, ...(result as object) });
-  } catch (err) {
-    if (err instanceof AuthError) {
-      return NextResponse.json({ ok: false }, { status: err.status });
-    }
-    return NextResponse.json(
-      { ok: false, error: err instanceof Error ? err.message : "Action failed." },
-      { status: 400 },
-    );
-  }
-}
+const transitionBodySchema = z.object({
+  to: z.enum(APPLICATION_STATUSES),
+  reason: z.string().optional(),
+  expectedRevision: z.number().int().positive().optional(),
+  quotation: z.object({
+    amount: z.string(),
+    notesStudent: z.string(),
+    notesInternal: z.string().optional(),
+  }).optional(),
+});
+const acknowledgeBodySchema = z.object({
+  expectedRevision: z.number().int().positive(),
+});
+const reopenBodySchema = z.object({ reason: z.string().default("") });
 
 // Status transition (ADM-APP-*): admin-only, transition-guarded, audited,
 // student emailed via outbox. Revision race-safe via expectedRevision.
@@ -28,46 +30,33 @@ export async function POST(
   request: Request,
   { params }: { params: { id: string } },
 ) {
-  const url = new URL(request.url);
-  const action = url.pathname.split("/").pop();
-  const admin = await requireAdmin().catch((err: unknown) => {
-    if (err instanceof AuthError) return null;
-    throw err;
-  });
-  if (!admin) return NextResponse.json({ ok: false }, { status: 403 });
-  const body = (await request.json().catch(() => ({}))) as {
-    to?: ApplicationStatus;
-    reason?: string;
-    expectedRevision?: number;
-    quotation?: { amount: string; notesStudent: string; notesInternal?: string };
-  };
+  try {
+    const admin = await requireAdmin();
+    const action = new URL(request.url).pathname.split("/").pop();
+    if (action !== "transition" && action !== "acknowledge" && action !== "reopen") {
+      return NextResponse.json({ ok: false }, { status: 404 });
+    }
+    const applicationId = adminIdSchema.parse(params.id);
+    const body = await readAdminBody(request);
 
-  if (action === "transition") {
-    if (!body.to) return NextResponse.json({ ok: false, error: "Target status required." }, { status: 400 });
-    return guard(() =>
-      transitionApplication({
+    if (action === "transition") {
+      const values = transitionBodySchema.parse(body);
+      const result = await transitionApplication({
         adminId: admin.id,
-        applicationId: params.id,
-        to: body.to as ApplicationStatus,
-        reason: body.reason,
-        expectedRevision: body.expectedRevision,
-        quotation: body.quotation,
-      }),
-    );
+        applicationId,
+        ...values,
+      });
+      return NextResponse.json({ ok: true, ...result });
+    }
+    if (action === "acknowledge") {
+      const { expectedRevision } = acknowledgeBodySchema.parse(body);
+      await acknowledgeRevision({ adminId: admin.id, applicationId, expectedRevision });
+      return NextResponse.json({ ok: true });
+    }
+    const { reason } = reopenBodySchema.parse(body);
+    await reopenRejected({ adminId: admin.id, applicationId, reason });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    return adminMutationError("admin.application.action.failed", error);
   }
-  if (action === "acknowledge") {
-    return guard(() =>
-      acknowledgeRevision({ adminId: admin.id, applicationId: params.id }).then(() => ({})),
-    );
-  }
-  if (action === "reopen") {
-    return guard(() =>
-      reopenRejected({
-        adminId: admin.id,
-        applicationId: params.id,
-        reason: String(body.reason ?? ""),
-      }).then(() => ({})),
-    );
-  }
-  return NextResponse.json({ ok: false }, { status: 404 });
 }

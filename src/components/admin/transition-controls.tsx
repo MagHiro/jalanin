@@ -53,7 +53,11 @@ export function TransitionControls({
     setBusy("ack");
     setError(null);
     try {
-      const res = await fetch(`/api/admin/applications/${applicationId}/acknowledge`, { method: "POST" });
+      const res = await fetch(`/api/admin/applications/${applicationId}/acknowledge`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ expectedRevision: revision }),
+      });
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) throw new Error(data.error ?? "Acknowledgement failed.");
       router.refresh();
@@ -110,7 +114,7 @@ export function TransitionControls({
       <ConfirmDialog
         open={pendingTarget !== null}
         title={`Move application to ${pendingTarget ?? ""}?`}
-        body="This is recorded in the audit trail and emailed to the student."
+        body="This is recorded in the audit trail and a notification is queued for the student."
         confirmLabel={`Move to ${pendingTarget ?? ""}`}
         tone="danger"
         busy={busy !== null}

@@ -1,4 +1,5 @@
 import { db } from "@/lib/db/client";
+import { DomainError } from "@/lib/errors/domain-error";
 import {
   adminNotifications,
   applicationDocuments,
@@ -67,9 +68,9 @@ export async function saveDraft(input: {
     .from(internships)
     .where(eq(internships.id, input.internshipId))
     .limit(1);
-  if (internship.length === 0) throw new Error("Internship not found.");
+  if (internship.length === 0) throw new DomainError("Internship not found.");
   if (internship[0].publicationStatus !== "Published") {
-    throw new Error("This internship is not currently accepting drafts.");
+    throw new DomainError("This internship is not currently accepting drafts.");
   }
 
   // Empty browser inputs are omitted for partial drafts. Consent is enforced
@@ -92,11 +93,12 @@ export async function saveDraft(input: {
           eq(applications.internshipId, input.internshipId),
         ),
       )
-      .limit(1);
+      .limit(1)
+      .for("update");
     if (existing.length > 0) {
       const row = existing[0];
       if (!row.isDraft) {
-        throw new Error(
+        throw new DomainError(
           "You already have a submitted application for this internship.",
         );
       }
@@ -116,7 +118,7 @@ export async function saveDraft(input: {
             parsed.additionalInformation ?? row.additionalInformation,
           updatedAt: new Date(),
         })
-        .where(eq(applications.id, row.id));
+        .where(and(eq(applications.id, row.id), eq(applications.isDraft, true)));
       return { applicationId: row.id, created: false };
     }
     const inserted = await tx
@@ -156,6 +158,11 @@ export async function saveDraft(input: {
       )
       .limit(1);
     if (winner.length === 0) throw new Error("Could not save draft.");
+    if (!winner[0].isDraft) {
+      throw new DomainError(
+        "You already have a submitted application for this internship.",
+      );
+    }
     return { applicationId: winner[0].id, created: false };
   });
 }
@@ -180,9 +187,9 @@ export async function submitApplication(input: {
       .from(internships)
       .where(eq(internships.id, input.internshipId))
       .limit(1);
-    if (listing.length === 0) throw new Error("Internship not found.");
+    if (listing.length === 0) throw new DomainError("Internship not found.");
     if (listing[0].publicationStatus !== "Published") {
-      throw new Error(
+      throw new DomainError(
         "This internship is no longer accepting applications. Your draft is preserved — please contact us for guidance.",
       );
     }
@@ -262,7 +269,7 @@ export async function submitApplication(input: {
     const [locked] = await tx.select().from(applications)
       .where(eq(applications.id, appId)).limit(1).for("update");
     if (!locked || locked.applicantUserId !== input.userId) {
-      throw new Error("Application not found.");
+      throw new DomainError("Application not found.");
     }
     if (!locked.isDraft) {
       return { applicationId: appId, ref: applicationRef(appId), duplicate: true };
@@ -270,7 +277,7 @@ export async function submitApplication(input: {
 
     const cv = await docsFor(appId);
     if (cv.length === 0) {
-      throw new Error("A CV upload is required before submitting.");
+      throw new DomainError("A CV upload is required before submitting.");
     }
 
     const now = new Date();
@@ -414,16 +421,16 @@ export async function editSubmittedApplication(input: {
       .where(eq(applications.id, input.applicationId))
       .limit(1)
       .for("update");
-    if (rows.length === 0) throw new Error("Application not found.");
+    if (rows.length === 0) throw new DomainError("Application not found.");
     const app = rows[0];
     if (app.applicantUserId !== input.userId) {
-      throw new Error("You can only edit your own applications.");
+      throw new DomainError("You can only edit your own applications.");
     }
     if (app.isDraft) {
-      throw new Error("This draft has not been submitted yet.");
+      throw new DomainError("This draft has not been submitted yet.");
     }
     if (isStudentEditLocked(app.lifecycleStatus as ApplicationStatus)) {
-      throw new Error(
+      throw new DomainError(
         `Applications in status ${app.lifecycleStatus} are locked for student editing.`,
       );
     }

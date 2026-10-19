@@ -168,6 +168,7 @@ test.describe("admin lifecycle", () => {
     );
     const ack = await request.post(`/api/admin/applications/${appId}/acknowledge`, {
       headers: { "x-e2e-user-id": ADMIN },
+      data: { expectedRevision: 2 },
     });
     expect(ack.ok()).toBe(true);
     await transition(
