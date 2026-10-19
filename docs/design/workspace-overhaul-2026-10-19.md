@@ -74,3 +74,7 @@ Following review of the populated admin screenshot, the lower overview panels we
 - **Placement desk:** Zero records now produce a compact inset empty state with a direct link to the existing placement form, not an oversized zero and redundant instruction. When placements exist, live totals and lifecycle breakdowns remain visible.
 - **Presentation:** Context-aware icon treatments, tighter spacing, stronger text hierarchy and a self-contained scroll area for the recent submissions table on small screens.
 - **QA:** A unit test covers event formatting and link safety. Playwright checks lower-panel presence, audit readability and 320px overflow. This is a presentation-only change: no new states, data sources, validation rules or mutations.
+
+### Mobile submissions containment follow-up
+
+The 320px regression was caused by an explicitly 650px-wide desktop submissions table. On narrow viewports the table is replaced by linked, single-column application records showing applicant, opportunity, stage and submission date. The desktop table retains full columns and horizontal scrolling. Visibility is explicitly scoped because unlayered overview CSS outranks Tailwind's `hidden` utility in this project.

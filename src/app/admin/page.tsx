@@ -120,6 +120,18 @@ export default async function AdminOverviewPage() {
             </tr>)}</tbody>
           </table>
         </div>
+        <ul className="ops-mobile-records" aria-label="Recent application submissions">
+          {recentApplications.rows.map(({ application, internshipTitle }) => <li key={application.id}>
+            <Link href={`/admin/applications/${application.id}`} className="ops-mobile-record">
+              <span className="ops-mobile-record-main">
+                <strong>{application.firstName} {application.lastName}</strong>
+                <span>{internshipTitle}</span>
+                <small>{application.submittedAt ? new Date(application.submittedAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" }) : "Not submitted"}</small>
+              </span>
+              <span className="ops-mobile-record-end"><StatusBadge status={application.lifecycleStatus} /><ArrowRight size={17} aria-hidden="true" /></span>
+            </Link>
+          </li>)}
+        </ul>
       </> : <div className="ops-records-empty"><FileText size={25} aria-hidden="true" /><div><h3>No submissions just yet</h3><p>As students apply, their newest submissions will land here for review.</p></div><Link href="/admin/internships">Manage internships <ArrowRight size={15} aria-hidden="true" /></Link></div>}
     </section>
 
