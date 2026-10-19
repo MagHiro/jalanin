@@ -230,3 +230,20 @@
 .workspace-shell .workspace-empty-guide{border-left:0;border-top:1px solid var(--replica-line)}
 }
 @media(prefers-reduced-motion:reduce){.workspace-shell *{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}}
+
+/* Flush Stripe-style recent record table beneath the overview metrics. */
+.workspace-shell .workspace-recent-records{padding:0!important;overflow:hidden}
+.workspace-shell .workspace-recent-records>.workspace-panel-heading{margin:0;padding:18px 22px;border-bottom:1px solid #e9ecec}
+.workspace-shell .workspace-recent-records .crm-table-scroll{overflow-x:auto}
+.workspace-shell .workspace-recent-records .crm-table th{background:#fafbfa}
+.workspace-shell .workspace-recent-records .crm-table td{height:58px}
+.workspace-shell .workspace-recent-records .crm-mobile-records{background:#fffefa}
+.workspace-shell .workspace-recent-records-guide{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:23px;color:#79858a;font-size:12px}
+.workspace-shell .workspace-recent-records-guide a{display:inline-flex;align-items:center;gap:6px;color:#3e5d95;font-weight:600}
+.workspace-shell .workspace-student-application-detail{max-width:1024px}
+.workspace-shell .workspace-student-application-detail .surface-card,.workspace-shell .workspace-student-application-detail .quote-panel{border:1px solid #e4e8e8;border-radius:11px;box-shadow:none;background:#fffefa}
+.workspace-shell .workspace-student-application-detail .surface-card h2{font-size:16px;font-weight:650}
+.workspace-shell .workspace-student-application-detail dl dt{font-size:12px;color:#87929c}
+.workspace-shell .workspace-student-application-detail dl dd{font-size:12px;color:#35465b;font-weight:600}
+.workspace-shell .workspace-student-application-detail .quote-panel{padding:22px}
+@media(max-width:767px){.workspace-shell .workspace-recent-records>.workspace-panel-heading{padding:15px}.workspace-shell .workspace-recent-records-guide{padding:17px}}
