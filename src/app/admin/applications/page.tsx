@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowDown, ArrowUp, Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
-import { listAdminApplications } from "@/features/admin/service";
+import { getAdminOverview, listAdminApplications } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -21,13 +21,14 @@ export default async function AdminApplicationsPage({ searchParams }: {
   const rawPage = Number(searchParams.page ?? 1);
   const page = Number.isSafeInteger(rawPage) ? Math.max(1, Math.min(100000, rawPage)) : 1;
   const pageSize = 20;
-  const { rows, total } = await listAdminApplications({
+  const [{ rows, total }, overview, reReviewQueue] = await Promise.all([listAdminApplications({
     q: searchParams.q,
     status: searchParams.status,
     sort: searchParams.sort === "oldest" ? "oldest" : searchParams.sort === "name" ? "name" : "newest",
     needsReReview: searchParams.rereview === "1" ? true : undefined,
     page, pageSize,
-  });
+  }), getAdminOverview(), listAdminApplications({ needsReReview: true, page: 1, pageSize: 1 })]);
+  const allApplicationsCount = Object.values(overview.statusCounts).reduce((sum, n) => sum + n, 0);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const filterStatus = searchParams.status ?? "";
   const reReview = searchParams.rereview === "1";
@@ -38,14 +39,14 @@ export default async function AdminApplicationsPage({ searchParams }: {
   ];
 
   return <div className="crm-list-page">
-    <PageHeader eyebrow="Applications / Review queue" title="Applications" description="Review submissions, track lifecycle stages, and acknowledge revised records." />
+    <PageHeader icon="☰" eyebrow="Applications / Review queue" title="Applications" description="Review submissions, track lifecycle stages, and acknowledge revised records." />
     <CrmViews label="Application queues" items={[
-      { label: "All applications", href: listHref(path, searchParams, { status: null, rereview: null }), active: !filterStatus && !reReview },
-      { label: "New", href: listHref(path, searchParams, { status: "New", rereview: null }), active: filterStatus === "New" && !reReview },
-      { label: "In review", href: listHref(path, searchParams, { status: "In Review", rereview: null }), active: filterStatus === "In Review" && !reReview },
-      { label: "Quotation sent", href: listHref(path, searchParams, { status: "Quotation Sent", rereview: null }), active: filterStatus === "Quotation Sent" && !reReview },
-      { label: "Completed", href: listHref(path, searchParams, { status: "Completed", rereview: null }), active: filterStatus === "Completed" && !reReview },
-      { label: "Re-review required", href: listHref(path, searchParams, { status: null, rereview: "1" }), active: reReview },
+      { label: "All applications", href: listHref(path, searchParams, { status: null, rereview: null }), active: !filterStatus && !reReview, count: allApplicationsCount },
+      { label: "New", href: listHref(path, searchParams, { status: "New", rereview: null }), active: filterStatus === "New" && !reReview, count: overview.statusCounts["New"] ?? 0 },
+      { label: "In review", href: listHref(path, searchParams, { status: "In Review", rereview: null }), active: filterStatus === "In Review" && !reReview, count: overview.statusCounts["In Review"] ?? 0 },
+      { label: "Quotation sent", href: listHref(path, searchParams, { status: "Quotation Sent", rereview: null }), active: filterStatus === "Quotation Sent" && !reReview, count: overview.statusCounts["Quotation Sent"] ?? 0 },
+      { label: "Completed", href: listHref(path, searchParams, { status: "Completed", rereview: null }), active: filterStatus === "Completed" && !reReview, count: overview.statusCounts["Completed"] ?? 0 },
+      { label: "Re-review required", href: listHref(path, searchParams, { status: null, rereview: "1" }), active: reReview, count: reReviewQueue.total },
     ]} />
     <section className="crm-records" aria-label="Application records">
       <form method="get" aria-label="Filter applications" className="crm-toolbar">

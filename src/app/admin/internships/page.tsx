@@ -33,7 +33,7 @@ export default async function AdminInternshipsPage({ searchParams }: {
   ];
 
   return <div className="crm-list-page">
-    <PageHeader eyebrow="Catalogue / Listings" title="Internships" description="Manage published opportunities, drafts, and application dates." actions={<Link href="/admin/internships/new" className="btn btn-primary btn-sm"><Plus size={16} /> New internship</Link>} />
+    <PageHeader icon="▤" eyebrow="Catalogue / Listings" title="Internships" description="Manage published opportunities, drafts, and application dates." actions={<Link href="/admin/internships/new" className="btn btn-primary btn-sm"><Plus size={16} /> New internship</Link>} />
     <CrmViews label="Internship publication views" items={[
       { label: "All listings", href: listHref(path, searchParams, { status: null }), active: !searchParams.status },
       ...STATUSES.map(status => ({ label: status, href: listHref(path, searchParams, { status }), active: searchParams.status === status })),

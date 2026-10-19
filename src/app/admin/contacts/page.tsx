@@ -26,7 +26,7 @@ export default async function AdminContactsPage({ searchParams }: { searchParams
   const total = Number(counts[0]?.total ?? 0);
   const filters = query ? [{ label: `Search: ${query}`, href: listHref(path, searchParams, { q: null }) }] : [];
   return <div className="crm-list-page">
-    <PageHeader eyebrow="Communication / Inbox" title="Contact inbox" description="Incoming enquiries from the public website. Reply using the sender’s email address." />
+    <PageHeader icon="✉" eyebrow="Communication / Inbox" title="Contact inbox" description="Incoming enquiries from the public website. Reply using the sender’s email address." />
     <section className="crm-records" aria-label="Contact enquiries">
       <form method="get" aria-label="Search contact messages" className="crm-toolbar">
         <label className="crm-search"><Search size={17} aria-hidden="true" /><span className="sr-only">Search name, email or subject</span><input type="search" name="q" defaultValue={query} placeholder="Search sender, email or subject" /></label>

@@ -25,7 +25,7 @@ export default async function AdminStudentsPage({ searchParams }: {
   });
   const filters = searchParams.q ? [{ label: `Name: ${searchParams.q}`, href: listHref(path, searchParams, { q: null }) }] : [];
   return <div className="crm-list-page">
-    <PageHeader eyebrow="People / Directory" title="Students" description="Student profiles linked to submitted applications and placement records." />
+    <PageHeader icon="○" eyebrow="People / Directory" title="Students" description="Student profiles linked to submitted applications and placement records." />
     <section className="crm-records" aria-label="Student records">
       <form method="get" aria-label="Search students" className="crm-toolbar">
         <label className="crm-search"><Search size={17} aria-hidden="true" /><span className="sr-only">Search display name</span><input type="search" name="q" defaultValue={searchParams.q ?? ""} placeholder="Search display name" /></label>

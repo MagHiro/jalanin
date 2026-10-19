@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Plus, Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
-import { listAdminPlacements } from "@/features/admin/service";
+import { getAdminOverview, listAdminPlacements } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -21,16 +21,17 @@ export default async function AdminPlacementsPage({ searchParams }: {
   const rawPage = Number(searchParams.page ?? 1);
   const page = Number.isSafeInteger(rawPage) ? Math.max(1, Math.min(100000, rawPage)) : 1;
   const pageSize = 20;
-  const { rows, total } = await listAdminPlacements({ q: searchParams.q, status: searchParams.status, page, pageSize });
+  const [{ rows, total }, overview] = await Promise.all([listAdminPlacements({ q: searchParams.q, status: searchParams.status, page, pageSize }), getAdminOverview()]);
+  const allPlacementsCount = Object.values(overview.placementCounts).reduce((sum, n) => sum + n, 0);
   const filters = [
     ...(searchParams.q ? [{ label: `Search: ${searchParams.q}`, href: listHref(path, searchParams, { q: null }) }] : []),
     ...(searchParams.status ? [{ label: `Status: ${searchParams.status}`, href: listHref(path, searchParams, { status: null }) }] : []),
   ];
   return <div className="crm-list-page">
-    <PageHeader eyebrow="Operations / Outcomes" title="Placements" description="Manage team-arranged placements, schedules, and lifecycle progress." actions={<Link href="/admin/placements/new" className="btn btn-primary btn-sm"><Plus size={16} /> New placement</Link>} />
+    <PageHeader icon="✦" eyebrow="Operations / Outcomes" title="Placements" description="Manage team-arranged placements, schedules, and lifecycle progress." actions={<Link href="/admin/placements/new" className="btn btn-primary btn-sm"><Plus size={16} /> New placement</Link>} />
     <CrmViews label="Placement status views" items={[
-      { label: "All placements", href: listHref(path, searchParams, { status: null }), active: !searchParams.status },
-      ...STATUSES.map(status => ({ label: status, href: listHref(path, searchParams, { status }), active: searchParams.status === status })),
+      { label: "All placements", href: listHref(path, searchParams, { status: null }), active: !searchParams.status, count: allPlacementsCount },
+      ...STATUSES.map(status => ({ label: status, href: listHref(path, searchParams, { status }), active: searchParams.status === status, count: overview.placementCounts[status] ?? 0 })),
     ]} />
     <section className="crm-records" aria-label="Placement records">
       <form method="get" aria-label="Filter placements" className="crm-toolbar">

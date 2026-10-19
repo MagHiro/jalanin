@@ -33,7 +33,7 @@ export default async function AdminNotificationsPage({ searchParams }: {
   }
 
   return <div className="crm-list-page">
-    <PageHeader eyebrow="Communication / Alerts" title="Notifications" description="Application submissions and revisions requiring team attention." />
+    <PageHeader icon="●" eyebrow="Communication / Alerts" title="Notifications" description="Application submissions and revisions requiring team attention." />
     <CrmViews label="Notification views" items={[
       { label: "All notifications", href: listHref(path, searchParams, { unread: null }), active: !unreadOnly },
       { label: "Unread", href: listHref(path, searchParams, { unread: "1" }), active: unreadOnly },

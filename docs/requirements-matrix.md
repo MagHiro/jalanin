@@ -130,3 +130,8 @@ placeholder behavior shipped as confirmed.
 ## Admin/student CRM-list presentation pass (2026-10-19)
 
 UI-only refinement of existing ADM-APP, ADM-JOB, ADM-STU, D11 placement, COM-04 contact, NOT-03 alert, and student APP list/detail capabilities. Replaced multiple card grids with scannable, paginated/sortable/filterable list layouts where the existing service supports those operations; contact sender/subject search is new read-only query composition on the existing table under `requireAdmin`. Re-review acknowledgement, lifecycle status mutations, quotation constraints, ownership checks, stored read state and server validations remain unchanged. Existing unit and Playwright workflows plus new CRM view-navigation/typography assertions are release checks. No unsupported lead CRM/marketing automation, export, bulk mutation, RLS bypass or database migration.
+
+
+### Authenticated workspace presentation — 2026-10-19
+- Shared admin/student navigation and mobile shortcuts, accessible calendar controls, searchable dropdown improvements, contextual empty-state guidance, richer profile detail and truthful lifecycle counts; presentation-layer implementation, preserving existing server-side authorization, validation and workflows.
+- QA: GitHub CI (lint, typecheck, tests, build, Playwright) triggered by commits to main. Populated-record visual signoff remains an explicit release check. Design notes: docs/design/workspace-overhaul-2026-10-19.md.

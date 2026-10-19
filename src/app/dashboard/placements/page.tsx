@@ -17,7 +17,7 @@ export default async function StudentPlacementsPage() {
   if (!user) redirect("/auth/login?next=/dashboard/placements");
   const rows = await db.select().from(placements).where(eq(placements.studentUserId, user.id)).orderBy(desc(placements.updatedAt));
   return <div className="crm-list-page">
-    <PageHeader eyebrow="My workspace / Placements" title="My placements" description="The placements arranged for you, including your organization, dates, and current progress." />
+    <PageHeader icon="✦" eyebrow="My workspace / Placements" title="My placements" description="The placements arranged for you, including your organization, dates, and current progress." />
     <section className="crm-records" aria-label="Your placement records">
       <CrmTableMeta total={rows.length} page={1} pageSize={rows.length || 1} noun="placements" note="Only placements associated with your account are visible." />
       {rows.length ? <>

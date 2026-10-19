@@ -23,7 +23,7 @@ export default async function StudentApplicationsPage({ searchParams }: { search
 
   return <div className="crm-list-page">
     {searchParams.draft && <div role="status" className="alert alert-success"><strong>Draft saved.</strong> You can resume it any time. It has not been submitted.</div>}
-    <PageHeader eyebrow="My workspace / Applications" title="My applications" description="Track your submissions and continue drafts without losing your progress." actions={<Link href="/opportunities" className="btn btn-primary btn-sm"><Compass size={16} /> Browse internships</Link>} />
+    <PageHeader icon="☰" eyebrow="My workspace / Applications" title="My applications" description="Track your submissions and continue drafts without losing your progress." actions={<Link href="/opportunities" className="btn btn-primary btn-sm"><Compass size={16} /> Browse internships</Link>} />
     <CrmViews label="Application views" items={[
       { label: "All", href: listHref(path, searchParams, { view: null, draft: null }), active: view === "all", count: apps.length },
       { label: "Submitted", href: listHref(path, searchParams, { view: "submitted", draft: null }), active: view === "submitted", count: submitted.length },

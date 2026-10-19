@@ -180,3 +180,49 @@
 .workspace-shell input[type="file"]::file-selector-button{padding:9px 13px;margin-right:12px;border:1px solid #d6dfe5;border-radius:8px;background:#eef1f8;color:#314774;font-family:inherit;font-weight:600;cursor:pointer}
 .workspace-shell input[type="file"]::file-selector-button:hover{background:#e0e7f7}
 .workspace-shell :is(.workspace-command-dialog,.workspace-mobile-dialog)::backdrop{background:rgba(22,34,57,.45);backdrop-filter:blur(3px)}
+
+/* Student record: operational detail density, with useful real account facts. */
+.workspace-shell .workspace-student-record{display:flex;flex-direction:column;gap:20px}
+.workspace-shell .workspace-back-link{display:inline-flex;align-items:center;gap:8px;min-height:38px;color:#42608e;font-size:13px;font-weight:600}
+.workspace-shell .workspace-back-link:hover{color:#203d70}
+.workspace-shell .workspace-student-record-heading{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:22px;padding-bottom:22px;border-bottom:1px solid #e0e5df}
+.workspace-shell .workspace-student-record-heading>.workspace-back-link{flex-basis:100%;margin-bottom:-8px}
+.workspace-shell .workspace-student-record-title{display:flex;align-items:center;gap:17px;min-width:0}
+.workspace-shell .workspace-student-record-avatar{display:grid;place-items:center;width:69px;height:69px;flex-shrink:0;border:1px solid #d9e2ee;border-radius:16px;background:#dfe8f6;color:#304b83;font-size:24px;font-weight:600}
+.workspace-shell .workspace-student-record-title h1{margin-top:3px;font-size:clamp(31px,3vw,40px);font-weight:500;letter-spacing:-.06em;line-height:1.1}
+.workspace-shell .workspace-record-reference{margin-top:8px;color:#89938e;font-size:12px;overflow-wrap:anywhere}
+.workspace-shell .workspace-student-record-stats{display:grid;grid-template-columns:repeat(3,minmax(90px,1fr));gap:9px}
+.workspace-shell .workspace-student-record-stats>div{min-width:105px;padding:12px 15px;border:1px solid #e3e7e1;border-radius:10px;background:#fffefa}
+.workspace-shell .workspace-student-record-stats span{display:block;color:#818c85;font-size:11px;font-weight:600}
+.workspace-shell .workspace-student-record-stats strong{display:block;margin-top:5px;color:#2d447b;font-size:29px;font-weight:500;line-height:1.15}
+.workspace-shell .workspace-student-record-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(290px,.75fr);gap:16px;align-items:start}
+.workspace-shell .workspace-student-record-main,.workspace-shell .workspace-student-record-side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.workspace-shell .workspace-record-section{overflow:hidden;padding:22px;border:1px solid #e4e7e0;border-radius:13px;background:#fffefa;box-shadow:0 5px 18px rgba(33,39,47,.035)}
+.workspace-shell .workspace-record-section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.workspace-shell .workspace-record-section-title>div{display:flex;align-items:center;gap:11px}
+.workspace-shell .workspace-record-section-icon{display:grid;place-items:center;width:40px;height:40px;flex-shrink:0;border-radius:10px;background:#eaf0f8;color:#37548b}
+.workspace-shell .workspace-record-section-title h2{margin-top:3px;font-size:18px;font-weight:500;letter-spacing:-.035em}
+.workspace-shell .workspace-record-section-count{padding:5px 9px;border-radius:7px;background:#f1f3ef;color:#667472;font-size:12px}
+.workspace-shell .workspace-record-rows{margin-inline:-22px;margin-bottom:-22px}
+.workspace-shell .workspace-record-rows li{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:76px;padding:14px 22px;border-top:1px solid #e9ebe6}
+.workspace-shell .workspace-record-rows li:hover{background:#f6f8f5}
+.workspace-shell .workspace-record-row-title{font-weight:600;font-size:14px;color:#314266}
+.workspace-shell .workspace-record-row-title:hover{text-decoration:underline;text-underline-offset:3px}
+.workspace-shell .workspace-record-rows li p{margin-top:4px;font-size:12px;color:#85918b}
+.workspace-shell .workspace-record-row-actions{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.workspace-shell .workspace-record-row-actions>a{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;color:#5673a2}
+.workspace-shell .workspace-record-row-actions>a:hover{background:#e7edf8}
+.workspace-shell .workspace-record-empty{display:flex;align-items:start;justify-content:space-between;gap:13px;flex-wrap:wrap;padding:24px;border:1px dashed #dfe4df;border-radius:9px;background:#f8f9f5}
+.workspace-shell .workspace-record-empty p{max-width:420px;color:#6e7a74;font-size:13px;line-height:1.6}
+.workspace-shell .workspace-record-empty a{display:inline-flex;align-items:center;gap:5px;color:#33528c;font-size:12px;font-weight:600}
+.workspace-shell .workspace-student-facts>div{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 0;border-bottom:1px solid #e9ebe6}
+.workspace-shell .workspace-student-facts dt{display:flex;align-items:center;gap:8px;color:#78827d;font-size:12px}
+.workspace-shell .workspace-student-facts dd{color:#344765;font-size:12px;font-weight:600}
+.workspace-shell .workspace-student-privacy{display:flex;gap:9px;margin-top:19px;padding:13px;background:#f0f3f8;border-radius:9px;color:#5e6b78;font-size:12px;line-height:1.5}
+.workspace-shell .workspace-student-privacy svg{flex-shrink:0;color:#375894}
+.workspace-shell .workspace-student-links{padding:19px}
+.workspace-shell .workspace-student-links>a{display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid #eceee8;color:#354a6f;font-size:13px;font-weight:600}
+.workspace-shell .workspace-student-links>a svg:last-child{margin-left:auto}
+.workspace-shell .workspace-student-links>a:hover{color:#1d3b7a}
+@media(max-width:1050px){.workspace-shell .workspace-student-record-grid{grid-template-columns:1fr}.workspace-shell .workspace-student-record-side{display:grid;grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.workspace-shell .workspace-student-record-stats{width:100%;grid-template-columns:repeat(3,minmax(0,1fr))}.workspace-shell .workspace-student-record-stats>div{min-width:0;padding:11px}.workspace-shell .workspace-student-record-side{display:flex}.workspace-shell .workspace-record-row-actions{gap:5px}.workspace-shell .workspace-record-rows li{align-items:start}.workspace-shell .workspace-record-reference{font-size:10px}}
