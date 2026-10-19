@@ -247,3 +247,6 @@
 .workspace-shell .workspace-student-application-detail dl dd{font-size:12px;color:#35465b;font-weight:600}
 .workspace-shell .workspace-student-application-detail .quote-panel{padding:22px}
 @media(max-width:767px){.workspace-shell .workspace-recent-records>.workspace-panel-heading{padding:15px}.workspace-shell .workspace-recent-records-guide{padding:17px}}
+
+/* Keep the unified metric ribbon flush but retain its subtle individual elevation. */
+.workspace-shell .workspace-stat{box-shadow:0 1px 2px rgba(31,43,65,.035)!important}
