@@ -1,9 +1,10 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Activity, ArrowRight, Bell, BriefcaseBusiness, CheckCircle2, ChevronRight, CircleDot, ClipboardList, Clock3, FileText, Plus, Users } from "lucide-react";
+import { Activity, ArrowRight, ArrowRightLeft, Bell, BriefcaseBusiness, CheckCircle2, ChevronRight, CircleDot, ClipboardList, Clock3, FileCheck2, FilePenLine, FileText, Plus, Users } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
 import { getAdminOverview, listAdminApplications, recentAudit } from "@/features/admin/service";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { adminActivityHref, describeAdminActivity } from "@/lib/ui/admin-activity";
 
 export const metadata: Metadata = { title: "Admin overview", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -124,14 +125,50 @@ export default async function AdminOverviewPage() {
 
     <div className="ops-bottom-grid">
       <section className="ops-panel ops-activity" aria-labelledby="ops-activity-title">
-        <div className="ops-panel-head"><div><span className="ops-label">THE OPERATIONS TRAIL</span><h2 id="ops-activity-title">Recent activity</h2></div><Activity size={18} aria-hidden="true" /></div>
-        {audit.length > 0 ? <ol className="ops-activity-list">{audit.map(event => <li key={event.id}><span className="ops-activity-dot" aria-hidden="true" /><div><strong>{event.action}</strong><span>{event.entityType} · {String(event.entityId).slice(0, 8)}</span></div><time dateTime={new Date(event.createdAt).toISOString()} className="tnum">{new Date(event.createdAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short" })}</time></li>)}</ol> : <div className="ops-activity-empty"><Clock3 size={21} aria-hidden="true" /><p>Changes to applications and records will show up here.</p></div>}
+        <div className="ops-panel-head">
+          <div><span className="ops-label">RECENT CHANGES</span><h2 id="ops-activity-title">Recent activity</h2></div>
+          <span className="ops-activity-indicator"><Activity size={15} aria-hidden="true" /> Activity log</span>
+        </div>
+        <p className="ops-activity-intro">A clearer view of what has changed across your workspace.</p>
+        {audit.length > 0
+          ? <ol className="ops-activity-list">{audit.map(event => {
+            const item = describeAdminActivity(event.entityType, event.action);
+            const href = adminActivityHref(event.entityType, String(event.entityId));
+            const date = new Date(event.createdAt);
+            return <li key={event.id} className="ops-activity-entry">
+              <span className={`ops-activity-symbol ops-activity-symbol--${item.tone}`} aria-hidden="true">
+                {item.tone === "transition" ? <ArrowRightLeft size={18} /> : item.tone === "submitted" ? <FileCheck2 size={18} /> : item.tone === "created" ? <Plus size={18} /> : <FilePenLine size={18} />}
+              </span>
+              <div className="ops-activity-details">
+                <div className="ops-activity-entry-title">
+                  {href ? <Link href={href}>{item.title}</Link> : <strong>{item.title}</strong>}
+                  <time className="tnum" dateTime={date.toISOString()} title={date.toISOString()}>{date.toLocaleDateString("en-SG", { day: "numeric", month: "short" })}</time>
+                </div>
+                <p><span>{item.detail}</span><span aria-hidden="true" className="ops-activity-separator">·</span><span className="ops-activity-reference">{event.entityType} #{String(event.entityId).slice(0, 8)}</span></p>
+              </div>
+              {href && <Link href={href} className="ops-activity-open" aria-label={`View ${item.title.toLowerCase()} record`}><ArrowRight size={16} /></Link>}
+            </li>;
+          })}</ol>
+          : <div className="ops-activity-empty"><span className="ops-activity-symbol"><Clock3 size={19} /></span><div><strong>Nothing to report yet</strong><p>New submissions and record changes will show here automatically.</p></div></div>}
+        <div className="ops-activity-footer"><span><span className="ops-activity-footer-dot" /> Showing the {audit.length} most recent {audit.length === 1 ? "event" : "events"}</span><span>Recorded automatically</span></div>
       </section>
+
       <section className="ops-panel ops-placement-summary" aria-labelledby="ops-placements-title">
-        <div className="ops-panel-head"><div><span className="ops-label">BEYOND THE APPLICATION</span><h2 id="ops-placements-title">Placements</h2></div><Link href="/admin/placements" className="ops-text-link">Manage <ArrowRight size={16} aria-hidden="true" /></Link></div>
-        <div className="ops-placement-total"><strong className="tnum">{totalPlacements}</strong><span>recorded placements</span></div>
-        {Object.keys(overview.placementCounts).length > 0 ? <ul className="ops-placement-statuses">{Object.entries(overview.placementCounts).map(([status, value]) => <li key={status}><StatusBadge status={status} /><strong className="tnum">{value}</strong></li>)}</ul> : <p className="ops-empty-note">Placement status details will appear as records are added.</p>}
-        <Link href="/admin/placements/new" className="ops-placement-action"><Plus size={16} aria-hidden="true" /> New placement <ArrowRight size={16} aria-hidden="true" /></Link>
+        <div className="ops-panel-head">
+          <div><span className="ops-label">PLACEMENT DESK</span><h2 id="ops-placements-title">Placements</h2></div>
+          <Link href="/admin/placements" className="ops-text-link">View all <ArrowRight size={16} aria-hidden="true" /></Link>
+        </div>
+        {totalPlacements > 0 ? <>
+          <div className="ops-placement-total"><strong className="tnum">{totalPlacements}</strong><span>recorded {totalPlacements === 1 ? "placement" : "placements"}</span></div>
+          <ul className="ops-placement-statuses">{Object.entries(overview.placementCounts).map(([status, value]) => <li key={status}><StatusBadge status={status} /><strong className="tnum">{value}</strong></li>)}</ul>
+          <Link href="/admin/placements/new" className="ops-placement-action"><Plus size={16} aria-hidden="true" /> New placement <ArrowRight size={16} aria-hidden="true" /></Link>
+        </> : <div className="ops-placement-empty">
+          <div className="ops-placement-empty-top"><span className="ops-placement-empty-icon"><BriefcaseBusiness size={24} strokeWidth={1.7} aria-hidden="true" /></span><span className="ops-placement-empty-count tnum">0 on record</span></div>
+          <h3>Your first placement starts here.</h3>
+          <p>Once a placement is arranged, record the student, host organization and role to keep its details in one place.</p>
+          <Link href="/admin/placements/new" className="ops-placement-action"><Plus size={16} aria-hidden="true" /> Record a placement <ArrowRight size={16} aria-hidden="true" /></Link>
+          <div className="ops-placement-empty-footer"><CircleDot size={14} aria-hidden="true" /> Placement records appear here as they are added</div>
+        </div>}
       </section>
     </div>
   </div>;

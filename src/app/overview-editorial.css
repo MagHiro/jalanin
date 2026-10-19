@@ -320,3 +320,147 @@
   .workspace-shell .ops-stage,
   .workspace-shell .ops-metric { transition: background-color .18s ease,color .18s ease; }
 }
+
+
+/* Operations / lower dashboard: compact audit timeline and a useful placement desk.
+   These overrides intentionally target only the two panels in the provided screenshot. */
+.workspace-shell .ops-bottom-grid {
+  grid-template-columns: minmax(0, 1.16fr) minmax(0, .84fr);
+  align-items: start;
+}
+.workspace-shell .ops-bottom-grid > .ops-panel { min-width: 0; }
+.workspace-shell .ops-activity,
+.workspace-shell .ops-placement-summary { padding: 27px 29px; }
+.workspace-shell .ops-activity-indicator {
+  display: inline-flex; align-items: center; gap: 7px; flex: none;
+  color: #65788b; border: 1px solid #e4e9ed; border-radius: 99px;
+  padding: 6px 10px; font-size: 11px; font-weight: 650; background: #f7f9f9;
+}
+.workspace-shell .ops-activity-intro {
+  max-width: 440px; margin: 11px 0 0; color: #82909b;
+  font-size: 12px; line-height: 1.5;
+}
+.workspace-shell .ops-activity-list {
+  list-style: none; margin: 20px 0 0; padding: 0; position: relative;
+}
+.workspace-shell .ops-activity-list::before {
+  content: ""; position: absolute; left: 19px; top: 30px; bottom: 36px;
+  width: 1px; background: #e2e9e5; pointer-events: none;
+}
+.workspace-shell .ops-activity-list .ops-activity-entry {
+  display: grid; grid-template-columns: 40px minmax(0, 1fr) 27px;
+  gap: 14px; align-items: center; min-width: 0;
+  border-top: 1px solid #edf0ee; border-bottom: 0;
+  padding: 16px 0;
+}
+.workspace-shell .ops-activity-list .ops-activity-entry:last-child { border-bottom: 1px solid #edf0ee; }
+.workspace-shell .ops-activity-symbol {
+  position: relative; z-index: 1; display: inline-grid; flex: none; place-items: center;
+  width: 40px; height: 40px; border-radius: 12px;
+  background: #edf2f0; color: #668579; border: 1px solid #e0eae5;
+}
+.workspace-shell .ops-activity-symbol--transition { background: #e9eff7; color: #536fa1; border-color: #dce6f2; }
+.workspace-shell .ops-activity-symbol--submitted { background: #eef3e7; color: #627e5a; border-color: #e3ebda; }
+.workspace-shell .ops-activity-symbol--created { background: #f4eee3; color: #9a8056; border-color: #eee4d5; }
+.workspace-shell .ops-activity-list .ops-activity-entry > .ops-activity-details {
+  display: block; flex: initial; min-width: 0;
+}
+.workspace-shell .ops-activity-entry-title {
+  display: flex; align-items: baseline; flex-wrap: wrap; justify-content: space-between; gap: 5px 12px;
+}
+.workspace-shell .ops-activity-entry-title > :is(a,strong) {
+  font-size: 14px; font-weight: 690; line-height: 1.35; color: #31445b;
+  text-transform: none; overflow-wrap: anywhere;
+}
+.workspace-shell .ops-activity-entry-title > a:hover { color: #4669a2; text-decoration: underline; text-underline-offset: 3px; }
+.workspace-shell .ops-activity-entry-title time { flex: none; color: #9aa5af; font-size: 11px; font-weight: 600; }
+.workspace-shell .ops-activity-details p {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px;
+  color: #7a8b93; margin: 5px 0 0; font-size: 11px; line-height: 1.5;
+}
+.workspace-shell .ops-activity-reference { color: #9ba7ad; font-size: 11px; }
+.workspace-shell .ops-activity-separator { color: #b6c0c4; }
+.workspace-shell .ops-activity-open {
+  display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 9px;
+  border: 1px solid #e6eaec; color: #657d97; background: #fbfcfc;
+}
+.workspace-shell .ops-activity-open:hover { background: #eef3f8; color: #3e6093; }
+.workspace-shell .ops-activity-footer {
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 18px;
+  margin-top: 14px; font-size: 10px; color: #9ba6ae;
+}
+.workspace-shell .ops-activity-footer > span:first-child { display: inline-flex; align-items: center; gap: 7px; }
+.workspace-shell .ops-activity-footer-dot { display: inline-block; width: 6px; height: 6px; background: #94ae9e; border-radius: 50%; }
+.workspace-shell .ops-activity-empty {
+  display: flex; gap: 13px; align-items: center; padding: 28px 0 21px;
+}
+.workspace-shell .ops-activity-empty strong { display: block; color: #354b5c; font-size: 14px; font-weight: 680; }
+.workspace-shell .ops-activity-empty p { margin: 5px 0 0; color: #8b9aa2; font-size: 12px; }
+
+.workspace-shell .ops-placement-summary > .ops-panel-head { margin-bottom: 18px; }
+.workspace-shell .ops-placement-empty {
+  display: flex; flex-direction: column; min-height: 241px; padding: 21px;
+  border: 1px solid #e2eadf; border-radius: 13px;
+  background: linear-gradient(133deg, #f3f7f1 0%, #f7f8f4 57%, #f4f7fa 100%);
+}
+.workspace-shell .ops-placement-empty-top {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.workspace-shell .ops-placement-empty-icon {
+  display: inline-grid; place-items: center; width: 47px; height: 47px;
+  color: #607e69; background: #dfeade; border-radius: 13px;
+}
+.workspace-shell .ops-placement-empty-count {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: #fffefa; border: 1px solid #dde7db; border-radius: 99px;
+  color: #718379; font-size: 11px; font-weight: 700; padding: 6px 10px;
+}
+.workspace-shell .ops-placement-empty-count::before {
+  content: ""; display: block; width: 6px; height: 6px; border: 1.5px solid #9eb3a5; border-radius: 50%;
+}
+.workspace-shell .ops-placement-empty h3 {
+  margin: 19px 0 8px; color: #314b42; font-size: clamp(19px, 2vw, 23px);
+  font-weight: 590; letter-spacing: -.04em; line-height: 1.18;
+}
+.workspace-shell .ops-placement-empty > p {
+  margin: 0 0 20px; color: #718178; font-size: 12px; line-height: 1.65;
+  max-width: 390px;
+}
+.workspace-shell .ops-placement-empty .ops-placement-action {
+  display: flex; align-items: center; justify-content: flex-start; gap: 10px;
+  min-height: 45px; padding: 11px 14px;
+  border-radius: 9px; background: #304b48; color: #fffefa;
+  font-size: 12px; font-weight: 730;
+}
+.workspace-shell .ops-placement-empty .ops-placement-action:hover { background: #45645e; }
+.workspace-shell .ops-placement-empty .ops-placement-action svg:last-child { margin-left: auto; }
+.workspace-shell .ops-placement-empty-footer {
+  display: flex; gap: 7px; align-items: center; padding-top: 15px; margin-top: 15px;
+  border-top: 1px solid #e1e9df; color: #899a8d; font-size: 10px; line-height: 1.4;
+}
+.workspace-shell .ops-placement-summary .ops-placement-statuses {
+  display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); column-gap: 16px;
+}
+.workspace-shell .ops-placement-summary .ops-placement-action { min-height: 43px; }
+
+/* The submissions table must scroll inside its own panel, not widen the page.
+   This also prevents the documented 320px admin-overview regression. */
+.workspace-shell .ops-overview { overflow-x: clip; }
+.workspace-shell .ops-overview > * { min-width: 0; max-width: 100%; }
+.workspace-shell .ops-submissions { width: 100%; min-width: 0; max-width: 100%; overflow: hidden; }
+.workspace-shell .ops-table-scroll { display: block; width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; }
+
+@media (max-width: 1023px) {
+  .workspace-shell .ops-bottom-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .workspace-shell .ops-activity, .workspace-shell .ops-placement-summary { padding: 24px 22px; }
+  .workspace-shell .ops-activity-indicator { display: none; }
+}
+@media (max-width: 767px) {
+  .workspace-shell .ops-bottom-grid { grid-template-columns: minmax(0,1fr); }
+  .workspace-shell .ops-activity, .workspace-shell .ops-placement-summary { padding: 23px 19px; }
+  .workspace-shell .ops-activity-list .ops-activity-entry { gap: 9px; }
+  .workspace-shell .ops-activity-entry-title time { font-size: 10px; }
+  .workspace-shell .ops-activity-footer { gap: 7px; }
+  .workspace-shell .ops-placement-empty { padding: 18px; }
+  .workspace-shell .ops-placement-summary .ops-placement-statuses { grid-template-columns: minmax(0,1fr); }
+}

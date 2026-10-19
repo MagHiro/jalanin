@@ -154,3 +154,9 @@ UI-only refinement of existing ADM-APP, ADM-JOB, ADM-STU, D11 placement, COM-04 
 
 - **Student dashboard / application lifecycle:** Existing server-scoped applications, drafts and placements power a journey-specific overview with an accurate prioritized next action, status badges and linked milestone summaries. No lifecycle or authorization semantics changed. UI regression: `tests/e2e/workspaces.spec.ts`, `tests/e2e/workspace-replica.spec.ts`.
 - **Admin overview / operations visibility:** Existing authorized aggregates, audit feed, recent submissions and unread notifications power the review-priority overview and pipeline stage distribution. No new metrics, schema, permissions or transitions. UI regression: `tests/e2e/workspaces.spec.ts`, `tests/e2e/workspace-replica.spec.ts`.
+
+### Admin overview lower-panel refinement — 2026-10-20
+
+- **Activity trail:** Read-only formatting of persisted audit-event action codes, with validated links to existing record detail routes. No actor attribution or status mutation is inferred.
+- **Placement summary:** Distinct zero/nonzero compositions using existing authorized placement counts and the existing create route.
+- **Verification:** `tests/unit/admin-activity.test.ts` and `tests/e2e/workspace-replica.spec.ts` cover event labels, safe record links, empty-state panel structure and mobile containment.

@@ -16,8 +16,28 @@ test.describe("Mobbin-derived workspace structure", () => {
     await expect(page.getByRole("link", { name: /Go to review queue/ })).toHaveAttribute("href", "/admin/applications?status=New");
     await expect(page.locator(".ops-submissions")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Recent submissions" })).toBeVisible();
+    await expect(page.locator(".ops-activity")).toBeVisible();
+    await expect(page.locator(".ops-placement-summary")).toBeVisible();
+    await expect(page.getByRole("link", { name: "View all" }).last()).toHaveAttribute("href", "/admin/placements");
+    const events = page.locator(".ops-activity-entry");
+    if (await events.count()) {
+      await expect(events.first().locator(".ops-activity-entry-title")).not.toContainText("status:");
+    }
     await expect(page.locator(".workspace-sidebar")).toBeVisible();
     await expect(page.locator(".workspace-topbar")).toBeVisible();
+  });
+
+  test("admin overview remains contained and navigable at 320px", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 850 });
+    await page.goto("/admin");
+    await expect(page.locator(".ops-activity")).toBeVisible();
+    await expect(page.locator(".ops-placement-summary")).toBeVisible();
+    const tableScroll = page.locator(".ops-table-scroll");
+    if (await tableScroll.count()) {
+      expect(await tableScroll.evaluate(el => getComputedStyle(el).overflowX)).toBe("auto");
+    }
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(1);
   });
 
   test("student overview provides genuine journey milestones and next action", async ({ page }) => {

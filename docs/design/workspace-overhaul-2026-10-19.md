@@ -65,3 +65,12 @@ The list primitives `CrmViews`, `CrmFilterChips`, `CrmTableMeta`, `listHref` and
 The two landing pages no longer share one generic hero/metric/panel layout. The **student overview** is an editorial, warm-toned journey narrative with a server-derived next action (re-review, saved draft, placement, application tracking, or opportunity discovery), a three-step linked route, actual counts and recent application/placement records. A milestone is described only as “On record,” not falsely marked as an approved workflow transition. The **admin overview** is a navy operations command center with a prominent real new-submission queue, six stage-specific lifecycle bars, four live platform metrics, actual recent submissions, audit events, notification counts, placement summaries and navigation shortcuts.
 
 Both surfaces use a scoped stylesheet (`src/app/overview-editorial.css`) rather than altering the shared CRM routes and their input components. Every CTA links to an existing authorized route. The design has responsive 320px handling, explicit focus outlines, reduced-motion-aware hover transitions and no invented records or metrics. Regression coverage lives in `tests/e2e/workspaces.spec.ts` and `tests/e2e/workspace-replica.spec.ts`.
+
+## Admin overview: activity and placement detail — 20 October 2026
+
+Following review of the populated admin screenshot, the lower overview panels were tightened rather than introducing more decorative dashboard cards.
+
+- **Audit timeline:** Recent events retain their persisted type, ID, action and timestamp, but action strings are translated into readable event titles with the actual `from → to` statuses in supporting text. Supported records link to existing authorized detail routes, using UUID validation. No actor or organization names are inferred from partial data.
+- **Placement desk:** Zero records now produce a compact inset empty state with a direct link to the existing placement form, not an oversized zero and redundant instruction. When placements exist, live totals and lifecycle breakdowns remain visible.
+- **Presentation:** Context-aware icon treatments, tighter spacing, stronger text hierarchy and a self-contained scroll area for the recent submissions table on small screens.
+- **QA:** A unit test covers event formatting and link safety. Playwright checks lower-panel presence, audit readability and 320px overflow. This is a presentation-only change: no new states, data sources, validation rules or mutations.
