@@ -24,7 +24,7 @@ export default async function StudentApplicationDetailPage({
     ["New", "In Review"].includes(application.lifecycleStatus);
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto min-w-0 max-w-3xl space-y-6 [overflow-wrap:anywhere]">
       {searchParams.submitted && (
         <div role="status" className="alert alert-success">
           <p className="font-semibold">Application submitted.</p>
@@ -61,8 +61,8 @@ export default async function StudentApplicationDetailPage({
             ["Preferred dates", `${application.preferredStart} → ${application.preferredEnd}`],
             ["Revision", `r${application.revision}`],
           ].map(([k, v]) => (
-            <div key={k} className="flex justify-between gap-4 border-b border-border py-2 last:border-0">
-              <dt className="shrink-0 text-muted-foreground">{k}</dt><dd className="text-right font-medium text-foreground">{v}</dd>
+            <div key={k} className="flex min-w-0 flex-wrap justify-between gap-x-4 gap-y-1 border-b border-border py-2 last:border-0">
+              <dt className="text-muted-foreground">{k}</dt><dd className="min-w-0 max-w-full font-medium text-foreground sm:text-right">{v}</dd>
             </div>
           ))}
         </dl>
@@ -76,9 +76,9 @@ export default async function StudentApplicationDetailPage({
             <Link href={`/apply/${application.internshipId}`} className="btn btn-outline btn-sm">Edit application</Link>
           ) : (
             <p className="rounded-xl bg-muted p-3 text-xs leading-5 text-muted-foreground">
-              Editing is locked from Quotation Sent onwards. Your quotation will
-              arrive by email — reply there to accept or decline. Contact us if
-              you need changes.
+              Editing is unavailable in the current status. Quotations are queued
+              for email delivery; reply to the quotation email to accept or decline.
+              Contact us if you need changes or have not received it.
             </p>
           )}
         </div>
@@ -115,8 +115,8 @@ export default async function StudentApplicationDetailPage({
             <h2 id="quote-h" className="text-sm font-semibold text-foreground">About your quotation</h2>
             <p className="mt-1.5">
               {application.lifecycleStatus === "Quotation Sent" || application.lifecycleStatus === "Accepted"
-                ? "Your quotation was sent by email with the amount in SGD and the reply instructions. This dashboard shows the status only — the email is authoritative."
-                : "When our team prepares your custom quotation, it arrives by email with the SGD amount and reply instructions. No expiry is claimed here — if terms mention timing, they are in the email."}
+                ? "Your quotation has been queued for email delivery with the SGD amount and reply instructions. This status does not confirm delivery. Check your inbox and spam folder, or contact us if it has not arrived. The quotation email contains the authoritative terms."
+                : "When our team prepares your custom quotation, it is queued for email delivery with the SGD amount and reply instructions. Any timing terms are in the quotation email."}
             </p>
           </section>
         </>

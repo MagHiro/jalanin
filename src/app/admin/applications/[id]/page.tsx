@@ -29,12 +29,12 @@ export default async function AdminApplicationDetailPage({
   const allowed = application.isDraft
     ? []
     : allowedTransitionsFor(application.lifecycleStatus as ApplicationStatus);
-  const chainIndex = application.isDraft
-    ? -1
-    : APPLICATION_STATUSES.indexOf(application.lifecycleStatus as ApplicationStatus);
+  const reachedStatuses = new Set(events.flatMap((event) =>
+    event.fromStatus ? [event.fromStatus, event.toStatus] : [event.toStatus],
+  ));
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6 [overflow-wrap:anywhere]">
       <div>
         <nav aria-label="Breadcrumb">
           <Link href="/admin/applications" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
@@ -61,8 +61,8 @@ export default async function AdminApplicationDetailPage({
         {!application.isDraft && (
           <ol aria-label="Application lifecycle" className="mt-3 flex flex-wrap items-center gap-1 text-xs">
             {APPLICATION_STATUSES.map((s, i) => {
-              const reached = i <= chainIndex;
-              const current = i === chainIndex;
+               const reached = reachedStatuses.has(s);
+               const current = s === application.lifecycleStatus;
               return (
                 <li key={s} className="flex items-center gap-1">
                   {i > 0 && <span aria-hidden="true" className="text-muted-foreground">›</span>}
@@ -98,8 +98,8 @@ export default async function AdminApplicationDetailPage({
                 ["Preferred dates", `${application.preferredStart} → ${application.preferredEnd}`],
                 ["Submitted", application.submittedAt ? new Date(application.submittedAt).toLocaleString("en-SG") : "—"],
               ].map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-4 border-b border-border py-2">
-                  <dt className="shrink-0 text-muted-foreground">{k}</dt><dd className="text-right font-medium text-foreground">{v}</dd>
+                <div key={k} className="flex min-w-0 flex-wrap justify-between gap-x-4 gap-y-1 border-b border-border py-2">
+                  <dt className="text-muted-foreground">{k}</dt><dd className="min-w-0 max-w-full font-medium text-foreground sm:text-right">{v}</dd>
                 </div>
               ))}
             </dl>
@@ -183,7 +183,7 @@ export default async function AdminApplicationDetailPage({
           </section>
         </div>
 
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           <section aria-labelledby="actions-h" className="surface-card h-fit p-5 md:p-6 xl:sticky xl:top-28">
             <h2 id="actions-h" className="text-base font-semibold tracking-tight text-foreground">Workflow actions</h2>
             <div className="mt-3">
