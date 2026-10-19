@@ -100,11 +100,6 @@ test.describe("admin lifecycle", () => {
       {
         to: "Quotation Sent",
         expectedRevision: 1,
-        quotation: {
-          amount: "1500",
-          notesStudent: "Includes placement and support.",
-          notesInternal: "internal",
-        },
       },
       200,
     );

@@ -88,7 +88,7 @@ has NOT been migrated — see `docs/migration-cutover.md` §7 blockers.
 | ID | Requirement | Implementation | Verify | Status |
 |---|---|---|---|---|
 | WEB-01…08 | Landing, hero CTA, How-It-Works, featured, about+contact, responsive, legal+SEO, states | `src/app/(public)/...`, layouts | E/M | Verified |
-| WEB-NAV (WEB-06/07 refinement) | Editorial public navigation with supplied logo/favicon, responsive menu and existing account links | `SiteHeader`, `PublicNavigation`, root metadata and App Router favicon; existing server session/admin checks | Browser automation: seven widths 320–1440px, menu open/Escape/link dismissal, active directory route; lint/typecheck | Verified |
+| WEB-NAV (WEB-06/07 refinement) | Editorial public navigation with supplied logo/favicon, responsive menu and existing account links | `SiteHeader`, `PublicNavigation`, root metadata and single `public/favicon.ico` asset (no conflicting App Router icon route); existing server session/admin checks | Browser automation: seven widths 320–1440px, menu open/Escape/link dismissal, active directory route; `tests/e2e/favicon.spec.ts` checks favicon HTTP response and shared metadata across public/auth pages; lint/typecheck | Verified |
 | WEB-NAV-FLOAT | User-requested floating rounded header and grouped dropdown pattern | Shared public-header CSS and Explore disclosure: bounded surface, sticky inset, grouped links, photo CTA, mobile expansion; Google Sans Flex/theme retained | Browser checks at seven widths: inset, overflow/overlap, opening, Escape, selection; lint/typecheck/build | Verified |
 | WEB-NAV-WIDTH | Borderless, wider floating header refinement | 1600px maximum shell, full-width inner navigation, no shell/dropdown outline | Browser geometry at 375/1024/1440/1920px: border, width, overflow | Verified |
 | JOB-01…11 | Directory search/filter/sort/page; cards; detail; quote messaging; 404; publish+deadline; SEO | `features/internships`, `app/(public)/opportunities` | E | Verified |
@@ -147,6 +147,12 @@ UI-only refinement of existing ADM-APP, ADM-JOB, ADM-STU, D11 placement, COM-04 
 
 
 ### Authenticated workspace presentation — 2026-10-19
+
+- **Temporary user-directed quotation override:** Quotation Sent is stage-only. Admin quotation amount/terms/internal-note entry and quotation creation are disabled; transition API no longer accepts quotation data into the service. Canonical workflow no longer requires a quote row, but admin authorization, revision acknowledgement, edit locks, concurrency, audit and outbox status notifications remain unchanged. Historical quote rows are preserved; no schema migration or placeholder monetary values. This temporarily supersedes quote-entry requirements (D03/ADM-APP quotation capture) until re-enabled. Unit and lifecycle regression coverage updated; full DB/browser verification pending.
+
+- **Minimal admin overview:** Replaced the oversized dark hero and decorative orbit with a compact white section, concise Overview heading, restrained review count and responsive divider. Existing queue counts, links and creation actions preserved; no backend/authz/state changes. Regression assertions in `tests/e2e/workspaces.spec.ts`; browser visual verification pending.
+
+- **Header action simplification:** Removed the shared admin creation/student exploration CTA from the workspace header on all routes and widths. Page-level actions and command-palette shortcuts remain available; backend/authz unchanged. Regression assertions added to `tests/e2e/workspaces.spec.ts` for both roles.
 - Shared admin/student navigation and mobile shortcuts, accessible calendar controls, searchable dropdown improvements, contextual empty-state guidance, richer profile detail and truthful lifecycle counts; presentation-layer implementation, preserving existing server-side authorization, validation and workflows.
 - QA: GitHub CI (lint, typecheck, tests, build, Playwright) triggered by commits to main. Populated-record visual signoff remains an explicit release check. Design notes: docs/design/workspace-overhaul-2026-10-19.md.
 

@@ -44,7 +44,7 @@ describe("application transitions (PRD §7.7)", () => {
     expect(r.ok).toBe(false);
   });
 
-  it("requires a valid SGD quotation for Quotation Sent", () => {
+  it("allows stage-only Quotation Sent without quotation data", () => {
     const missing = canTransition({
       from: "In Review",
       to: "Quotation Sent",
@@ -53,7 +53,7 @@ describe("application transitions (PRD §7.7)", () => {
       hasValidQuotation: false,
       revisionReviewed: true,
     });
-    expect(missing.ok).toBe(false);
+    expect(missing.ok).toBe(true);
     const present = canTransition({
       from: "In Review",
       to: "Quotation Sent",

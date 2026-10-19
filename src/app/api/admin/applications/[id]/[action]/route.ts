@@ -13,11 +13,6 @@ const transitionBodySchema = z.object({
   to: z.enum(APPLICATION_STATUSES),
   reason: z.string().optional(),
   expectedRevision: z.number().int().positive().optional(),
-  quotation: z.object({
-    amount: z.string(),
-    notesStudent: z.string(),
-    notesInternal: z.string().optional(),
-  }).optional(),
 });
 const acknowledgeBodySchema = z.object({
   expectedRevision: z.number().int().positive(),

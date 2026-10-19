@@ -18,10 +18,8 @@ export function TransitionControls({
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [quote, setQuote] = useState({ amount: "", notesStudent: "", notesInternal: "" });
   const [reason, setReason] = useState("");
   const [pendingTarget, setPendingTarget] = useState<string | null>(null);
-  const needsQuote = (target: string) => target === "Quotation Sent";
 
   async function act(target: string, extra: Record<string, unknown> = {}) {
     setBusy(target);
@@ -34,7 +32,6 @@ export function TransitionControls({
           to: target,
           reason: reason || undefined,
           expectedRevision: revision,
-          quotation: needsQuote(target) ? quote : undefined,
           ...extra,
         }),
       });
@@ -78,17 +75,6 @@ export function TransitionControls({
         <span>Reason / note <span className="font-normal text-muted-foreground">(audited)</span></span>
         <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Optional reason recorded in audit" className="field" />
       </label>
-      {allowed.some(needsQuote) && (
-        <fieldset className="rounded-xl border border-border bg-muted p-4 text-sm">
-          <legend className="rounded-md bg-surface px-2 font-semibold text-foreground">Quotation (SGD only)</legend>
-          <label className="field-label"><span>Amount (SGD) *</span>
-            <input value={quote.amount} onChange={(e) => setQuote({ ...quote, amount: e.target.value })} placeholder="e.g. 1250.50" inputMode="decimal" className="field !bg-surface" /></label>
-          <label className="field-label mt-3"><span>Student-facing terms * <span className="font-normal text-muted-foreground">(sent by email)</span></span>
-            <textarea value={quote.notesStudent} onChange={(e) => setQuote({ ...quote, notesStudent: e.target.value })} rows={3} className="field !bg-surface" /></label>
-          <label className="field-label mt-3"><span>Internal notes <span className="font-normal text-muted-foreground">(never emailed)</span></span>
-            <textarea value={quote.notesInternal} onChange={(e) => setQuote({ ...quote, notesInternal: e.target.value })} rows={2} className="field !bg-surface" /></label>
-        </fieldset>
-      )}
       {error && <p role="alert" className="alert alert-error">{error}</p>}
       <div className="flex flex-wrap gap-2">
         {allowed.map((target) => (

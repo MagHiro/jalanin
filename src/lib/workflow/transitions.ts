@@ -44,7 +44,8 @@ export const TRANSITIONS: readonly TransitionRule[] = [
   { from: null, to: "New", actor: "student", requiresQuotation: false, requiresReviewedRevision: false },
   { from: "New", to: "In Review", actor: "admin", requiresQuotation: false, requiresReviewedRevision: false },
   { from: "New", to: "Rejected", actor: "admin", requiresQuotation: false, requiresReviewedRevision: false },
-  { from: "In Review", to: "Quotation Sent", actor: "admin", requiresQuotation: true, requiresReviewedRevision: true },
+  // Temporary stage-only quotation workflow: no quotation data entry required.
+  { from: "In Review", to: "Quotation Sent", actor: "admin", requiresQuotation: false, requiresReviewedRevision: true },
   { from: "In Review", to: "Rejected", actor: "admin", requiresQuotation: false, requiresReviewedRevision: false },
   { from: "Quotation Sent", to: "Accepted", actor: "admin", requiresQuotation: false, requiresReviewedRevision: false },
   { from: "Quotation Sent", to: "Rejected", actor: "admin", requiresQuotation: false, requiresReviewedRevision: false },

@@ -21,11 +21,15 @@ for (const role of ["admin", "student"] as const) {
       await expect(page.locator(role === "admin" ? ".ops-priority > a" : ".journey-primary-link")).toBeVisible();
       if (width === 1440) await expect(page.locator("main#main h1")).toHaveCSS("font-weight", "500");
       await expect(page.locator(".public-header")).toHaveCount(0);
+      await expect(page.locator(".workspace-topbar .workspace-topbar-cta")).toHaveCount(0);
+      await expect(page.locator(".workspace-topbar").getByRole("link", { name: /New internship|New placement|Explore internships/i })).toHaveCount(0);
       await expect(page.locator("main#main")).toHaveCount(1);
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
       if (width === 1440) {
         if (role === "admin") {
           await expect(page.locator(".ops-masthead")).toBeVisible();
+          await expect(page.locator(".ops-masthead h1")).toHaveText("Overview");
+          await expect(page.locator(".ops-masthead-orbit")).toHaveCount(0);
           await expect(page.locator(".ops-metrics .ops-metric")).toHaveCount(4);
           await expect(page.locator(".ops-stage-list .ops-stage")).toHaveCount(6);
         } else {

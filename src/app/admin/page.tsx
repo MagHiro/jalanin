@@ -40,23 +40,22 @@ export default async function AdminOverviewPage() {
   return <div className="ops-overview">
     <section className="ops-masthead" aria-labelledby="overview-title">
       <div className="ops-heading">
-        <p className="ops-eyebrow"><span className="ops-live-dot" /> JALANIN / OPERATIONS</p>
-        <h1 id="overview-title">Make every move<br /><em>count.</em></h1>
-        <p>Your command center for applications, people, and the decisions that keep opportunities moving.</p>
+        <p className="ops-eyebrow">Operations</p>
+        <h1 id="overview-title">Overview</h1>
+        <p>Manage applications, opportunities and people.</p>
         <div className="ops-heading-actions">
           <Link href="/admin/applications" className="ops-button-light">Open applications <ArrowRight size={17} aria-hidden="true" /></Link>
           <Link href="/admin/internships/new" className="ops-button-outline"><Plus size={16} aria-hidden="true" /> New internship</Link>
         </div>
       </div>
       <div className="ops-priority">
-        <div className="ops-priority-top"><span><CircleDot size={15} aria-hidden="true" /> ACTION REQUIRED</span><span>01 / REVIEW QUEUE</span></div>
+        <div className="ops-priority-top"><span>Review queue</span></div>
         <strong className="ops-priority-number tnum">{newCount.toLocaleString("en-SG")}</strong>
-        <h2>New {newCount === 1 ? "application" : "applications"} waiting</h2>
+        <h2>New {newCount === 1 ? "application" : "applications"}</h2>
         <p>{newCount > 0 ? "Fresh submissions are ready for your team's first review." : "No new submissions to review right now."}</p>
         <Link href="/admin/applications?status=New">Go to review queue <ArrowRight size={18} aria-hidden="true" /></Link>
         <div className="ops-priority-foot"><span>{inReviewCount.toLocaleString("en-SG")} in review</span><Link href="/admin/applications?rereview=1">Re-review requests <ChevronRight size={15} aria-hidden="true" /></Link></div>
       </div>
-      <div className="ops-masthead-orbit" aria-hidden="true" />
     </section>
 
     <section className="ops-metrics-section" aria-labelledby="ops-pulse-heading">

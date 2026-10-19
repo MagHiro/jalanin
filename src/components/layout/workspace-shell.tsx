@@ -148,7 +148,6 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
         <div className="workspace-topbar-end">
           <button ref={searchTrigger} type="button" className="workspace-search-trigger" onClick={() => setSearchOpen(true)} aria-label="Search workspace pages" aria-haspopup="dialog"><Search size={17} /><span>Search pages</span><kbd>⌘ K</kbd></button>
           <Link href={isAdmin ? "/admin/notifications" : "/dashboard/applications"} className="workspace-topbar-icon" aria-label={isAdmin ? "Notifications" : "My applications"}>{isAdmin ? <Bell size={18} /> : <BriefcaseBusiness size={18} />}{isAdmin && unread > 0 && <span className="workspace-topbar-notice" />}</Link>
-          <Link href={quickHref} className="workspace-topbar-cta">{isAdmin ? <Plus size={17} /> : <Compass size={17} />}<span>{quickLabel}</span></Link>
         </div>
       </header>
       <main id="main" className="workspace-content">{children}</main>

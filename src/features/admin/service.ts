@@ -20,7 +20,6 @@ import { applicationRef, audit, singleCount } from "@/lib/utils";
 import {
   internshipInputSchema,
   placementInputSchema,
-  quotationInputSchema,
 } from "@/lib/validation/schemas";
 import {
   allowedNextPlacementStatuses,
@@ -30,7 +29,6 @@ import {
   allowedNextStatuses,
   canTransition,
   formatSgd,
-  parseSgdToMinor,
   type ApplicationStatus,
 } from "@/lib/workflow/transitions";
 import { and, asc, count, desc, eq, ilike, or } from "drizzle-orm";
@@ -280,7 +278,7 @@ export async function getAdminApplication(id: string) {
 
 /**
  * Admin status transition. Transactional: permission → valid transition →
- * prerequisites (re-review acknowledged, quotation present for Quotation Sent,
+ * prerequisites (re-review acknowledged,
  * optimistic-concurrency revision check) → persist → audit + status event +
  * student email (outbox). Email failure never rolls back the transition, but
  * delivery state stays visible via the outbox (NOT-03).
@@ -291,7 +289,6 @@ export async function transitionApplication(input: {
   to: ApplicationStatus;
   reason?: string;
   expectedRevision?: number;
-  quotation?: { amount: string; notesStudent: string; notesInternal?: string };
 }) {
   return db.transaction(async (tx) => {
     const rows = await tx
@@ -316,57 +313,12 @@ export async function transitionApplication(input: {
       );
     }
 
-    const existingQuotes = await tx
-      .select()
-      .from(quotations)
-      .where(eq(quotations.applicationId, app.id))
-      .orderBy(desc(quotations.revision))
-      .limit(1);
-
-    // Quotation Sent requires valid SGD quotation data in the same tx.
-    let quoteForEmail: { amountMinor: number; terms: string } | null =
-      existingQuotes.length > 0
-        ? {
-            amountMinor: existingQuotes[0].amountMinor,
-            terms: existingQuotes[0].notesStudent,
-          }
-        : null;
-    if (input.to === "Quotation Sent") {
-      const q = quotationInputSchema.parse(input.quotation ?? {});
-      const minor = parseSgdToMinor(q.amount);
-      if (minor === null) throw new DomainError("Enter a valid SGD amount.");
-      const nextRev = (existingQuotes[0]?.revision ?? 0) + 1;
-      const inserted = await tx
-        .insert(quotations)
-        .values({
-          applicationId: app.id,
-          amountMinor: minor,
-          currency: "SGD",
-          notesStudent: q.notesStudent,
-          notesInternal: q.notesInternal || null,
-          createdBy: input.adminId,
-          sentAt: new Date(),
-          revision: nextRev,
-        })
-        .returning({
-          amountMinor: quotations.amountMinor,
-          notesStudent: quotations.notesStudent,
-        });
-      quoteForEmail = {
-        amountMinor: inserted[0].amountMinor,
-        terms: inserted[0].notesStudent,
-      };
-    }
-
     const check = canTransition({
       from,
       to: input.to,
       actor: "admin",
       needsReReview: app.needsReReview,
-      hasValidQuotation:
-        input.to === "Quotation Sent"
-          ? quoteForEmail !== null
-          : existingQuotes.length > 0 || quoteForEmail !== null,
+      hasValidQuotation: false,
       revisionReviewed: app.reviewedRevision >= app.revision,
     });
     if (!check.ok) throw new DomainError(check.reason ?? "Application transition is not permitted.");
@@ -406,22 +358,7 @@ export async function transitionApplication(input: {
 
     const ref = applicationRef(app.id);
     const studentName = `${app.firstName} ${app.lastName}`.trim() || "there";
-    if (input.to === "Quotation Sent" && quoteForEmail) {
-      // Quotation email carries amount + currency + student terms (D03).
-      // Internal notes are never included (ADM-APP-11). No expiry claimed (B01).
-      await enqueueEmail({
-        eventKey: `quotation:${statusEvent.id}`,
-        recipient: app.email,
-        templateKey: "quotation-sent",
-        payload: {
-          studentName: app.firstName || studentName,
-          internshipTitle: internship.title,
-          applicationRef: ref,
-          amountMinor: quoteForEmail.amountMinor,
-          terms: quoteForEmail.terms,
-        },
-      }, tx);
-    } else {
+    // Stage-only workflow: do not create or resend monetary quotations.
       await enqueueEmail({
         eventKey: `status-change:${statusEvent.id}`,
         recipient: app.email,
@@ -434,7 +371,6 @@ export async function transitionApplication(input: {
           nextStep: STATUS_NEXT_STEPS[input.to] ?? "Our team will be in touch.",
         },
       }, tx);
-    }
     return { ref };
   });
 }

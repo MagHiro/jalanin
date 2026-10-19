@@ -110,31 +110,28 @@
 .workspace-shell .journey-help a { color: #355b45; display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 720; }
 
 /* Admin: a focused operations room, not a second student dashboard. */
-.workspace-shell .ops-masthead { display: grid; grid-template-columns: minmax(0,1.08fr) minmax(310px,.78fr); gap: clamp(25px,4vw,72px); position: relative; isolation: isolate; overflow: hidden; padding: clamp(30px,3.5vw,52px); background: #222e4e; border-radius: 21px; color: #f7f8ff; }
+.workspace-shell .ops-masthead { display: grid; grid-template-columns: minmax(0,1.08fr) minmax(310px,.78fr); gap: clamp(25px,4vw,56px); padding: 32px; background: #fff; border: 1px solid #e3e6ec; border-radius: 12px; color: #25314b; }
 .workspace-shell .ops-heading { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; position: relative; z-index: 1; }
-.workspace-shell .ops-eyebrow { color: #ccd6eb; display: flex; align-items: center; gap: 9px; font-size: 10px; font-weight: 740; letter-spacing: .15em; margin: 0 0 31px; }
-.workspace-shell .ops-live-dot { width: 7px; height: 7px; border-radius: 50%; background: #c6d9aa; box-shadow: 0 0 0 4px rgba(206,233,174,.13); }
-.workspace-shell .ops-masthead h1 { color: #fffefa; font-size: clamp(43px,4.4vw,68px); }
-.workspace-shell .ops-masthead h1 em { font-style: normal; color: #cddcb7; }
-.workspace-shell .ops-heading > p:not(.ops-eyebrow) { max-width: 450px; margin: 18px 0 27px; color: #c5ccda; font-size: 14px; line-height: 1.65; }
+.workspace-shell .ops-eyebrow { color: #667085; font-size: 11px; font-weight: 600; letter-spacing: .06em; margin: 0 0 10px; }
+.workspace-shell .ops-masthead h1 { color: #25314b; font-size: clamp(28px,3vw,36px); }
+.workspace-shell .ops-heading > p:not(.ops-eyebrow) { max-width: 450px; margin: 12px 0 22px; color: #667085; font-size: 14px; line-height: 1.65; }
 .workspace-shell .ops-heading-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .workspace-shell .ops-button-light,
 .workspace-shell .ops-button-outline { display: inline-flex; justify-content: center; align-items: center; gap: 13px; border-radius: 8px; min-height: 44px; padding: 11px 15px; font-size: 12px; font-weight: 730; }
-.workspace-shell .ops-button-light { background: #e4e9d8; color: #263850; }
-.workspace-shell .ops-button-light:hover { background: #f4f7ec; }
-.workspace-shell .ops-button-outline { color: #f2f5fc; border: 1px solid #66748d; }
-.workspace-shell .ops-button-outline:hover { background: #384767; }
-.workspace-shell .ops-priority { position: relative; z-index: 1; background: #faf9f3; border-radius: 14px; padding: clamp(22px,2.5vw,32px); color: #25314b; min-width: 0; }
+.workspace-shell .ops-button-light { background: #283657; color: #fff; }
+.workspace-shell .ops-button-light:hover { background: #40547e; }
+.workspace-shell .ops-button-outline { color: #344054; border: 1px solid #d8dde5; }
+.workspace-shell .ops-button-outline:hover { background: #f5f6f8; }
+.workspace-shell .ops-priority { border-left: 1px solid #e3e6ec; padding: 0 0 0 32px; color: #25314b; min-width: 0; }
 .workspace-shell .ops-priority-top { display: flex; justify-content: space-between; gap: 8px; align-items: center; color: #657270; font-size: 9px; font-weight: 750; letter-spacing: .12em; }
 .workspace-shell .ops-priority-top > span:first-child { display: inline-flex; align-items: center; gap: 8px; color: #6d7a58; }
-.workspace-shell .ops-priority-number { display: block; font-size: clamp(64px,7vw,112px); font-weight: 500; letter-spacing: -.075em; line-height: 1; margin-top: 22px; }
-.workspace-shell .ops-priority h2 { font-size: 23px; color: #283651; line-height: 1.2; margin: 8px 0 9px; }
+.workspace-shell .ops-priority-number { display: block; font-size: 40px; font-weight: 500; letter-spacing: -.04em; line-height: 1; margin-top: 14px; }
+.workspace-shell .ops-priority h2 { font-size: 16px; color: #283651; line-height: 1.4; margin: 8px 0; }
 .workspace-shell .ops-priority > p { font-size: 12px; line-height: 1.5; color: #747d82; margin-bottom: 18px; }
-.workspace-shell .ops-priority > a { display: inline-flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 43px; padding: 11px 14px; background: #283657; color: #fff; border-radius: 7px; font-size: 12px; font-weight: 730; }
-.workspace-shell .ops-priority > a:hover { background: #40547e; }
+.workspace-shell .ops-priority > a { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: #283657; font-size: 12px; font-weight: 650; }
+.workspace-shell .ops-priority > a:hover { text-decoration: underline; }
 .workspace-shell .ops-priority-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 9px; align-items: center; border-top: 1px solid #e6e6e1; margin-top: 20px; padding-top: 14px; font-size: 11px; color: #74817d; }
 .workspace-shell .ops-priority-foot a { display: inline-flex; align-items: center; color: #34558a; font-weight: 660; }
-.workspace-shell .ops-masthead-orbit { position: absolute; z-index: 0; left: 22%; bottom: -225px; width: 480px; height: 480px; border: 1px solid rgba(240,249,255,.06); border-radius: 50%; box-shadow: 0 0 0 65px rgba(240,249,255,.018),0 0 0 132px rgba(240,249,255,.012); pointer-events: none; }
 .workspace-shell .ops-metrics-section { display: flex; flex-direction: column; gap: 18px; }
 .workspace-shell .ops-label { color: #7b8b9a; }
 .workspace-shell .ops-metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border: 1px solid #e2e5ea; border-radius: 15px; overflow: hidden; background: #fffefa; }
@@ -257,6 +254,7 @@
   .workspace-shell .ops-metric:nth-child(n+3) { border-top: 1px solid #e7e9ee; }
 }
 @media (max-width: 767px) {
+  .workspace-shell .ops-priority { border-left: 0; border-top: 1px solid #e3e6ec; padding: 24px 0 0; }
   .workspace-shell .journey-overview, .workspace-shell .ops-overview { gap: 16px; }
   .workspace-shell .journey-masthead, .workspace-shell .ops-masthead { grid-template-columns: minmax(0,1fr); border-radius: 15px; }
   .workspace-shell .journey-introduction { padding: 29px 24px 34px; min-height: 270px; }
@@ -285,12 +283,10 @@
   .workspace-shell .journey-record-arrow { display: none; }
   .workspace-shell .journey-record-symbol { width: 36px; height: 36px; }
   .workspace-shell .ops-masthead { padding: 29px 22px 21px; gap: 26px; }
-  .workspace-shell .ops-masthead h1 { font-size: clamp(43px,10vw,55px); }
+  .workspace-shell .ops-masthead h1 { font-size: 28px; }
   .workspace-shell .ops-eyebrow { margin-bottom: 22px; }
   .workspace-shell .ops-heading > p:not(.ops-eyebrow) { font-size: 13px; margin: 13px 0 23px; }
-  .workspace-shell .ops-priority { padding: 22px; }
-  .workspace-shell .ops-priority-number { font-size: 75px; margin-top: 15px; }
-  .workspace-shell .ops-priority h2 { font-size: 21px; }
+  .workspace-shell .ops-priority-number { font-size: 36px; }
   .workspace-shell .ops-metrics-section { gap: 13px; }
   .workspace-shell .ops-metric { padding: 19px 15px; gap: 11px; }
   .workspace-shell .ops-metric strong { font-size: 31px; }
