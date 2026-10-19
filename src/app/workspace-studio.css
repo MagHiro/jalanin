@@ -883,3 +883,44 @@
   .workspace-shell *::before,
   .workspace-shell *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* Advanced picker and multi-select finishing details. */
+.workspace-shell .workspace-calendar-time {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-top: 12px; padding: 14px 6px;
+  border-top: 1px solid #e8eaf0;
+}
+.workspace-shell .workspace-calendar-time label {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: #445371; font-size: 12px; font-weight: 650;
+}
+.workspace-shell .workspace-calendar-time input {
+  width: 124px; min-height: 38px; padding: 7px 9px;
+  border: 1px solid #d6dce9; border-radius: 9px;
+  color: #233451; background: #f8f9fc; font-size: 13px;
+}
+.workspace-shell .workspace-calendar-end-actions { display: flex; gap: 6px; margin-left: auto; }
+.workspace-shell .workspace-calendar-bottom .workspace-calendar-apply {
+  padding: 8px 15px; border-radius: 9px;
+  background: var(--studio-navy); color: white;
+}
+.workspace-shell .workspace-calendar-bottom .workspace-calendar-apply:disabled { opacity: .4; }
+.workspace-shell .workspace-multiselect-values { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.workspace-shell .workspace-multiselect-count {
+  display: inline-grid; flex: 0 0 auto; place-items: center;
+  min-width: 23px; height: 23px; padding: 0 5px;
+  background: #e4e9f7; color: #304980; border-radius: 7px; font-weight: 700; font-size: 11px;
+}
+.workspace-shell .workspace-select-footer {
+  display: flex; align-items: center; gap: 10px;
+  border-top: 1px solid #e8eaf0; padding: 9px 8px 4px;
+  color: #798497; font-size: 11px;
+}
+.workspace-shell .workspace-select-footer .workspace-select-clear {
+  width: auto; margin-left: auto; padding: 6px;
+  border: 0; color: #51689c; font-size: 11px;
+}
+.workspace-shell .workspace-select-done {
+  min-height: 31px; padding: 6px 12px;
+  background: var(--studio-navy); color: white; border-radius: 8px; font-weight: 650;
+}

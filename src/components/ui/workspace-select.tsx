@@ -16,15 +16,26 @@ export function WorkspaceSelect({ name, options, defaultValue, placeholder, aria
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState<string[]>(() => Array.isArray(defaultValue) ? defaultValue : defaultValue === undefined ? [] : [defaultValue]);
   const matches = options.filter(o => o.label.toLowerCase().includes(query.toLowerCase()));
-  const label = multiple ? selected.length ? selected.map(v => options.find(o => o.value === v)?.label).filter(Boolean).join(", ") : placeholder ?? "Select options" : options.find(o => o.value === selected[0])?.label ?? placeholder ?? "Select an option";
+  const label = options.find(o => o.value === selected[0])?.label ?? placeholder ?? "Select an option";
   useEffect(() => {
     if (!open) return;
-    search.current?.focus();
+    if (options.length > 5) search.current?.focus();
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && panel.current) gsap.fromTo(panel.current, { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: 0.16, ease: "power2.out", clearProps: "all" });
     const close = (e: PointerEvent) => { if (!root.current?.contains(e.target as Node)) setOpen(false); };
     document.addEventListener("pointerdown", close);
     return () => document.removeEventListener("pointerdown", close);
   }, [open]);
+  useEffect(() => {
+    const form = root.current?.closest("form");
+    if (!form) return;
+    const reset = () => {
+      setSelected(Array.isArray(defaultValue) ? defaultValue : defaultValue === undefined ? [] : [defaultValue]);
+      setQuery("");
+      setOpen(false);
+    };
+    form.addEventListener("reset", reset);
+    return () => form.removeEventListener("reset", reset);
+  }, [defaultValue]);
   function choose(value: string) {
     if (multiple) setSelected(old => old.includes(value) ? old.filter(v => v !== value) : [...old, value]);
     else { setSelected([value]); setOpen(false); setQuery(""); trigger.current?.focus(); }
@@ -42,13 +53,16 @@ export function WorkspaceSelect({ name, options, defaultValue, placeholder, aria
   }
   return <div ref={root} className="workspace-select" onKeyDown={onKeyDown}>
     {multiple ? selected.map(v => <input key={v} type="hidden" name={name} value={v} />) : <input type="hidden" name={name} value={selected[0] ?? ""} />}
-    <button ref={trigger} type="button" disabled={disabled} className="workspace-select-trigger" role="combobox" aria-label={ariaLabel} aria-expanded={open} aria-haspopup="listbox" aria-controls={id} onClick={() => { setOpen(v => !v); setQuery(""); setActive(0); }}><span className="min-w-0 truncate">{label}</span><ChevronDown size={16} aria-hidden="true" /></button>
+    <button ref={trigger} type="button" disabled={disabled} className="workspace-select-trigger" role="combobox" aria-label={ariaLabel} aria-expanded={open} aria-haspopup="listbox" aria-controls={id} onClick={() => { setOpen(v => !v); setQuery(""); setActive(0); }}><span className="min-w-0 truncate">{multiple ? selected.length
+      ? <span className="workspace-multiselect-values"><span className="workspace-multiselect-count">{selected.length}</span><span>{selected.slice(0, 2).map(v => options.find(o => o.value === v)?.label ?? v).join(", ")}{selected.length > 2 ? ` +${selected.length - 2} more` : ""}</span></span>
+      : placeholder ?? "Select options"
+      : label}</span><ChevronDown size={16} aria-hidden="true" /></button>
     {open && <div ref={panel} className="workspace-select-popover">
       {options.length > 5 && <div className="workspace-select-search"><Search size={14} /><input ref={search} aria-label={`Search ${ariaLabel.toLowerCase()}`} placeholder="Search options…" value={query} onChange={e => { setQuery(e.target.value); setActive(0); }} /></div>}
       <div id={id} role="listbox" aria-label={ariaLabel} aria-multiselectable={multiple || undefined} className="workspace-select-options">
         {matches.length ? matches.map((o, i) => <button key={o.value} type="button" role="option" aria-selected={selected.includes(o.value)} className="workspace-select-option" data-active={active === i ? "true" : undefined} onFocus={() => setActive(i)} onMouseEnter={() => setActive(i)} onClick={() => choose(o.value)}><span>{o.label}</span>{selected.includes(o.value) && <Check size={15} />}</button>) : <p className="workspace-select-no-results">No matching options</p>}
       </div>
-      {multiple && selected.length > 0 && <button className="workspace-select-clear" type="button" onClick={() => setSelected([])}>Clear selection ({selected.length})</button>}
+      {multiple && <div className="workspace-select-footer"><span role="status">{selected.length} selected</span>{selected.length > 0 && <button className="workspace-select-clear" type="button" onClick={() => setSelected([])}>Clear all</button>}<button type="button" className="workspace-select-done" onClick={() => { setOpen(false); trigger.current?.focus(); }}>Done</button></div>}
     </div>}
   </div>;
 }
