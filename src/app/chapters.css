@@ -487,3 +487,45 @@ dialog::backdrop { background:rgba(15,32,75,.47); backdrop-filter:blur(7px); }
  .workspace-shell .workspace-page-heading h1 { font-size:2.6rem; }
  .workspace-shell .workspace-stat-strip { gap:10px; }
 }
+
+
+/* Detail surfaces, application workflows and public date controls. */
+.workspace-shell .workspace-mobbin-record h1,.workspace-shell .workspace-record-detail h1 { font-size:clamp(2.1rem,3vw,3.4rem); font-weight:720; letter-spacing:-.065em; line-height:1.08; }
+.workspace-shell .workspace-mobbin-record > .grid,.workspace-shell .workspace-record-detail > .grid { align-items:start; }
+.workspace-shell .workspace-mobbin-record .surface-card { background:#fff; padding:clamp(23px,2.4vw,37px); border:0; border-radius:21px; }
+.workspace-shell .workspace-mobbin-record .surface-card > h2 { color:#203464; font-size:1.18rem; font-weight:680; letter-spacing:-.035em; }
+.workspace-shell .workspace-mobbin-record dl > div { border-color:#eef2f9; padding-block:12px; }
+.workspace-shell .workspace-mobbin-record dt { color:#77839d; }
+.workspace-shell .workspace-mobbin-record dd { color:#243558; font-weight:620; }
+.workspace-shell .workspace-mobbin-record ol[aria-label="Application lifecycle"] { padding:8px 0; gap:7px; }
+.workspace-shell .workspace-mobbin-record ol[aria-label="Application lifecycle"] li > span:last-child { border:0; padding:8px 11px; }
+.workspace-shell .workspace-record-detail .workspace-record-section,.workspace-shell .workspace-mobbin-record .workspace-record-section { background:#fff; border:0; border-radius:20px; }
+.workspace-shell .workspace-pipeline-visual { box-shadow:none; }
+.workspace-shell .workspace-panel-heading h2 { font-weight:690; }
+.public-site .workspace-date-field { position:relative; }
+.public-site .workspace-date-field .field { background:#eef2fa; border:1px solid transparent; border-radius:13px; padding-right:50px; }
+.public-site .workspace-date-button { border:0; color:#4265b5; background:transparent; border-radius:10px; }
+.public-site .workspace-date-button:hover { background:#dfe9ff; }
+.public-site .workspace-calendar-popover { border:0; border-radius:18px; padding:15px; background:#fff; box-shadow:0 24px 70px rgba(19,39,93,.16); }
+.public-site .workspace-calendar-heading { color:#223965; font-weight:720; }
+.public-site .workspace-calendar-heading button { background:#e9f0fc; border:0; border-radius:10px; }
+.public-site .workspace-calendar-day { border:0; border-radius:10px; }
+.public-site .workspace-calendar-day:hover:not(:disabled) { background:#eaf1ff; }
+.public-site .workspace-calendar-day[aria-pressed="true"] { background:var(--primary); color:#fff; }
+.public-site .workspace-calendar-day[aria-current="date"]:not([aria-pressed="true"]) { box-shadow:inset 0 0 0 1.5px #84a4eb; }
+.public-site .workspace-calendar-time input { background:#eef2fa; border:0; border-radius:10px; }
+.public-site .workspace-calendar-bottom { border-color:#eaf0fb; }
+.public-site .workspace-calendar-bottom button { border:0; }
+.public-site .workspace-calendar-apply { background:var(--primary); color:#fff; }
+.public-site .workspace-select-trigger { border:0; background:#eef2fa; border-radius:12px; }
+.public-site .workspace-select-popover { border:0; box-shadow:var(--shadow-float); border-radius:15px; }
+.public-site .workspace-select-option:hover,.public-site .workspace-select-option[data-active="true"] { background:#eef3ff; }
+.public-site .learn-application form .form-section { border:0; border-radius:20px; padding:clamp(22px,3vw,38px); }
+.public-site .learn-application form .consent-panel { background:#eaf0fb; }
+.public-site .learn-application form > div:last-of-type { position:relative; }
+@media(max-width:767px) {
+ .workspace-shell .workspace-mobbin-record .surface-card { padding:24px 20px; }
+ .public-site .workspace-calendar-popover { max-width:calc(100vw - 40px); }
+ .public-site .learn-application form .grid.grid-cols-2 { grid-template-columns:1fr; }
+ .public-site .learn-application form .md\\:grid-cols-2 { min-width:0; }
+}
