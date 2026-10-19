@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, ArrowUpRight, BriefcaseBusiness, ChevronDown, Info, ListOrdered, Mail, Menu, X } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, ChevronDown, Info, ListOrdered, Mail, Menu, X } from "lucide-react";
 import { SignOutButton } from "./sign-out-button";
 import logo from "../../../public/logo.png";
 
@@ -66,12 +66,12 @@ export function PublicNavigation({ signedIn, admin }: { signedIn: boolean; admin
         <>
           {admin && <Link href="/admin" className="public-account-link" onClick={closeMenus}>Admin</Link>}
           <SignOutButton />
-          <Link href="/dashboard" className="btn btn-primary public-header-cta" onClick={closeMenus}>Dashboard <ArrowUpRight size={17} strokeWidth={1.6} aria-hidden="true" /></Link>
+          <Link href="/dashboard" className="btn btn-primary public-header-cta" onClick={closeMenus}>Dashboard <ArrowRight size={17} strokeWidth={1.6} aria-hidden="true" /></Link>
         </>
       ) : (
         <>
           <Link href="/auth/login" className="public-account-link" onClick={closeMenus}>Log in</Link>
-          <Link href="/auth/sign-up" className="btn btn-primary public-header-cta" onClick={closeMenus}>Sign up <ArrowUpRight size={17} strokeWidth={1.6} aria-hidden="true" /></Link>
+          <Link href="/auth/sign-up" className="btn btn-primary public-header-cta" onClick={closeMenus}>Sign up <ArrowRight size={17} strokeWidth={1.6} aria-hidden="true" /></Link>
         </>
       )}
     </>
@@ -125,7 +125,7 @@ export function PublicNavigation({ signedIn, admin }: { signedIn: boolean; admin
           <div className="public-menu-feature-shade" />
           <span className="relative z-10 flex h-full flex-col justify-between p-6">
             <span className="self-start rounded-full border border-white/50 px-3 py-1 text-xs tracking-[.08em]">A new perspective</span>
-            <span><span className="block text-[28px] font-medium leading-[1.1] tracking-[-.045em]">Your next chapter starts here.</span><span className="mt-4 flex items-center gap-3 text-sm">Browse internships <ArrowUpRight size={18} strokeWidth={1.6} aria-hidden="true" /></span></span>
+            <span><span className="block text-[28px] font-medium leading-[1.1] tracking-[-.045em]">Your next chapter starts here.</span><span className="mt-4 flex items-center gap-3 text-sm">Browse internships <ArrowRight size={18} strokeWidth={1.6} aria-hidden="true" /></span></span>
           </span>
         </Link>
       </div>
