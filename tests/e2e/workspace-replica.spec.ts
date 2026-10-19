@@ -40,7 +40,7 @@ test.describe("Mobbin-derived workspace structure", () => {
     }
     await page.goto("/admin/internships/new");
     await page.getByRole("combobox", { name: "Publication status" }).click();
-    await expect(page.getByRole("option", { name: "Published" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Published", exact: true })).toBeVisible();
     await page.keyboard.press("Escape");
   });
 
