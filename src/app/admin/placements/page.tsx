@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
+import { WorkspaceSelect } from "@/components/ui/workspace-select";
 
 export const metadata = { title: "Placements", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -44,10 +45,7 @@ export default async function AdminPlacementsPage({
         </label>
         <label className="field-label">
           <span className="sr-only">Placement status</span>
-          <select name="status" defaultValue={searchParams.status ?? ""} className="field !min-h-11">
-            <option value="">All statuses</option>
-            {PLACEMENT_STATUSES.map((s) => <option key={s}>{s}</option>)}
-          </select>
+          <WorkspaceSelect name="status" ariaLabel="Filter by placement status" defaultValue={searchParams.status ?? ""} options={[{ value: "", label: "All statuses" }, ...PLACEMENT_STATUSES.map(v => ({ value: v, label: v }))]} />
         </label>
         <div className="flex items-end">
           <button className="btn btn-primary btn-sm min-h-11">Filter</button>

@@ -4,6 +4,7 @@ import { listAdminApplications } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { WorkspaceSelect } from "@/components/ui/workspace-select";
 
 export const metadata = { title: "Applications", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -64,20 +65,11 @@ export default async function AdminApplicationsPage({
         </label>
         <label className="field-label">
           <span className="sr-only">Status</span>
-          <select name="status" defaultValue={searchParams.status ?? ""} className="field !min-h-11">
-            <option value="">All statuses</option>
-            {STATUSES.map((s) => (
-              <option key={s}>{s}</option>
-            ))}
-          </select>
+          <WorkspaceSelect name="status" ariaLabel="Filter by application status" defaultValue={searchParams.status ?? ""} options={[{ value: "", label: "All statuses" }, ...STATUSES.map(v => ({ value: v, label: v }))]} />
         </label>
         <label className="field-label">
           <span className="sr-only">Sort applications</span>
-          <select name="sort" defaultValue={searchParams.sort ?? "newest"} className="field !min-h-11">
-            <option value="newest">Newest submitted</option>
-            <option value="oldest">Oldest submitted</option>
-            <option value="name">Applicant surname</option>
-          </select>
+          <WorkspaceSelect name="sort" ariaLabel="Sort applications" defaultValue={searchParams.sort ?? "newest"} options={[{ value: "newest", label: "Newest submitted" }, { value: "oldest", label: "Oldest submitted" }, { value: "name", label: "Applicant surname" }]} />
         </label>
         <div className="flex items-end gap-2">
           <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-border bg-surface px-3 py-1.5 text-[13px]">

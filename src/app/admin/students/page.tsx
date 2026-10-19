@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth/require";
 import { listAdminStudents } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
+import { WorkspaceSelect } from "@/components/ui/workspace-select";
 
 export const metadata = { title: "Students", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -43,10 +44,7 @@ export default async function AdminStudentsPage({
         </label>
         <label>
           <span className="sr-only">Sort students</span>
-          <select name="sort" className="field !mt-0 !min-h-11" defaultValue={searchParams.sort ?? "name"}>
-            <option value="name">Name A–Z</option>
-            <option value="newest">Newest</option>
-          </select>
+          <WorkspaceSelect name="sort" ariaLabel="Sort students" defaultValue={searchParams.sort ?? "name"} options={[{ value: "name", label: "Name A–Z" }, { value: "newest", label: "Newest" }]} />
         </label>
         <button className="btn btn-primary btn-sm min-h-11 shrink-0">Search</button>
       </form>

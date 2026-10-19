@@ -3,6 +3,8 @@ import { requireAdmin } from "@/lib/auth/require";
 import { listAdminInternships } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
+import { WorkspaceSelect } from "@/components/ui/workspace-select";
+import { RecordActions } from "@/components/ui/record-actions";
 
 export const metadata = { title: "Manage internships", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -54,20 +56,11 @@ export default async function AdminInternshipsPage({
         </label>
         <label className="field-label">
           <span className="sr-only">Publication status</span>
-          <select name="status" defaultValue={searchParams.status ?? ""} className="field !min-h-11">
-            <option value="">All statuses</option>
-            <option>Draft</option>
-            <option>Published</option>
-            <option>Unpublished</option>
-          </select>
+          <WorkspaceSelect name="status" ariaLabel="Filter by publication status" defaultValue={searchParams.status ?? ""} options={[{ value: "", label: "All statuses" }, ...["Draft", "Published", "Unpublished"].map(v => ({ value: v, label: v }))]} />
         </label>
         <label className="field-label">
           <span className="sr-only">Sort internships</span>
-          <select name="sort" defaultValue={searchParams.sort ?? "updated"} className="field !min-h-11">
-            <option value="updated">Recently updated</option>
-            <option value="title">Title A–Z</option>
-            <option value="start">Start date</option>
-          </select>
+          <WorkspaceSelect name="sort" ariaLabel="Sort internships" defaultValue={searchParams.sort ?? "updated"} options={[{ value: "updated", label: "Recently updated" }, { value: "title", label: "Title A–Z" }, { value: "start", label: "Start date" }]} />
         </label>
         <div className="flex items-end">
           <button className="btn btn-primary btn-sm min-h-11">Filter</button>
@@ -99,7 +92,7 @@ export default async function AdminInternshipsPage({
                     </span>
                   </td>
                   <td className="text-right">
-                    <Link href={`/admin/internships/${r.id}/edit`} className="btn btn-outline btn-sm">Edit</Link>
+                    <RecordActions primary={{ href: `/admin/internships/${r.id}/edit`, label: "Edit" }} items={[{ href: `/opportunities/${r.slug}`, label: "View public listing", external: true }]} />
                   </td>
                 </tr>
               ))}

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { WorkspaceSelect } from "@/components/ui/workspace-select";
+import { DateInput } from "@/components/ui/date-input";
 
 interface Initial {
   id?: string;
@@ -86,20 +88,15 @@ export function InternshipForm({
           <label className="field-label"><span>Country code * <span className="font-normal text-muted-foreground">(e.g. SG)</span></span>
             <input name="countryCode" required minLength={2} maxLength={2} defaultValue={v("countryCode")} className="field" placeholder="SG" /></label>
           <label className="field-label"><span>Category</span>
-            <select name="categoryId" defaultValue={initial?.categoryId ?? ""} className="field">
-              <option value="">— none —</option>
-              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select></label>
+            <WorkspaceSelect name="categoryId" ariaLabel="Category" defaultValue={initial?.categoryId ?? ""} options={[{ value: "", label: "No category" }, ...categories.map(c => ({ value: c.id, label: c.name }))]} /></label>
           <label className="field-label"><span>Publication status *</span>
-            <select name="publicationStatus" defaultValue={initial?.publicationStatus ?? "Draft"} className="field">
-              <option>Draft</option><option>Published</option><option>Unpublished</option>
-            </select></label>
+            <WorkspaceSelect name="publicationStatus" ariaLabel="Publication status" defaultValue={initial?.publicationStatus ?? "Draft"} options={["Draft", "Published", "Unpublished"].map(v => ({ value: v, label: v }))} /></label>
           <label className="field-label"><span>Start date *</span>
-            <input name="startDate" type="date" required defaultValue={v("startDate")} className="field" /></label>
+            <DateInput name="startDate" type="date" ariaLabel="Start date" defaultValue={v("startDate")} required /></label>
           <label className="field-label"><span>End date *</span>
-            <input name="endDate" type="date" required defaultValue={v("endDate")} className="field" /></label>
+            <DateInput name="endDate" type="date" ariaLabel="End date" defaultValue={v("endDate")} required /></label>
           <label className="field-label"><span>Application deadline <span className="font-normal text-muted-foreground">(optional, informational)</span></span>
-            <input name="applicationDeadline" type="datetime-local" defaultValue={v("applicationDeadline")} className="field" /></label>
+            <DateInput name="applicationDeadline" type="datetime-local" ariaLabel="Application deadline" defaultValue={v("applicationDeadline")}  /></label>
           <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm font-medium">
             <input type="checkbox" name="featured" defaultChecked={initial?.featured} className="size-4 accent-primary" /> Featured on landing
           </label>

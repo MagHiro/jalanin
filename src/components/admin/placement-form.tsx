@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { allowedNextPlacementStatusesUI } from "./statuses";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { DateInput } from "@/components/ui/date-input";
 
 interface Initial {
   id?: string;
@@ -109,9 +110,9 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
           <label className="field-label"><span>Country code *</span>
             <input name="countryCode" required minLength={2} maxLength={2} defaultValue={v("countryCode")} className="field" placeholder="SG" /></label>
           <label className="field-label"><span>Start date</span>
-            <input name="startDate" type="date" defaultValue={v("startDate")} className="field" /></label>
+            <DateInput name="startDate" ariaLabel="Start date" defaultValue={v("startDate")} /></label>
           <label className="field-label"><span>End date</span>
-            <input name="endDate" type="date" defaultValue={v("endDate")} className="field" /></label>
+            <DateInput name="endDate" ariaLabel="End date" defaultValue={v("endDate")} /></label>
           <label className="field-label md:col-span-2"><span>Notes <span className="font-normal text-muted-foreground">(visible to the student)</span></span>
             <textarea name="notes" rows={3} defaultValue={v("notes")} className="field" /></label>
           <div className="md:col-span-2">
