@@ -18,7 +18,7 @@ export function CrmViews({ items, label = "Record views" }: {
   label?: string;
 }) {
   return <nav className="crm-views" aria-label={label}>
-    {items.map(item => <Link key={item.href} href={item.href} aria-current={item.active ? "page" : undefined} className="crm-view">
+    {items.map(item => <Link key={item.href} href={item.href} aria-label={item.label} aria-current={item.active ? "page" : undefined} className="crm-view">
       <span>{item.label}</span>{item.count !== undefined && <span className="crm-view-count tnum">{item.count}</span>}
     </Link>)}
   </nav>;

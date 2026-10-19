@@ -236,3 +236,9 @@
 .workspace-shell .form-section .grid.grid-cols-2{grid-template-columns:1fr!important}
 .workspace-shell .workspace-date-field .workspace-calendar-popover{left:0;right:auto;width:min(320px,calc(100vw - 38px))}
 }
+
+/* Keep command search compact at narrow widths; desktop minimum must never leak into mobile. */
+@media(max-width:767px){
+.workspace-shell .workspace-search-trigger{width:38px!important;min-width:38px!important;flex:0 0 38px}
+.workspace-shell .workspace-topbar-end{min-width:0}
+}
