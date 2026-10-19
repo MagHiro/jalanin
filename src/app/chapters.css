@@ -527,5 +527,8 @@ dialog::backdrop { background:rgba(15,32,75,.47); backdrop-filter:blur(7px); }
  .workspace-shell .workspace-mobbin-record .surface-card { padding:24px 20px; }
  .public-site .workspace-calendar-popover { max-width:calc(100vw - 40px); }
  .public-site .learn-application form .grid.grid-cols-2 { grid-template-columns:1fr; }
- .public-site .learn-application form .md\\:grid-cols-2 { min-width:0; }
+
 }
+
+/* GSAP owns reveals; disable older competing keyframes. */
+.public-site [data-scroll-reveal].public-revealed { animation:none; }
