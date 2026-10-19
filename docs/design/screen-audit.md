@@ -104,3 +104,11 @@ Public-header-only redesign using supplied logo/favicon and existing local Googl
 Follow-up: non-hero sections now mapped individually to inspected Mobbin previews in `section-reference-map.md`; directory uses role rows, process uses four steps, About is centered, contact uses underlined inputs, authentication puts the form first, legal uses document navigation, and public application field sections use a label column. Hero retained.
 
 Public landing, directory/detail, auth/recovery, application intro and legal surfaces refreshed; `/admin` and `/dashboard` excluded. Seven-width public route browser sweep, keyboard flow, reduced-motion/no-JS and route interruption coverage: see [direction G evidence](public-direction-g.md). Authenticated application form states retain prior coverage and were not visually re-audited in this pass.
+
+## CRM list upgrade — 2026-10-19
+
+- Desktop list-table + mobile stacked-record treatment: admin applications, internships, students, placements, contacts, notifications; student applications and placements. Admin stage views map to existing server-filter parameters, with no client-only counting or unauthorized bulk actions.
+- Body typography and headings now obey `design.md` (Google Sans Flex, 30–36px / 500 workspace title, readable 14px labels and 12–14px data metadata); warm surfaces, hairline separators inside borderless elevated table containers.
+- URL navigation is semantic and keyboard-operable: tab links carry `aria-current=page`, filter chips are removable links, sortable headings retain search constraints, native GET forms preserve server-side query handling and pagination. Active counts shown for student views are calculated from that student's authorized application records.
+- Added Playwright checks for the admin application New queue, the student Drafts view, active tab state, and title font weight. Existing responsive 320–1440px authenticated route sweeps and screenshots remain the regression baseline.
+- Remaining manual sign-off: populated large-volume directories, long translations/user content, keyboard picker behavior, email-client reply URL handling and real production-staging viewport screenshots. This audit does not claim they have been visually reviewed in a browser with production data.

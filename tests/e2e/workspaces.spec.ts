@@ -18,6 +18,7 @@ for (const role of ["admin", "student"] as const) {
       await page.setViewportSize({ width, height: 960 });
       await page.goto(route);
       await expect(page.locator("main#main h1")).toBeVisible();
+      if (width === 1440) await expect(page.locator("main#main h1")).toHaveCSS("font-weight", "500");
       await expect(page.locator(".public-header")).toHaveCount(0);
       await expect(page.locator("main#main")).toHaveCount(1);
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
@@ -42,6 +43,20 @@ for (const role of ["admin", "student"] as const) {
     await page.goto(`${route}/applications`);
     await expect(page.locator("main h1")).toBeVisible();
     await expect(page.locator(".workspace-sidebar a[aria-current=page]")).toContainText("Applications");
+    await expect(page.locator(".crm-records")).toBeVisible();
+    await expect(page.locator(".crm-view[aria-current=page]")).toHaveCount(1);
+    if (role === "admin") {
+      await expect(page.getByRole("form", { name: "Filter applications" })).toBeVisible();
+      await page.getByRole("navigation", { name: "Application queues" }).getByRole("link", { name: "New", exact: true }).click();
+      await expect(page).toHaveURL(/status=New/);
+      await expect(page.locator(".crm-records")).toBeVisible();
+      await page.goto("/admin/applications");
+    } else {
+      await page.getByRole("navigation", { name: "Application views" }).getByRole("link", { name: /Drafts/ }).click();
+      await expect(page).toHaveURL(/view=drafts/);
+      await expect(page.locator(".crm-records")).toBeVisible();
+      await page.goto("/dashboard/applications");
+    }
     if (role === "admin") {
       await page.goto("/admin/internships/new");
       await expect(page.getByRole("textbox", { name: "Title *", exact: true })).toBeVisible();

@@ -126,3 +126,7 @@ placeholder behavior shipped as confirmed.
 - NFR (performance): shared workspace no longer initializes GSAP on each route; admin navigation uses one indexed count rather than full overview aggregates. Verify page-bundle and latency impact in deployment telemetry.
 
 - NFR (bundle performance): public motion and form reveal now use lightweight browser APIs instead of GSAP imports; accessibility/reduced-motion behavior must be verified by CI/browser testing.
+
+## Admin/student CRM-list presentation pass (2026-10-19)
+
+UI-only refinement of existing ADM-APP, ADM-JOB, ADM-STU, D11 placement, COM-04 contact, NOT-03 alert, and student APP list/detail capabilities. Replaced multiple card grids with scannable, paginated/sortable/filterable list layouts where the existing service supports those operations; contact sender/subject search is new read-only query composition on the existing table under `requireAdmin`. Re-review acknowledgement, lifecycle status mutations, quotation constraints, ownership checks, stored read state and server validations remain unchanged. Existing unit and Playwright workflows plus new CRM view-navigation/typography assertions are release checks. No unsupported lead CRM/marketing automation, export, bulk mutation, RLS bypass or database migration.
