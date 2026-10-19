@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, ArrowUpRight, BriefcaseBusiness, FilePenLine, MapPin, MoveUpRight } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, CheckCircle2, Compass, FilePenLine, MapPin } from "lucide-react";
 import { getSessionUser } from "@/lib/auth/require";
 import { listStudentApplications } from "@/features/applications/service";
 import { db } from "@/lib/db/client";
@@ -20,35 +20,65 @@ export default async function DashboardPage() {
     return counts;
   }, {});
   const highestStatusCount = Math.max(1, ...Object.values(statusCounts));
-
+  const statistics = [
+    { label: "Applications", value: submitted.length, caption: "Submitted for review", href: "/dashboard/applications", icon: BriefcaseBusiness },
+    { label: "Saved drafts", value: drafts.length, caption: "Continue when ready", href: "/dashboard/applications", icon: FilePenLine },
+    { label: "Placements", value: studentPlacements.length, caption: "Your recorded placements", href: "/dashboard/placements", icon: CheckCircle2 },
+  ];
+  const nextHref = drafts.length > 0 ? `/apply/${drafts[0].application.internshipId}` : submitted.length > 0 ? "/dashboard/applications" : "/opportunities";
+  const nextLabel = drafts.length > 0 ? "Resume application" : submitted.length > 0 ? "View applications" : "Explore internships";
 
   return <div className="workspace-overview">
-    <section className="workspace-welcome" aria-labelledby="journey-title"><div><p className="workspace-kicker">A little progress, every day</p><h1 id="journey-title">Your journey,<br /><span>taking shape.</span></h1><p className="workspace-intro">From your first application to your next big opportunity.<br className="hidden md:block" /> Here’s where it all comes together.</p></div><Link href="/opportunities" className="btn btn-primary">Find internships <ArrowUpRight size={18} /></Link></section>
+    <section className="workspace-page-heading" aria-labelledby="dashboard-title">
+      <div><p className="workspace-kicker">My workspace / Overview</p><h1 id="dashboard-title">My dashboard</h1><p className="workspace-intro">Stay up to date with your applications, saved drafts, and placements.</p></div>
+      <Link href="/opportunities" className="btn btn-primary"><Compass size={17} /> Browse internships</Link>
+    </section>
 
-    <section aria-label="Your journey at a glance" className="workspace-stat-strip workspace-student-stats">{[
-      { value: submitted.length, label: "Applications", href: "/dashboard/applications" },
-      { value: drafts.length, label: "Saved drafts", href: "/dashboard/applications" },
-      { value: studentPlacements.length, label: "Placements", href: "/dashboard/placements" },
-    ].map(stat => <Link key={stat.label} href={stat.href} className="workspace-stat"><span className="workspace-stat-label">{stat.label}<ArrowUpRight size={16} /></span><strong className="tnum">{stat.value}</strong></Link>)}</section>
+    <section aria-label="Your journey at a glance" className="workspace-stat-strip workspace-student-stats">
+      {statistics.map(({ label, value, caption, href, icon: Icon }) => <Link key={label} href={href} className="workspace-stat">
+        <div className="workspace-stat-label"><span>{label}</span><span className="workspace-stat-icon"><Icon size={18} strokeWidth={1.8} /></span></div>
+        <strong className="tnum">{value}</strong>
+        <span className="workspace-stat-caption">{caption}</span>
+      </Link>)}
+    </section>
 
-    {submitted.length > 0 && <section className="workspace-section workspace-progress" aria-labelledby="status-distribution-title">
-      <div className="workspace-section-heading"><div><p className="workspace-kicker">At a glance / Progress</p><h2 id="status-distribution-title">Application status</h2></div><Link href="/dashboard/applications" className="workspace-text-link">All applications <ArrowRight size={16} /></Link></div>
+    <div className="workspace-main-grid">
+      <section className="workspace-data-card workspace-recent-applications" aria-labelledby="apps-heading">
+        <div className="workspace-panel-heading"><div><p className="workspace-kicker">Applications</p><h2 id="apps-heading">Recent applications</h2></div><Link href="/dashboard/applications" className="workspace-text-link">View all <ArrowRight size={15} /></Link></div>
+        {submitted.length > 0 ? <ul className="workspace-application-list">
+          {submitted.slice(0, 4).map(({ application, internshipTitle, internshipCity, internshipCountry }) => <li key={application.id}>
+            <span className="workspace-record-icon"><BriefcaseBusiness size={19} /></span>
+            <div className="workspace-record-body"><h3><Link href={`/dashboard/applications/${application.id}`}>{internshipTitle}</Link></h3><p><MapPin size={13} /> {internshipCity}, {internshipCountry}</p>{application.needsReReview && <span className="badge badge-rereview mt-1">Updated — re-review required</span>}</div>
+            <div className="workspace-record-status"><StatusBadge status={application.lifecycleStatus} /><Link href={`/dashboard/applications/${application.id}`} className="workspace-text-link">Details</Link></div>
+          </li>)}
+        </ul> : <div className="workspace-inline-empty"><FilePenLine size={22} /><strong>{drafts.length ? "Your applications are in progress" : "Ready to get started?"}</strong><p>{drafts.length ? "Complete a saved draft to submit it for review." : "Find an internship that feels right, then track every step here."}</p><Link href={nextHref} className="workspace-text-link">{nextLabel} <ArrowRight size={14} /></Link></div>}
+        {drafts.length > 0 && <div className="workspace-drafts"><p><FilePenLine size={16} /> {drafts.length} saved draft{drafts.length === 1 ? "" : "s"}</p><Link className="workspace-text-link" href={`/apply/${drafts[0].application.internshipId}`}>Continue <ArrowRight size={14} /></Link></div>}
+      </section>
+
+      <section className="workspace-data-card workspace-queue-card" aria-labelledby="next-heading">
+        <div className="workspace-panel-heading"><div><p className="workspace-kicker">Next steps</p><h2 id="next-heading">What’s next?</h2></div><span className="workspace-panel-icon"><Compass size={20} /></span></div>
+        <p className="workspace-queue-title">{drafts.length > 0 ? "You have a draft to finish" : submitted.length > 0 ? "Keep track of your progress" : "Start your internship journey"}</p>
+        <p className="workspace-panel-copy">{drafts.length > 0 ? "Your saved application is ready. Finish the details and submit when you’re comfortable." : submitted.length > 0 ? "Check application statuses here. Quotations are sent by email when prepared." : "Explore available opportunities across Southeast Asia and apply to a role that fits your goals."}</p>
+        <div className="workspace-queue-actions"><Link href={nextHref} className="btn btn-primary">{nextLabel} <ArrowRight size={15} /></Link></div>
+      </section>
+    </div>
+
+    {submitted.length > 0 && <section className="workspace-data-card workspace-progress-card" aria-labelledby="status-heading">
+      <div className="workspace-panel-heading"><div><p className="workspace-kicker">Your progress</p><h2 id="status-heading">Application status</h2></div><Link href="/dashboard/applications" className="workspace-text-link">All applications <ArrowRight size={15} /></Link></div>
       <div className="workspace-progress-grid">
-        {Object.entries(statusCounts).map(([status, value]) => <Link href="/dashboard/applications" key={status} className="workspace-progress-item">
+        {Object.entries(statusCounts).map(([status, value]) => <div key={status} className="workspace-progress-item">
           <div className="workspace-progress-item-top"><StatusBadge status={status} /><strong className="tnum">{value}</strong></div>
-          <div className="workspace-progress-track" aria-label={`${value} applications are ${status}`}><span style={{ width: `${(value / highestStatusCount) * 100}%` }} /></div>
-        </Link>)}
+          <div className="workspace-progress-track" role="img" aria-label={`${value} applications are ${status}`}><span style={{ width: `${(value / highestStatusCount) * 100}%` }} /></div>
+        </div>)}
       </div>
     </section>}
 
-    <section className="workspace-priority" aria-labelledby="next-step-title"><div className="workspace-priority-icon"><MoveUpRight size={27} strokeWidth={1.5} /></div><div><p className="workspace-kicker">Your next step</p><h2 id="next-step-title">{drafts.length > 0 ? "Pick up where you left off." : submitted.length > 0 ? "Good things are in motion." : "Possibility starts with a first step."}</h2><p>{drafts.length > 0 ? "Your saved application is ready when you are. Take a moment to finish the details." : submitted.length > 0 ? "Follow your application updates below. Quotations arrive by email, and your status is shown here." : "Explore internships, find your fit, and start an application. You can save a draft along the way."}</p></div><Link href={drafts.length > 0 ? `/apply/${drafts[0].application.internshipId}` : submitted.length > 0 ? "/dashboard/applications" : "/opportunities"} className="btn btn-primary">{drafts.length > 0 ? "Resume draft" : submitted.length > 0 ? "View applications" : "Explore internships"}<ArrowRight size={17} /></Link></section>
-
-    <section aria-labelledby="apps-h" className="workspace-section"><div className="workspace-section-heading"><div><p className="workspace-kicker">01 / In motion</p><h2 id="apps-h">Your applications <span className="workspace-heading-count tnum">{submitted.length}</span></h2></div><Link href="/dashboard/applications" className="workspace-text-link">View all <ArrowRight size={16} /></Link></div>
-      {submitted.length === 0 ? <div className="workspace-quiet-empty"><FilePenLine size={28} strokeWidth={1.5} /><h3>{drafts.length > 0 ? "Your first submission is still ahead." : "A world of opportunity awaits."}</h3><p>{drafts.length > 0 ? "Finish a saved draft to send it for review. Submitted applications will appear here." : "When you apply, you’ll have a clear view of every update, right here."}</p><Link href={drafts.length > 0 ? `/apply/${drafts[0].application.internshipId}` : "/opportunities"} className="workspace-text-link">{drafts.length > 0 ? "Resume application" : "Find your opportunity"}<ArrowUpRight size={16} /></Link></div> : <ul className="workspace-application-list">{submitted.slice(0, 4).map(({ application, internshipTitle, internshipCity, internshipCountry }) => <li key={application.id}><div className="workspace-record-icon"><BriefcaseBusiness size={22} strokeWidth={1.5} /></div><div className="workspace-record-body"><h3><Link href={`/dashboard/applications/${application.id}`}>{internshipTitle}</Link></h3><p><MapPin size={14} />{internshipCity}, {internshipCountry}</p>{application.needsReReview && <span className="badge badge-rereview mt-2">Updated — re-review required</span>}</div><StatusBadge status={application.lifecycleStatus} /><Link href={`/dashboard/applications/${application.id}`} className="workspace-record-action" aria-label={`View details for ${internshipTitle}`}><ArrowUpRight size={19} /></Link></li>)}</ul>}
-      {drafts.length > 0 && <div className="workspace-drafts"><h3><FilePenLine size={18} /> Saved for later <span className="tnum">{drafts.length}</span></h3><ul>{drafts.map(({ application, internshipTitle }) => <li key={application.id}><span>{internshipTitle}<span className="badge badge-draft ml-3">Draft</span></span><Link href={`/apply/${application.internshipId}`} className="workspace-text-link">Resume <ArrowRight size={16} /></Link></li>)}</ul></div>}
+    <section className="workspace-data-card workspace-placements-card" aria-labelledby="placements-heading">
+      <div className="workspace-panel-heading"><div><p className="workspace-kicker">Placements</p><h2 id="placements-heading">Placement updates</h2></div><Link href="/dashboard/placements" className="workspace-text-link">View all <ArrowRight size={15} /></Link></div>
+      {studentPlacements.length > 0 ? <ul className="workspace-placement-list">
+        {studentPlacements.slice(0, 4).map(p => <li key={p.id}><div><h3>{p.role}</h3><p>{p.organization}{p.startDate && ` · ${p.startDate}`}</p></div><StatusBadge status={p.placementStatus} /></li>)}
+      </ul> : <div className="workspace-inline-empty workspace-inline-empty-horizontal"><BriefcaseBusiness size={21} /><div><strong>Placements will appear here</strong><p>Your team-managed placement details will be available as soon as a placement is arranged.</p></div><Link href="/dashboard/applications" className="workspace-text-link">View applications <ArrowRight size={14} /></Link></div>}
     </section>
-
-    <div className="workspace-bottom-grid"><section aria-labelledby="placements-h" className="workspace-section"><div className="workspace-section-heading"><div><p className="workspace-kicker">02 / The next chapter</p><h2 id="placements-h">Your placements <span className="workspace-heading-count tnum">{studentPlacements.length}</span></h2></div><Link href="/dashboard/placements" className="workspace-text-link">View all <ArrowRight size={16} /></Link></div>{studentPlacements.length === 0 ? <div className="workspace-quiet-empty"><BriefcaseBusiness size={28} strokeWidth={1.5} /><h3>Something to look forward to.</h3><p>When our team arranges a placement for you, its details and progress will appear here.</p></div> : <ul className="workspace-placement-list">{studentPlacements.slice(0, 4).map(p => <li key={p.id}><StatusBadge status={p.placementStatus} /><h3>{p.role}</h3><p>{p.organization}</p>{(p.startDate || p.endDate) && <p className="tnum text-sm">{p.startDate ?? "Start date to be confirmed"} — {p.endDate ?? "End date to be confirmed"}</p>}</li>)}</ul>}</section><aside className="workspace-note"><MoveUpRight size={28} strokeWidth={1.5} /><p className="workspace-kicker">Made for your next move</p><h2>A new perspective.<br />A new possibility.</h2><p>Take a look at internships across Southeast Asia. Your next chapter might be closer than you think.</p><Link href="/opportunities" className="workspace-text-link">Browse internships <ArrowUpRight size={17} /></Link></aside></div>
   </div>;
 }
 
