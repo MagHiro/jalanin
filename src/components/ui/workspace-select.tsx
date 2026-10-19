@@ -20,10 +20,12 @@ export function WorkspaceSelect({ name, options, defaultValue, placeholder, aria
   useEffect(() => {
     if (!open) return;
     if (options.length > 5) search.current?.focus();
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && panel.current) gsap.fromTo(panel.current, { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: 0.16, ease: "power2.out", clearProps: "all" });
+    const tween = !window.matchMedia("(prefers-reduced-motion: reduce)").matches && panel.current
+      ? gsap.fromTo(panel.current, { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: 0.18, ease: "power2.out", clearProps: "all" })
+      : null;
     const close = (e: PointerEvent) => { if (!root.current?.contains(e.target as Node)) setOpen(false); };
     document.addEventListener("pointerdown", close);
-    return () => document.removeEventListener("pointerdown", close);
+    return () => { tween?.kill(); document.removeEventListener("pointerdown", close); };
   }, [open]);
   useEffect(() => {
     const form = root.current?.closest("form");
