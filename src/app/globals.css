@@ -1410,3 +1410,9 @@ html { scroll-padding-top: 116px; }
 }
 /* Prevent the prior dashboard accent stripe from returning in any state. */
 .workspace-shell .workspace-stat::before { content: none !important; display: none !important; }
+
+/* Desktop admin formerly inherited pale-on-dark navigation text. */
+@media (min-width: 1024px) {
+  .workspace-shell .workspace-sidebar .workspace-nav-item:not([aria-current="page"]) { color: #5e687f; }
+  .workspace-shell .workspace-sidebar .workspace-nav-item:not([aria-current="page"]):hover { color: #202a53; }
+}
