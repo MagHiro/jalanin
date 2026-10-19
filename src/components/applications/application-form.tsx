@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Reveal } from "@/components/motion/reveal";
+import { DateInput } from "@/components/ui/date-input";
 
 interface Props {
   internshipId: string;
@@ -201,9 +202,9 @@ export function ApplicationForm({ internshipId, existing }: Props) {
               <input name="graduationYear" type="number" required min={1950} max={2100} defaultValue={get("graduationYear")} className="field" placeholder="2026" /></label>
             <div className="grid grid-cols-2 gap-4">
               <label className="field-label"><span>Preferred start *</span>
-                <input name="preferredStart" type="date" required defaultValue={get("preferredStart")} className="field" /></label>
+                <DateInput name="preferredStart" type="date" required defaultValue={get("preferredStart")} ariaLabel="Preferred start date" /></label>
               <label className="field-label"><span>Preferred end *</span>
-                <input name="preferredEnd" type="date" required defaultValue={get("preferredEnd")} className="field" /></label>
+                <DateInput name="preferredEnd" type="date" required defaultValue={get("preferredEnd")} ariaLabel="Preferred end date" /></label>
             </div>
           </div>
         </section>

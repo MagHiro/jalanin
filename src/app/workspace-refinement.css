@@ -170,3 +170,13 @@
 .workspace-shell .workspace-empty-panel h2{font-size:21px}
 }
 @media(prefers-reduced-motion:reduce){.workspace-shell .workspace-stat,.workspace-shell .workspace-sidebar{transform:none!important;transition:none!important}}
+
+.workspace-shell .workspace-select-clear{display:block;width:100%;padding:10px 14px;border-top:1px solid #e5e9e7;color:#35548a;font-size:12px;font-weight:600;text-align:left}
+.workspace-shell .workspace-select-clear:hover{background:#f0f3fa}
+.workspace-shell .workspace-date-field input::-webkit-calendar-picker-indicator{opacity:0;pointer-events:none}
+.workspace-shell .workspace-date-field .workspace-date-button{border-radius:8px;right:7px}
+.workspace-shell .workspace-calendar-day:focus-visible,.workspace-shell .workspace-calendar-heading button:focus-visible{outline:2px solid #526da4;outline-offset:1px}
+.workspace-shell input[type="checkbox"],.workspace-shell input[type="radio"]{accent-color:var(--w-indigo)}
+.workspace-shell input[type="file"]::file-selector-button{padding:9px 13px;margin-right:12px;border:1px solid #d6dfe5;border-radius:8px;background:#eef1f8;color:#314774;font-family:inherit;font-weight:600;cursor:pointer}
+.workspace-shell input[type="file"]::file-selector-button:hover{background:#e0e7f7}
+.workspace-shell :is(.workspace-command-dialog,.workspace-mobile-dialog)::backdrop{background:rgba(22,34,57,.45);backdrop-filter:blur(3px)}
