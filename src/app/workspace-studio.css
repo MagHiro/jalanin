@@ -924,3 +924,50 @@
   min-height: 31px; padding: 6px 12px;
   background: var(--studio-navy); color: white; border-radius: 8px; font-weight: 650;
 }
+
+/* Form commit bar and URL pagination */
+.workspace-shell .workspace-editor-submit {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 18px; flex-wrap: wrap;
+  padding: 17px 19px; margin-top: 5px;
+  border: 1px solid #e1e4ec; border-radius: 14px;
+  background: #f2f3f9;
+}
+.workspace-shell .workspace-editor-submit > div:first-child { display: flex; flex-direction: column; gap: 4px; }
+.workspace-shell .workspace-editor-submit strong { color: #283858; font-size: 13px; font-weight: 660; }
+.workspace-shell .workspace-editor-submit span { color: #738099; font-size: 11px; }
+.workspace-shell .workspace-editor-submit-actions { display: flex; gap: 9px; flex-wrap: wrap; }
+.workspace-shell .workspace-pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 17px 21px; flex-wrap: wrap;
+  border-top: 1px solid var(--studio-border);
+  background: #fffefa;
+}
+.workspace-shell .workspace-pagination-range { color: #798393; font-size: 12px; font-weight: 580; }
+.workspace-shell .workspace-pagination-pages { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+.workspace-shell .workspace-page-arrow,
+.workspace-shell .workspace-page-number {
+  display: inline-grid; place-items: center;
+  min-width: 37px; min-height: 37px;
+  padding: 7px 10px; border-radius: 9px;
+  color: #4c5971; background: #f6f7f9;
+  border: 1px solid #e6e8ee;
+  font-size: 12px; font-weight: 650;
+}
+.workspace-shell .workspace-page-arrow:hover,
+.workspace-shell .workspace-page-number:hover { background: #e9edf7; border-color: #bdc7df; }
+.workspace-shell .workspace-page-number[aria-current="page"] { background: var(--studio-navy); color: white; border-color: var(--studio-navy); }
+.workspace-shell .workspace-page-arrow.is-disabled { opacity: .38; }
+.workspace-shell .workspace-page-gap { padding: 0 3px; color: #858e9c; }
+.workspace-shell .workspace-date-field input::-webkit-calendar-picker-indicator { opacity: 0; width: 0; }
+.workspace-shell dialog[aria-labelledby]:modal {
+  border: 1px solid #e0e4ed; border-radius: 19px;
+  background: #fffefa; padding: 28px;
+  box-shadow: 0 27px 75px rgba(20,28,56,.24);
+}
+@media(max-width:767px) {
+  .workspace-shell .workspace-editor-submit { align-items: stretch; }
+  .workspace-shell .workspace-editor-submit-actions { width: 100%; }
+  .workspace-shell .workspace-editor-submit-actions > * { flex: 1; }
+  .workspace-shell .workspace-pagination { justify-content: center; text-align: center; }
+}

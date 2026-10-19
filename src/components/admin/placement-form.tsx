@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { allowedNextPlacementStatusesUI } from "./statuses";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { DateInput } from "@/components/ui/date-input";
@@ -115,10 +116,14 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
             <DateInput name="endDate" ariaLabel="End date" defaultValue={v("endDate")} /></label>
           <label className="field-label md:col-span-2"><span>Notes <span className="font-normal text-muted-foreground">(visible to the student)</span></span>
             <textarea name="notes" rows={3} defaultValue={v("notes")} className="field" /></label>
-          <div className="md:col-span-2">
-            <button disabled={busy} className="btn btn-primary">
-              {busy ? "Saving…" : initial?.id ? "Save placement" : "Create placement (Preparing)"}
-            </button>
+          <div className="md:col-span-2 workspace-editor-submit">
+            <div><strong>{initial?.id ? "Placement details" : "Create placement"}</strong><span>Changes are recorded in the placement workspace.</span></div>
+            <div className="workspace-editor-submit-actions">
+              <Link href="/admin/placements" className="btn btn-outline">Cancel</Link>
+              <button type="submit" disabled={busy} className="btn btn-primary">
+                {busy ? "Saving…" : initial?.id ? "Save changes" : "Create placement"}
+              </button>
+            </div>
           </div>
         </div>
       </form>

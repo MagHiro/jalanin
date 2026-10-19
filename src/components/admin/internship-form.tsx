@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { WorkspaceSelect } from "@/components/ui/workspace-select";
 import { DateInput } from "@/components/ui/date-input";
 
@@ -114,9 +115,15 @@ export function InternshipForm({
         </div>
       </section>
       {error && <p role="alert" className="alert alert-error">{error}</p>}
-      <button disabled={busy} className="btn btn-primary">
-        {busy ? "Saving…" : "Save internship"}
-      </button>
+      <div className="workspace-editor-submit">
+        <div><strong>{initial?.id ? "Update internship" : "Ready to save?"}</strong><span>Changes to the listing take effect after saving.</span></div>
+        <div className="workspace-editor-submit-actions">
+          <Link href="/admin/internships" className="btn btn-outline">Cancel</Link>
+          <button type="submit" disabled={busy} className="btn btn-primary">
+            {busy ? "Saving…" : initial?.id ? "Save changes" : "Create internship"}
+          </button>
+        </div>
+      </div>
     </form>
   );
 }
