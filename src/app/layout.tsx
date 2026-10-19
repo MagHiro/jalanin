@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import "./public-design.css";
 import "./workspace-refinement.css";
+import "./mobbin-replica.css";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { RouteFrame } from "@/components/layout/route-frame";
