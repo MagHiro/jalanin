@@ -1,47 +1,27 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ArrowRight, CircleHelp, Sparkles } from "lucide-react";
 import { DomainIcon } from "./domain-icon";
 
-/**
- * Designed empty state: calm dashed surface, explanatory copy,
- * and one clear next action. Never implies a confirmed record.
- */
-export function EmptyState({
-  title,
-  body,
-  actionHref,
-  actionLabel,
-  icon,
-}: {
-  title: string;
-  body?: ReactNode;
-  actionHref?: string;
-  actionLabel?: string;
-  icon?: ReactNode;
+/** Contextual guidance; actual records, not invented data, drive the workspace. */
+export function EmptyState({ title, body, actionHref, actionLabel, icon }: {
+  title: string; body?: ReactNode; actionHref?: string; actionLabel?: string; icon?: ReactNode;
 }) {
-  return (
-    <div className="rounded-2xl border border-dashed border-border bg-surface p-8 text-center md:p-10">
-      {icon && (
-        <div
-          aria-hidden="true"
-          className="mx-auto mb-4 grid size-12 place-items-center rounded-2xl bg-secondary text-xl text-primary"
-        >
-          {typeof icon === "string" ? <DomainIcon name={icon} size={24} /> : icon}
-        </div>
-      )}
-      <p className="text-base font-semibold tracking-tight text-foreground">
-        {title}
-      </p>
-      {body && (
-        <p className="mx-auto mt-1 max-w-md text-sm leading-6 text-muted-foreground">
-          {body}
-        </p>
-      )}
-      {actionHref && actionLabel && (
-        <Link href={actionHref} className="btn btn-primary btn-sm mt-5">
-          {actionLabel}
-        </Link>
-      )}
+  const filtered = /in this view|found/i.test(title);
+  return <div className="workspace-empty-panel">
+    <div className="workspace-empty-primary">
+      <span className="workspace-empty-mark" aria-hidden="true">{icon ? typeof icon === "string" ? <DomainIcon name={icon} size={22} /> : icon : <Sparkles size={22} />}</span>
+      <p className="workspace-empty-eyebrow">{filtered ? "CURRENT VIEW" : "WORKSPACE STATUS"}</p>
+      <h2>{title}</h2>
+      {body && <div className="workspace-empty-copy">{body}</div>}
+      {actionHref && actionLabel && <Link href={actionHref} className="btn btn-primary btn-sm workspace-empty-action">{actionLabel} <ArrowRight size={15} /></Link>}
     </div>
-  );
+    <div className="workspace-empty-guide">
+      <span className="workspace-empty-guide-icon"><CircleHelp size={19} /></span>
+      <p className="workspace-empty-guide-kicker">A useful next step</p>
+      <h3>{filtered ? "Broaden your search" : "Everything is ready"}</h3>
+      <p>{filtered ? "Try a different keyword or clear the current filters to see other records." : "As activity happens in Jalanin, real records will be organized here. No sample data is shown."}</p>
+      <div className="workspace-empty-guide-line"><span /><span /><span /></div>
+    </div>
+  </div>;
 }

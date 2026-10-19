@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowLeft, ArrowRight, Bell, BriefcaseBusiness, ChevronRight, Command, Compass, LayoutGrid, Menu, Plus, Search, ShieldCheck, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Bell, BriefcaseBusiness, ChevronRight, Command, Compass, LayoutGrid, Menu, PanelLeftClose, PanelLeftOpen, Plus, Search, ShieldCheck, X } from "lucide-react";
 import { gsap } from "gsap";
 import { DomainIcon } from "@/components/ui/domain-icon";
 import { SignOutButton } from "./sign-out-button";
@@ -26,11 +26,13 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
   const paletteInput = useRef<HTMLInputElement>(null);
   const searchTrigger = useRef<HTMLButtonElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const [query, setQuery] = useState("");
   const isAdmin = role === "admin";
   const home = isAdmin ? "/admin" : "/dashboard";
-  const quickHref = isAdmin ? "/admin/internships/new" : "/opportunities";
-  const quickLabel = isAdmin ? "New internship" : "Browse internships";
+  const placementContext = pathname.startsWith("/admin/placements");
+  const quickHref = isAdmin ? (placementContext ? "/admin/placements/new" : "/admin/internships/new") : "/opportunities";
+  const quickLabel = isAdmin ? (placementContext ? "New placement" : "New internship") : "Explore internships";
   const current = [...items].reverse().find(item => item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`));
   const filtered = items.filter(item => item.label.toLowerCase().includes(query.trim().toLowerCase()));
   const unread = items.find(item => item.href.endsWith("/notifications"))?.badge ?? 0;
@@ -45,6 +47,18 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
         { label: "My journey", items: items.filter(item => item.href.startsWith("/dashboard/")) },
         { label: "More", items: items.filter(item => item.href === "/admin") },
       ];
+
+  useEffect(() => {
+    try { setCollapsed(window.localStorage.getItem("jalanin:rail-collapsed") === "1"); } catch { /* optional preference */ }
+  }, []);
+
+  function toggleRail() {
+    setCollapsed(previous => {
+      const next = !previous;
+      try { window.localStorage.setItem("jalanin:rail-collapsed", next ? "1" : "0"); } catch { /* storage disabled */ }
+      return next;
+    });
+  }
 
   useEffect(() => {
     if (mobile.current?.open) mobile.current.close();
@@ -120,14 +134,14 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
     <div className="workspace-account-actions"><SignOutButton /></div>
   </div>;
 
-  return <div ref={root} className={`workspace-shell workspace-${role}`}>
+  return <div ref={root} className={`workspace-shell workspace-${role}${collapsed ? " workspace-collapsed" : ""}`}>
     <a href="#main" className="workspace-skip-link">Skip to main content</a>
-    <aside className="workspace-sidebar">{brand}{navigation}{bottom}</aside>
+    <aside className="workspace-sidebar">{brand}<button type="button" className="workspace-rail-toggle" onClick={toggleRail} aria-label={collapsed ? "Expand navigation" : "Collapse navigation"} title={collapsed ? "Expand navigation" : "Collapse navigation"}>{collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}</button>{navigation}{bottom}</aside>
     <div className="workspace-body">
       <header className="workspace-topbar">
         <div className="workspace-topbar-start">
           <button type="button" className="workspace-menu-button" onClick={() => { if (!mobile.current?.open) mobile.current?.showModal(); }} aria-label="Open workspace navigation" aria-controls="workspace-mobile-navigation" aria-haspopup="dialog"><Menu size={20} /></button>
-          <div className="workspace-breadcrumb"><span className="workspace-breadcrumb-root">{isAdmin ? "Admin" : "Dashboard"}</span><ChevronRight size={15} aria-hidden="true" /><b>{current?.label ?? "Overview"}</b></div>
+          <div className="workspace-breadcrumb"><span className="workspace-breadcrumb-root">{isAdmin ? "Workspace / Admin" : "Workspace / Student"}</span><ChevronRight size={15} aria-hidden="true" /><b>{current?.label ?? "Overview"}</b></div>
         </div>
         <div className="workspace-topbar-end">
           <button ref={searchTrigger} type="button" className="workspace-search-trigger" onClick={() => setSearchOpen(true)} aria-label="Search workspace pages" aria-haspopup="dialog"><Search size={17} /><span>Search pages</span><kbd>⌘ K</kbd></button>
@@ -136,6 +150,7 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
         </div>
       </header>
       <main id="main" className="workspace-content">{children}</main>
+      <nav className="workspace-mobile-bottom-nav" aria-label="Quick workspace navigation">{items.filter(item => isAdmin ? ["/admin", "/admin/applications", "/admin/internships", "/admin/notifications"].includes(item.href) : ["/dashboard", "/dashboard/applications", "/dashboard/placements"].includes(item.href)).map(item => { const active = item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(item.href + "/"); return <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined}><DomainIcon name={item.icon} size={19} /><span>{item.label}</span>{!!item.badge && <i aria-label={item.badge + " unread"} />}</Link>; })}</nav>
       <footer className="workspace-footer"><span>© {new Date().getFullYear()} Jalanin</span><span>Built for the next step · <Link href="/privacy">Privacy</Link></span></footer>
     </div>
     <dialog ref={mobile} id="workspace-mobile-navigation" className="workspace-mobile-dialog" aria-label="Workspace navigation" onClick={event => { if (event.target === mobile.current) mobile.current.close(); }}>

@@ -34,7 +34,7 @@ export default async function AdminApplicationDetailPage({
   ));
 
   return (
-    <div className="min-w-0 space-y-6 [overflow-wrap:anywhere]">
+    <div className="workspace-record-detail min-w-0 space-y-6 [overflow-wrap:anywhere]">
       <div>
         <nav aria-label="Breadcrumb">
           <Link href="/admin/applications" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
