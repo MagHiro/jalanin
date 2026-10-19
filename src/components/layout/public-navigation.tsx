@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, BriefcaseBusiness, ChevronDown, Info, ListOrdered, Mail, Menu, X } from "lucide-react";
 import { SignOutButton } from "./sign-out-button";
-import logo from "../../../public/logo.png";
 
 const links = [
   { href: "/opportunities", label: "Internships", description: "Find your next opportunity", icon: BriefcaseBusiness },
@@ -81,7 +80,7 @@ export function PublicNavigation({ signedIn, admin }: { signedIn: boolean; admin
     <header ref={header} className="public-header sticky z-40" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closeMenus(); }}>
       <div className="public-header-inner mx-auto px-5 md:px-10">
         <Link href="/" aria-label="Jalanin Internships — home" className="public-brand" onClick={closeMenus}>
-          <Image src={logo} alt="Jalanin Internship Program" priority className="h-auto w-[155px] sm:w-[190px]" />
+          <span className="chapters-wordmark"><span className="chapters-wordmark-symbol" aria-hidden="true">j.</span><span>jalanin<span className="chapters-wordmark-dot">.</span></span></span>
         </Link>
         <nav aria-label="Primary" className="hidden items-center gap-1 xl:gap-2 lg:flex">
           <button ref={exploreToggle} type="button" className="public-nav-link" aria-expanded={explore} aria-controls="public-explore-navigation" onClick={() => setExplore(!explore)}>
