@@ -71,7 +71,7 @@ for (const role of ["admin", "student"] as const) {
       await page.screenshot({ path: "/tmp/opencode/workspace-admin-form.png", fullPage: true });
       await page.setViewportSize({ width: 320, height: 960 });
       await page.goto("/admin/students");
-      await expect(page.getByRole("textbox", { name: "Search display name" })).toBeVisible();
+      await expect(page.getByRole("searchbox", { name: "Search display name" })).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
     }
     const nestedRoutes = role === "admin"
