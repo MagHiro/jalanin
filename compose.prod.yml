@@ -1,0 +1,73 @@
+# Production stack: Next.js app + standalone PostgreSQL.
+# Secrets live in an untracked .env.prod (see .env.example) — never in git.
+#   docker compose -f compose.prod.yml --env-file .env.prod up -d --build
+name: jalanin-prod
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env.prod}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env.prod}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - internal
+    # NOT exposed publicly: only the app reaches the database.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    build: .
+    restart: "no"
+    env_file:
+      - .env.prod
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL in .env.prod}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - internal
+    # One-off schema migration; the app starts only after it succeeds.
+    command: ["node", "scripts/migrate.prod.mjs"]
+    volumes:
+      - ./db:/app/db:ro
+
+  app:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - internal
+    ports:
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
+    volumes:
+      - public_uploads:/app/storage/public
+      - private_files:/app/storage/private
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  pgdata:
+  public_uploads:
+  private_files:
+
+networks:
+  internal:
+    driver: bridge

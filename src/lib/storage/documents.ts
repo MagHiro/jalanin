@@ -11,28 +11,37 @@ export interface DocumentStore {
   put(objectName: string, bytes: Buffer, mimeType: string): Promise<StoredDocument>;
   get(storagePath: string): Promise<Buffer>;
   remove(storagePath: string): Promise<void>;
-  /** Short-lived authorized download reference (URL or tokenized path). */
-  createSignedDownload(storagePath: string, filename: string): Promise<string>;
 }
 
-/** Filesystem backend for local development (STORAGE_BACKEND=local). */
-class LocalDocumentStore implements DocumentStore {
-  private dir: string;
+/** Resolve the private document root (outside the web-accessible tree). */
+export function privateDir(): string {
+  return path.resolve(
+    process.cwd(),
+    process.env.PRIVATE_UPLOAD_DIR ?? "storage/private",
+  );
+}
 
-  constructor() {
-    this.dir = path.resolve(
-      process.cwd(),
-      process.env.STORAGE_LOCAL_DIR ?? ".storage-local",
-    );
-  }
+/** Resolve the public upload root (served, sanitized filenames only). */
+export function publicDir(): string {
+  return path.resolve(
+    process.cwd(),
+    process.env.PUBLIC_UPLOAD_DIR ?? "storage/public",
+  );
+}
 
+const KEY_RE = /^[0-9a-f-]{36}\/cv\.(pdf|docx)$/i;
+
+/** Filesystem store: private CVs under PRIVATE_UPLOAD_DIR (or legacy keys). */
+class FilesystemDocumentStore implements DocumentStore {
   private fullPath(storagePath: string): string {
-    // Prevent path traversal: storagePath is `<uuid>/<uuid>.<ext>`.
-    if (!/^[0-9a-f-]{36}\/cv\.(pdf|docx)$/i.test(storagePath)) {
+    // Accept current `file:` keys and legacy `local:`/`supabase:` keys so
+    // rows written before cutover keep resolving after file migration.
+    const key = storagePath.replace(/^(file|local|supabase):/, "");
+    if (!KEY_RE.test(key)) {
       throw new Error("Invalid document storage key.");
     }
-    const resolved = path.resolve(this.dir, storagePath);
-    if (!resolved.startsWith(this.dir + path.sep)) {
+    const resolved = path.resolve(privateDir(), key);
+    if (!resolved.startsWith(privateDir() + path.sep)) {
       throw new Error("Invalid document storage path.");
     }
     return resolved;
@@ -41,81 +50,43 @@ class LocalDocumentStore implements DocumentStore {
   async put(objectName: string, bytes: Buffer): Promise<StoredDocument> {
     const key = `${randomUUID()}/${objectName}`;
     const full = this.fullPath(key);
-    await fs.mkdir(path.dirname(full), { recursive: true });
-    await fs.writeFile(full, bytes);
-    return { storagePath: `local:${key}` };
+    await fs.mkdir(path.dirname(full), { recursive: true, mode: 0o700 });
+    // Write atomically: temp file + rename, restrictive mode, fsync.
+    const tmp = `${full}.${randomUUID()}.tmp`;
+    try {
+      await fs.writeFile(tmp, bytes, { mode: 0o600 });
+      const handle = await fs.open(tmp, "r");
+      try {
+        await handle.sync();
+      } finally {
+        await handle.close();
+      }
+      await fs.rename(tmp, full);
+    } catch {
+      await fs.rm(tmp, { force: true });
+      throw new Error("Storage write failed.");
+    }
+    return { storagePath: `file:${key}` };
   }
 
   async get(storagePath: string): Promise<Buffer> {
-    return fs.readFile(this.fullPath(storagePath.replace(/^local:/, "")));
+    try {
+      return await fs.readFile(this.fullPath(storagePath));
+    } catch {
+      throw new Error("Document not found.");
+    }
   }
 
   async remove(storagePath: string): Promise<void> {
-    await fs.rm(this.fullPath(storagePath.replace(/^local:/, "")), {
-      force: true,
-    });
-  }
-
-  async createSignedDownload(storagePath: string): Promise<string> {
-    return `/api/documents/download?path=${encodeURIComponent(storagePath)}`;
+    await fs.rm(this.fullPath(storagePath), { force: true });
   }
 }
 
-/** Supabase private-bucket backend (STORAGE_BACKEND=supabase, prod). */
-class SupabaseDocumentStore implements DocumentStore {
-  private bucket(): string {
-    return process.env.STORAGE_BUCKET ?? "documents";
-  }
-
-  private serviceClient() {
-    // Lazy + server-only: service-role key must never reach the browser.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { createClient } = require("@supabase/supabase-js") as typeof import("@supabase/supabase-js");
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!url || !key) throw new Error("Supabase storage is not configured.");
-    return createClient(url, key);
-  }
-
-  async put(objectName: string, bytes: Buffer, mimeType: string): Promise<StoredDocument> {
-    const key = `${randomUUID()}/${objectName}`;
-    const { error } = await this.serviceClient()
-      .storage.from(this.bucket())
-      .upload(key, bytes, { contentType: mimeType, upsert: false });
-    if (error) throw new Error(`Storage upload failed: ${error.message}`);
-    return { storagePath: `supabase:${key}` };
-  }
-
-  async get(storagePath: string): Promise<Buffer> {
-    const { data, error } = await this.serviceClient()
-      .storage.from(this.bucket())
-      .download(storagePath.replace(/^supabase:/, ""));
-    if (error || !data) throw new Error("Storage download failed.");
-    return Buffer.from(await data.arrayBuffer());
-  }
-
-  async remove(storagePath: string): Promise<void> {
-    await this.serviceClient()
-      .storage.from(this.bucket())
-      .remove([storagePath.replace(/^supabase:/, "")]);
-  }
-
-  async createSignedDownload(storagePath: string): Promise<string> {
-    const { data, error } = await this.serviceClient()
-      .storage.from(this.bucket())
-      .createSignedUrl(storagePath.replace(/^supabase:/, ""), 60);
-    if (error || !data?.signedUrl) throw new Error("Could not sign download URL.");
-    return data.signedUrl;
-  }
-}
+let cached: DocumentStore | null = null;
 
 export function getDocumentStore(): DocumentStore {
-  const backend = (process.env.STORAGE_BACKEND ?? "local").toLowerCase();
-  if (backend === "supabase") return new SupabaseDocumentStore();
-  if (backend === "local" && process.env.NODE_ENV !== "production") {
-    return new LocalDocumentStore();
-  }
-  throw new Error("Private Supabase Storage must be configured in production.");
+  if (!cached) cached = new FilesystemDocumentStore();
+  return cached;
 }
 
 // ---- Upload validation (interim operational config, NOT a confirmed

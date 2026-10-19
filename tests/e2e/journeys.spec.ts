@@ -1,8 +1,7 @@
 // Full journey suite (PRD §14 UAT core + §0.B.2 V04-01…V04-10).
 // Runs against the dev server (E2E_MODE=1) with seeded data.
-// Auth uses the E2E session seam (signed httpOnly cookie via
-// POST /api/dev/session) because this environment has no Supabase Auth
-// service; production uses Supabase email/password (see docs/architecture.md).
+// Auth uses the E2E session seam (real native sessions via
+// POST /api/dev/session); production uses native email/password auth.
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 
 const STUDENT_A = "00000000-0000-0000-0000-00000000aa01";

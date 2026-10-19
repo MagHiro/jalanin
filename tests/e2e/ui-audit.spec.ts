@@ -24,7 +24,7 @@ test("contact keeps delayed success visible after the submit event has returned"
 
 test("confirmation contains keyboard focus and cannot dismiss while busy", async ({ page }) => {
   // This spec must also run alone: global setup clears student profiles.
-  const client = new Client({ connectionString: process.env.DATABASE_URL ?? "postgresql://jalanin:jalanin@localhost:54322/jalanin" });
+    const client = new Client({ connectionString: process.env.DATABASE_URL ?? "postgresql://jalanin:local_password@localhost:5432/jalanin" });
   await client.connect();
   try {
     await client.query(

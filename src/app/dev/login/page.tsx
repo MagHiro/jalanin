@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { isE2EMode } from "@/lib/supabase/server";
+import { isE2EMode } from "@/lib/auth/require";
 
 // Temporary local-dev entry page. Gated — 404s unless E2E_MODE=1.
 // Delete before production.

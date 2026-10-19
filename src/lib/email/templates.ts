@@ -107,3 +107,32 @@ export const STATUS_NEXT_STEPS: Record<string, string> = {
   Rejected: "Thank you for your interest. Please contact us if you would like feedback or alternatives.",
   Completed: "Your internship journey is marked complete. Thank you for travelling with Jalanin.",
 };
+
+export function verifyEmail(input: { verifyUrl: string }): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const subject = "Verify your Jalanin account email";
+  const bodyHtml = `<p>Welcome to Jalanin Internships.</p>
+<p>Confirm this email address to finish setting up your student account:</p>
+<p><a href="${esc(input.verifyUrl)}">Verify my email</a></p>
+<p>This link expires in 24 hours. If you did not create this account, ignore this email.</p>`;
+  const bodyText = `Welcome to Jalanin Internships.\n\nConfirm this email address to finish setting up your student account:\n${input.verifyUrl}\n\nThis link expires in 24 hours. If you did not create this account, ignore this email.`;
+  const { html, text } = layout("Verify your email", bodyHtml, bodyText);
+  return { subject, html, text };
+}
+
+export function passwordResetEmail(input: { resetUrl: string }): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const subject = "Reset your Jalanin password";
+  const bodyHtml = `<p>We received a request to reset your Jalanin Internships password.</p>
+<p><a href="${esc(input.resetUrl)}">Choose a new password</a></p>
+<p>This link expires in 1 hour. If you did not request this, ignore this email — your password is unchanged.</p>`;
+  const bodyText = `We received a request to reset your Jalanin Internships password.\n\nChoose a new password:\n${input.resetUrl}\n\nThis link expires in 1 hour. If you did not request this, ignore this email — your password is unchanged.`;
+  const { html, text } = layout("Reset your password", bodyHtml, bodyText);
+  return { subject, html, text };
+}

@@ -7,7 +7,7 @@ import { canTransition, type ApplicationStatus } from "../src/lib/workflow/trans
 const ADMIN = "00000000-0000-0000-0000-00000000ad01";
 const STUDENT = "00000000-0000-0000-0000-00000000ac01";
 const SECOND_STUDENT = "00000000-0000-0000-0000-00000000aa01";
-const connectionString = process.env.SUPABASE_DB_URL ?? process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL;
 
 interface Scenario {
   id: string;
@@ -68,12 +68,11 @@ function cvPdf(name: string, course: string): Buffer {
 }
 
 async function main(): Promise<void> {
-  if (!connectionString) throw new Error("Set DATABASE_URL or SUPABASE_DB_URL. See .env.example.");
+  if (!connectionString) throw new Error("Set DATABASE_URL. See .env.example.");
   const host = new URL(connectionString).hostname.replace(/^\[|\]$/g, "").toLowerCase();
   if (process.env.NODE_ENV === "production" || !["localhost", "127.0.0.1", "::1"].includes(host)) {
     throw new Error("Demo seeding requires a local development database.");
   }
-  if ((process.env.STORAGE_BACKEND ?? "local") !== "local") throw new Error("Demo CVs require STORAGE_BACKEND=local.");
   const client = new Client({ connectionString });
   const store = getDocumentStore();
   const uploaded: string[] = [];
@@ -83,6 +82,14 @@ async function main(): Promise<void> {
     await client.query("SELECT pg_advisory_xact_lock(20261012)");
     const admin = await client.query("SELECT 1 FROM admin_users WHERE user_id = $1 AND active", [ADMIN]);
     if (!admin.rowCount) throw new Error(`Provision the demo admin first: pnpm admin:grant ${ADMIN}`);
+    // Native demo identities: fixed ids match the dev-login presets and the
+    // E2E fixtures. Placeholder hashes are login-disabled (see dev notes).
+    await client.query(`INSERT INTO users (id, email, password_hash, email_verified_at) VALUES
+      ($1, 'demo-admin@example.com', '$2b$12$demoadminplaceholder0000000000000000000000000000', now()),
+      ($2, 'amina.demo@example.com', '$2b$12$demostudentplaceholder000000000000000000000000000', now()),
+      ($3, 'rizky.demo@example.com', '$2b$12$demostudentplaceholder000000000000000000000000001', now())
+      ON CONFLICT (id) DO NOTHING`,
+    [ADMIN, STUDENT, SECOND_STUDENT]);
     await client.query(`INSERT INTO profiles (user_id, display_name) VALUES
       ($1, 'Amina Rahman'), ($2, 'Rizky Pratama'), ($3, 'Jalanin Demo Coordinator') ON CONFLICT (user_id) DO NOTHING`,
     [STUDENT, SECOND_STUDENT, ADMIN]);

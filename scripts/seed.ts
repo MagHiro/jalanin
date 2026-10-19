@@ -1,4 +1,4 @@
-// Deterministic development seed runner. Loads supabase/seed.sql.
+// Deterministic development seed runner. Loads db/seed.sql.
 // Flags: --test truncates user-data tables first for isolated test runs.
 // Usage: pnpm db:seed | pnpm db:seed:test
 import "./load-env";
@@ -6,17 +6,16 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { Client } from "pg";
 
-const connectionString =
-  process.env.SUPABASE_DB_URL ?? process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
-  console.error("Set SUPABASE_DB_URL or DATABASE_URL. See .env.example.");
+  console.error("Set DATABASE_URL. See .env.example.");
   process.exit(1);
 }
 
 const testMode = process.argv.includes("--test");
 
-// Test seeding truncates user data: NEVER run this against hosted Supabase,
-// even if a developer accidentally leaves the dev project's URL in .env.local.
+// Test seeding truncates user data: NEVER run this against production,
+// even if a production URL is accidentally present in the environment.
 if (testMode) {
   const host = new URL(connectionString).hostname.toLowerCase();
   if (!["localhost", "127.0.0.1", "::1"].includes(host)) {
@@ -37,11 +36,12 @@ async function main(): Promise<void> {
         `TRUNCATE applications, application_revisions, application_documents,
          application_status_events, quotations, placements, admin_notifications,
          notification_outbox, audit_events, contact_submissions, consent_records,
-         profiles, admin_users RESTART IDENTITY CASCADE`,
+         profiles, admin_users, user_tokens, user_sessions, users
+         RESTART IDENTITY CASCADE`,
       );
     }
     const sql = readFileSync(
-      path.join(process.cwd(), "supabase", "seed.sql"),
+      path.join(process.cwd(), "db", "seed.sql"),
       "utf8",
     );
     await client.query(sql);

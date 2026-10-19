@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function SignOutButton() {
   const [busy, setBusy] = useState(false);
@@ -17,8 +16,8 @@ export function SignOutButton() {
           setBusy(true);
           setError(null);
           try {
-            const { error: signOutError } = await createSupabaseBrowserClient().auth.signOut();
-            if (signOutError) throw signOutError;
+            const res = await fetch("/api/auth/logout", { method: "POST" });
+            if (!res.ok) throw new Error("logout failed");
             window.location.assign("/");
           } catch {
             // Never claim sign-out succeeded while the session remains active.
