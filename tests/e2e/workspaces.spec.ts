@@ -73,7 +73,7 @@ for (const role of ["admin", "student"] as const) {
       const dateDialog = page.getByRole("dialog", { name: "Choose start date" });
       await expect(dateDialog).toBeVisible();
       await dateDialog.getByRole("button", { name: "Today" }).click();
-      await expect(page.locator('input[name="startDate"]')).toHaveValue(/\\d{4}-\\d{2}-\\d{2}/);
+      await expect(page.locator('input[name="startDate"]')).toHaveValue(/\d{4}-\d{2}-\d{2}/);
       await page.getByRole("button", { name: "Choose application deadline" }).click();
       const dateTimeDialog = page.getByRole("dialog", { name: "Choose application deadline" });
       await expect(dateTimeDialog).toBeVisible();
