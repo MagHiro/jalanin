@@ -7,8 +7,8 @@ export const metadata = { title: "New placement", robots: "noindex" };
 export default async function NewPlacementPage() {
   await requireAdmin();
   return (
-    <div className="space-y-5">
-      <div>
+    <div className="workspace-editor-page">
+      <div className="workspace-editor-heading">
         <nav aria-label="Breadcrumb">
           <Link href="/admin/placements" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
             <span aria-hidden="true">←</span> All placements
@@ -21,7 +21,15 @@ export default async function NewPlacementPage() {
           New placements start as Preparing.
         </p>
       </div>
+      <div className="workspace-editor-layout">
       <PlacementForm />
+      <aside className="workspace-editor-aside" aria-label="Placement workflow">
+        <h2>Placement workflow</h2>
+        <p>Placements are linked to student profiles and visible to their owners. The status changes only through the recorded workflow.</p>
+        <p>New records begin in Preparing. Status transitions remain auditable and follow the approved lifecycle.</p>
+        <Link href="/admin/placements">View all placements →</Link>
+      </aside>
+      </div>
     </div>
   );
 }

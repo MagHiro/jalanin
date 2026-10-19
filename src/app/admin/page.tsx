@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight, Bell, BriefcaseBusiness, CheckCircle2, ClipboardList, Clock3, FileText, Plus, Users } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
-import { getAdminOverview, recentAudit } from "@/features/admin/service";
+import { getAdminOverview, listAdminApplications, recentAudit } from "@/features/admin/service";
 import { StatusBadge } from "@/components/ui/status-badge";
 
 export const metadata: Metadata = { title: "Admin overview", robots: "noindex" };
@@ -20,7 +20,7 @@ const STATUS_LINKS: Array<[string, string]> = [
 export default async function AdminOverviewPage() {
   await requireAdmin();
   const overview = await getAdminOverview();
-  const audit = await recentAudit(8);
+  const [audit, recentApplications] = await Promise.all([recentAudit(8), listAdminApplications({ page: 1, pageSize: 5, sort: "newest" })]);
   const totalPlacements = Object.values(overview.placementCounts).reduce((a, b) => a + b, 0);
   const totalApplications = Object.values(overview.statusCounts).reduce((a, b) => a + b, 0);
   const statistics = [
@@ -79,6 +79,28 @@ export default async function AdminOverviewPage() {
         </div>
       </section>
     </div>
+
+    <section className="workspace-data-card workspace-recent-records" aria-labelledby="recent-records-heading">
+      <div className="workspace-panel-heading">
+        <div><p className="workspace-kicker">Application records</p><h2 id="recent-records-heading">Recent submissions</h2></div>
+        <Link href="/admin/applications" className="workspace-text-link">All applications <ArrowRight size={15}/></Link>
+      </div>
+      {recentApplications.rows.length ? <>
+        <div className="crm-table-scroll hidden md:block">
+          <table className="crm-table" aria-label="Recent application submissions">
+            <thead><tr><th scope="col">Applicant</th><th scope="col">Internship</th><th scope="col">Stage</th><th scope="col">Submitted</th><th scope="col" className="crm-col-action">Review</th></tr></thead>
+            <tbody>{recentApplications.rows.map(({ application, internshipTitle }) => <tr key={application.id}>
+              <td><Link className="crm-record-name" href={`/admin/applications/${application.id}`}>{application.firstName} {application.lastName}</Link><span className="crm-record-sub">{application.email}</span></td>
+              <td className="crm-record-secondary">{internshipTitle}</td>
+              <td><StatusBadge status={application.lifecycleStatus}/></td>
+              <td className="crm-date tnum">{application.submittedAt ? new Date(application.submittedAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short" }) : "—"}</td>
+              <td className="crm-col-action"><Link href={`/admin/applications/${application.id}`} className="crm-row-link">Open record</Link></td>
+            </tr>)}</tbody>
+          </table>
+        </div>
+        <ul className="crm-mobile-records md:hidden">{recentApplications.rows.map(({ application, internshipTitle }) => <li key={application.id}><div className="crm-mobile-top"><Link className="crm-record-name" href={`/admin/applications/${application.id}`}>{application.firstName} {application.lastName}</Link><StatusBadge status={application.lifecycleStatus}/></div><p>{internshipTitle}</p><Link href={`/admin/applications/${application.id}`} className="crm-row-link">Review application</Link></li>)}</ul>
+      </> : <div className="workspace-recent-records-guide"><p>No applications submitted yet. New student submissions will appear here automatically.</p><Link href="/admin/internships">View internship listings <ArrowRight size={15}/></Link></div>}
+    </section>
 
     <div className="workspace-bottom-grid">
       <section className="workspace-data-card workspace-activity-card" aria-labelledby="activity-heading">

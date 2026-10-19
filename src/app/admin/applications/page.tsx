@@ -7,6 +7,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { WorkspaceSelect } from "@/components/ui/workspace-select";
 import { Pagination } from "@/components/ui/pagination";
+import { RecordActions } from "@/components/ui/record-actions";
 import { CrmViews, CrmFilterChips, CrmTableMeta, listHref } from "@/components/ui/crm-list";
 
 export const metadata = { title: "Applications", robots: "noindex" };
@@ -81,7 +82,7 @@ export default async function AdminApplicationsPage({ searchParams }: {
               <td><div className="crm-badge-stack"><StatusBadge status={application.lifecycleStatus} />{application.needsReReview && <span className="badge badge-rereview">Re-review</span>}</div></td>
               <td className="crm-date">{application.submittedAt ? <time dateTime={new Date(application.submittedAt).toISOString()}>{new Date(application.submittedAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" })}</time> : "—"}</td>
               <td className="crm-col-numeric tnum">r{application.revision}</td>
-              <td className="crm-col-action"><Link href={`/admin/applications/${application.id}`} className="crm-row-link">Review <span className="sr-only">{application.firstName} {application.lastName}</span></Link></td>
+              <td className="crm-col-action"><RecordActions primary={{ href: `/admin/applications/${application.id}`, label: "Review" }} items={[{ href: `mailto:${application.email}`, label: "Email applicant" }]} /></td>
             </tr>)}</tbody>
           </table>
         </div>

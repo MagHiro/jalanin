@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
+import { RecordActions } from "@/components/ui/record-actions";
 import { WorkspaceSelect } from "@/components/ui/workspace-select";
 import { CrmViews, CrmFilterChips, CrmTableMeta, listHref } from "@/components/ui/crm-list";
 
@@ -49,7 +50,7 @@ export default async function AdminPlacementsPage({ searchParams }: {
             <td className="crm-record-secondary">{p.countryCode}</td>
             <td className="crm-date tnum">{p.startDate ?? "TBC"} – {p.endDate ?? "TBC"}</td>
             <td><StatusBadge status={p.placementStatus} /></td>
-            <td className="crm-col-action"><Link href={`/admin/placements/${p.id}/edit`} className="crm-row-link">Manage</Link></td>
+            <td className="crm-col-action"><RecordActions primary={{ href: `/admin/placements/${p.id}/edit`, label: "Manage" }} items={[{ href: `/admin/students/${p.studentUserId}`, label: "Student profile" }]} /></td>
           </tr>)}</tbody>
         </table></div>
         <ul className="crm-mobile-records md:hidden">{rows.map(p => <li key={p.id}><div className="crm-mobile-top"><Link className="crm-record-name" href={`/admin/placements/${p.id}/edit`}>{p.role}</Link><StatusBadge status={p.placementStatus} /></div><p>{p.organization} · {p.countryCode}</p><p className="crm-record-sub tnum">{p.startDate ?? "Start TBC"} – {p.endDate ?? "End TBC"}</p><div className="crm-mobile-bottom"><Link className="crm-row-link" href={`/admin/placements/${p.id}/edit`}>Manage placement</Link></div></li>)}</ul>

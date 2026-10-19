@@ -25,9 +25,9 @@ export default async function EditPlacementPage({
     .limit(1);
   if (!row) notFound();
   return (
-    <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
+    <div className="workspace-editor-page min-w-0 [overflow-wrap:anywhere]">
       {searchParams.created === "1" && <p role="status" className="alert alert-success">Placement created.</p>}
-      <div>
+      <div className="workspace-editor-heading">
         <nav aria-label="Breadcrumb">
           <Link href="/admin/placements" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
             <span aria-hidden="true">←</span> All placements
@@ -38,6 +38,7 @@ export default async function EditPlacementPage({
         </h1>
         <p className="mt-2"><StatusBadge status={row.placementStatus} /></p>
       </div>
+      <div className="workspace-editor-layout">
       <PlacementForm
         initial={{
           id: row.id,
@@ -52,6 +53,13 @@ export default async function EditPlacementPage({
           placementStatus: row.placementStatus,
         }}
       />
+      <aside className="workspace-editor-aside" aria-label="Placement workflow">
+        <h2>Placement workflow</h2>
+        <p>Placements are linked to student profiles and visible to their owners. The status changes only through the recorded workflow.</p>
+        <p>New records begin in Preparing. Status transitions remain auditable and follow the approved lifecycle.</p>
+        <Link href="/admin/placements">View all placements →</Link>
+      </aside>
+      </div>
     </div>
   );
 }

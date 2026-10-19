@@ -24,7 +24,7 @@ export default async function StudentApplicationDetailPage({
     ["New", "In Review"].includes(application.lifecycleStatus);
 
   return (
-    <div className="mx-auto min-w-0 max-w-3xl space-y-6 [overflow-wrap:anywhere]">
+    <div className="workspace-mobbin-record workspace-student-application-detail mx-auto min-w-0 max-w-5xl space-y-6 [overflow-wrap:anywhere]">
       {searchParams.submitted && (
         <div role="status" className="alert alert-success">
           <p className="font-semibold">Application submitted.</p>
