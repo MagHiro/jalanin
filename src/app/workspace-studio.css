@@ -971,3 +971,18 @@
   .workspace-shell .workspace-editor-submit-actions > * { flex: 1; }
   .workspace-shell .workspace-pagination { justify-content: center; text-align: center; }
 }
+
+/* Small-screen pickers stay on-screen even in two-column date fields. */
+@media (max-width: 767px) {
+  .workspace-shell .workspace-date-field .workspace-calendar-popover {
+    position: fixed;
+    top: 50dvh !important;
+    left: 50vw !important;
+    right: auto !important;
+    transform: translate(-50%,-50%);
+    z-index: 110;
+    width: min(340px,calc(100vw - 28px)) !important;
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+  }
+}

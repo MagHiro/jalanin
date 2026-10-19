@@ -24,7 +24,8 @@ for (const role of ["admin", "student"] as const) {
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
       if (width === 1440) {
         const stat = page.locator(".workspace-stat").first();
-        await expect(stat).toHaveCSS("border-left-width", "0px");
+        await expect(stat).toHaveCSS("border-left-width", "1px");
+        await expect(stat).toHaveCSS("border-top-left-radius", "16px");
         await expect(stat).not.toHaveCSS("box-shadow", "none");
         await expect(page.locator(".workspace-sidebar .workspace-nav-label").first()).toBeVisible();
         await expect(page.locator(".workspace-quick-card")).toHaveCount(0);
@@ -68,6 +69,18 @@ for (const role of ["admin", "student"] as const) {
       await page.getByRole("textbox", { name: "Description *", exact: true }).fill("Form component verification");
       await page.getByLabel("Featured on landing").check();
       await expect(page.getByLabel("Featured on landing")).toBeChecked();
+      await page.getByRole("button", { name: "Choose start date" }).click();
+      const dateDialog = page.getByRole("dialog", { name: "Choose start date" });
+      await expect(dateDialog).toBeVisible();
+      await dateDialog.getByRole("button", { name: "Today" }).click();
+      await expect(page.locator('input[name="startDate"]')).toHaveValue(/\\d{4}-\\d{2}-\\d{2}/);
+      await page.getByRole("button", { name: "Choose application deadline" }).click();
+      const dateTimeDialog = page.getByRole("dialog", { name: "Choose application deadline" });
+      await expect(dateTimeDialog).toBeVisible();
+      await dateTimeDialog.getByRole("button", { name: "Today" }).click();
+      await dateTimeDialog.getByLabel("Time for application deadline").fill("10:30");
+      await dateTimeDialog.getByRole("button", { name: "Apply" }).click();
+      await expect(page.locator('input[name="applicationDeadline"]')).toHaveValue(/T10:30$/);
       await page.screenshot({ path: "/tmp/opencode/workspace-admin-form.png", fullPage: true });
       await page.setViewportSize({ width: 320, height: 960 });
       await page.goto("/admin/students");
