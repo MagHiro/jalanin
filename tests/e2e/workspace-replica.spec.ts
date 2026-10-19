@@ -32,22 +32,13 @@ test.describe("Mobbin-derived workspace structure", () => {
     await page.goto("/admin");
     await expect(page.locator(".ops-activity")).toBeVisible();
     await expect(page.locator(".ops-placement-summary")).toBeVisible();
-    const tableScroll = page.locator(".ops-table-scroll");
-    if (await tableScroll.count()) {
-      expect(await tableScroll.evaluate(el => getComputedStyle(el).overflowX)).toBe("auto");
+    const mobileRecords = page.locator(".ops-mobile-records");
+    if (await mobileRecords.count()) {
+      await expect(mobileRecords).toBeVisible();
+      await expect(page.locator(".ops-table-scroll")).toBeHidden();
+      await expect(mobileRecords.getByRole("link").first()).toBeVisible();
     }
-    const diagnostics = await page.evaluate(() => ({
-      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      offenders: Array.from(document.querySelectorAll<HTMLElement>("body *"))
-        .map(el => {
-          const rect = el.getBoundingClientRect();
-          return { element: el.tagName.toLowerCase() + "." + String(el.className).slice(0, 65), left: Math.round(rect.left), right: Math.round(rect.right), width: Math.round(rect.width), overflow: getComputedStyle(el).overflowX };
-        })
-        .filter(el => el.right > innerWidth + 2 && el.width > 0)
-        .sort((a, b) => b.right - a.right)
-        .slice(0, 20),
-    }));
-    expect(diagnostics.overflow, JSON.stringify(diagnostics.offenders, null, 2)).toBeLessThanOrEqual(1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
   });
 
   test("student overview provides genuine journey milestones and next action", async ({ page }) => {

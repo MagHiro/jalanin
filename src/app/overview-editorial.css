@@ -460,3 +460,24 @@
   .workspace-shell .ops-placement-empty { padding: 18px; }
   .workspace-shell .ops-placement-summary .ops-placement-statuses { grid-template-columns: minmax(0,1fr); }
 }
+
+/* Keep the dense submissions table on desktop; use record cards on narrow screens.
+   Tailwind's hidden utility is lower-priority than the unlayered overview styles,
+   so visibility is controlled explicitly here. */
+.workspace-shell .ops-mobile-records { display: none; list-style: none; padding: 0; margin: 0; }
+@media (max-width: 767px) {
+  .workspace-shell .ops-submissions .ops-table-scroll { display: none; }
+  .workspace-shell .ops-mobile-records { display: block; }
+  .workspace-shell .ops-mobile-records li { border-top: 1px solid #edf0f3; }
+  .workspace-shell .ops-mobile-record {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 17px 19px; color: #354962;
+  }
+  .workspace-shell .ops-mobile-record:hover { background: #f6f9fc; }
+  .workspace-shell .ops-mobile-record-main { display: flex; flex-direction: column; gap: 5px; min-width: 0; flex: 1; }
+  .workspace-shell .ops-mobile-record-main strong { font-size: 13px; font-weight: 690; line-height: 1.3; overflow-wrap: anywhere; }
+  .workspace-shell .ops-mobile-record-main > span { font-size: 12px; line-height: 1.4; color: #76869a; overflow-wrap: anywhere; }
+  .workspace-shell .ops-mobile-record-main small { color: #a0aab5; font-size: 11px; }
+  .workspace-shell .ops-mobile-record-end { flex: none; display: flex; align-items: flex-end; flex-direction: column; gap: 13px; max-width: 116px; }
+  .workspace-shell .ops-mobile-record-end svg { color: #637b9d; }
+}
