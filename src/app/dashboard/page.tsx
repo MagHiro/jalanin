@@ -105,7 +105,7 @@ export default async function DashboardPage() {
       <aside className="journey-side-column">
         <section className="journey-destination-card" aria-labelledby="journey-destination-title">
           <div className="journey-destination-art" aria-hidden="true"><span className="journey-art-orbit journey-art-orbit-one" /><span className="journey-art-orbit journey-art-orbit-two" /><span className="journey-art-pin"><MapPin size={23} /></span><span className="journey-art-star">✳</span></div>
-          <span className="journey-label">WHERE YOU'RE HEADED</span>
+          <span className="journey-label">WHERE YOU&apos;RE HEADED</span>
           <h2 id="journey-destination-title">{studentPlacements.length > 0 ? "Your placement story." : "Good things take shape."}</h2>
           {studentPlacements.length > 0 ? <><p>Here’s the latest placement recorded for you.</p><div className="journey-destination-record"><strong>{studentPlacements[0].role}</strong><span>{studentPlacements[0].organization}</span><StatusBadge status={studentPlacements[0].placementStatus} /></div></> : <p>When your team arranges a placement, the details and next steps will appear here.</p>}
           <Link href="/dashboard/placements">View placements <ArrowRight size={16} aria-hidden="true" /></Link>
