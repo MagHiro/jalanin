@@ -1,7 +1,7 @@
 // Database integration tests: migrations, UNIQUE(application) constraint,
-// transactional submit, revision persistence, ownership, RLS posture.
-// Requires a live PostgreSQL (local Docker: pnpm db:start).
-//   DATABASE_URL=postgresql://jalanin:jalanin@localhost:54322/jalanin pnpm test
+// transactional submit, revision persistence, ownership, constraint posture.
+// Requires a live PostgreSQL (local: pnpm db:start).
+//   DATABASE_URL=postgresql://jalanin:local_password@127.0.0.1:5432/jalanin pnpm test
 import { beforeAll, describe, expect, it } from "vitest";
 import { Client } from "pg";
 
@@ -112,17 +112,19 @@ describe("database constraints", () => {
     ).rejects.toThrow(/check|constraint|invalid/i);
   });
 
-  it("prevents direct student writes bypassing reviewed workflows", async () => {
+  it("retires Supabase RLS: no policies remain, authz is application-level", async () => {
     if (skipped()) return;
+    // Migration 0005 removed every Supabase RLS policy. Authorization is
+    // enforced exclusively in application code (requireStudent/requireAdmin
+    // + ownership checks); the database keeps CHECK/UNIQUE/FK constraints.
     const { rows } = await client.query(
-      `SELECT policyname FROM pg_policies
-       WHERE schemaname = 'public' AND tablename = 'applications'`,
+      `SELECT policyname FROM pg_policies WHERE schemaname = 'public'`,
     );
-    const names = rows.map((r) => r.policyname as string);
-    expect(names).toContain("applications_student_read");
-    expect(names).not.toContain("applications_student_insert");
-    expect(names).not.toContain("applications_student_update");
-    expect(names).not.toContain("applications_student_update_submitted");
+    expect(rows.map((r) => r.policyname as string)).toEqual([]);
+    const secured = await client.query(
+      `SELECT tablename FROM pg_tables WHERE schemaname='public' AND rowsecurity IS TRUE`,
+    );
+    expect(secured.rows).toEqual([]);
   });
 
   it("enforces one active CV metadata record per application", async () => {
@@ -143,23 +145,24 @@ describe("database constraints", () => {
     await expect(client.query(query, base)).rejects.toThrow(/duplicate|unique/i);
   });
 
-  it("restricts raw access to analytics and rate limit tables", async () => {
+  it("keeps CHECK/UNIQUE constraints without RLS on ops tables", async () => {
     if (skipped()) return;
     const { rows } = await client.query(
       `SELECT tablename FROM pg_tables WHERE schemaname='public'
-       AND rowsecurity IS TRUE AND tablename IN ('analytics_events','request_rate_limits')`,
+       AND tablename IN ('analytics_events','request_rate_limits')`,
     );
     expect(rows.map((r) => r.tablename).sort()).toEqual(["analytics_events", "request_rate_limits"]);
   });
 
-  it("exposes RLS policies on user-data tables", async () => {
+  it("enforces domain constraints on user-data tables without RLS", async () => {
     if (skipped()) return;
+    // Application-level authorization (require.ts) gates every query; the
+    // database backstops domain rules via CHECK/UNIQUE/FK — verified above.
     const { rows } = await client.query(
-      `SELECT tablename FROM pg_tables WHERE schemaname='public' AND rowsecurity IS TRUE`,
+      `SELECT conname, contype FROM pg_constraint
+       WHERE conrelid IN ('applications'::regclass, 'quotations'::regclass, 'placements'::regclass)
+       AND contype IN ('c', 'u', 'f')`,
     );
-    const secured = new Set(rows.map((r) => r.tablename as string));
-    for (const t of ["applications", "placements", "quotations", "internships"]) {
-      expect(secured.has(t)).toBe(true);
-    }
+    expect(rows.length).toBeGreaterThan(0);
   });
 });
