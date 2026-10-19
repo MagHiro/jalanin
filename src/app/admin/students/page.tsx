@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowDown, Plus, Search } from "lucide-react";
+import { ArrowDown, Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
 import { listAdminStudents } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
