@@ -9,11 +9,14 @@ import {
   applications,
   auditEvents,
   categories,
+  contactSubmissions,
   internships,
   placements,
   profiles,
   quotations,
+  users,
 } from "@/lib/db/schema";
+import { waitingSince } from "@/lib/workflow/waiting-time";
 import { enqueueEmail } from "@/lib/email/outbox";
 import { STATUS_NEXT_STEPS } from "@/lib/email/templates";
 import { applicationRef, audit, singleCount } from "@/lib/utils";
@@ -190,14 +193,22 @@ export async function saveInternship(
 }
 
 // -------------------------------------------------------------- applications
+export interface AdminApplicationRow {
+  application: typeof applications.$inferSelect;
+  internshipTitle: string;
+  internshipSlug: string;
+  /** Start of the current-status wait (New / In Review), or null. */
+  waitingSince: Date | null;
+}
+
 export async function listAdminApplications(input: {
   q?: string;
   status?: string;
-  sort?: "newest" | "oldest" | "name";
+  sort?: "newest" | "oldest" | "name" | "waiting";
   needsReReview?: boolean;
   page: number;
   pageSize: number;
-}) {
+}): Promise<{ rows: AdminApplicationRow[]; total: number }> {
   const conds = [eq(applications.isDraft, false)];
   if (input.status) conds.push(eq(applications.lifecycleStatus, input.status));
   if (input.needsReReview !== undefined) {
@@ -229,13 +240,56 @@ export async function listAdminApplications(input: {
         : desc(applications.submittedAt),
       asc(applications.id),
     )
-    .limit(input.pageSize)
-    .offset((input.page - 1) * input.pageSize);
+    .limit(input.sort === "waiting" ? 200 : input.pageSize)
+    .offset(input.sort === "waiting" ? 0 : (input.page - 1) * input.pageSize);
   const totalRows = await db
     .select({ n: count() })
     .from(applications)
     .where(where);
-  return { rows, total: singleCount(totalRows) };
+  const total = singleCount(totalRows);
+
+  // Waiting time for New / In Review rows: entry into the current status
+  // from committed events, else submission time for the initial New state.
+  // Server-side; null when no reliable timing exists (neutral fallback).
+  const withWaiting: AdminApplicationRow[] = await Promise.all(
+    rows.map(async ({ application, internshipTitle, internshipSlug }) => {
+      if (application.lifecycleStatus !== "New" && application.lifecycleStatus !== "In Review") {
+        return { application, internshipTitle, internshipSlug, waitingSince: null };
+      }
+      const events = await db
+        .select({
+          toStatus: applicationStatusEvents.toStatus,
+          createdAt: applicationStatusEvents.createdAt,
+        })
+        .from(applicationStatusEvents)
+        .where(eq(applicationStatusEvents.applicationId, application.id));
+      return {
+        application,
+        internshipTitle,
+        internshipSlug,
+        waitingSince: waitingSince({
+          lifecycleStatus: application.lifecycleStatus,
+          submittedAt: application.submittedAt,
+          events,
+        }),
+      };
+    }),
+  );
+
+  if (input.sort === "waiting") {
+    // Oldest waiter first; rows without timing sink to the end.
+    withWaiting.sort((a, b) => {
+      if (!a.waitingSince && !b.waitingSince) return 0;
+      if (!a.waitingSince) return 1;
+      if (!b.waitingSince) return -1;
+      return a.waitingSince.getTime() - b.waitingSince.getTime();
+    });
+    return {
+      rows: withWaiting.slice((input.page - 1) * input.pageSize, input.page * input.pageSize),
+      total,
+    };
+  }
+  return { rows: withWaiting, total };
 }
 
 export async function getAdminApplication(id: string) {
@@ -534,6 +588,78 @@ export async function getAdminStudent(userId: string) {
   return { profile, applications: apps, placements: studentPlacements };
 }
 
+// ------------------------------------------------- placement student search
+export interface StudentSearchResult {
+  userId: string;
+  displayName: string | null;
+  email: string | null;
+}
+
+const STUDENT_SEARCH_LIMIT = 8;
+
+/**
+ * Admin-only student search for placement creation (A1). Searches display
+ * name and account email; returns a small page of candidates — never the
+ * whole directory. Callers MUST enforce requireAdmin before invoking.
+ */
+export async function searchStudentsForPlacement(
+  query: string,
+): Promise<StudentSearchResult[]> {
+  const q = query.trim().slice(0, 120);
+  if (q.length < 2) return [];
+  const term = `%${q}%`;
+  const rows = await db
+    .select({
+      userId: profiles.userId,
+      displayName: profiles.displayName,
+      email: users.email,
+    })
+    .from(profiles)
+    .leftJoin(users, eq(users.id, profiles.userId))
+    .where(or(ilike(profiles.displayName, term), ilike(users.email, term)))
+    .orderBy(asc(profiles.displayName), asc(profiles.userId))
+    .limit(STUDENT_SEARCH_LIMIT);
+  return rows.map((row) => ({
+    userId: row.userId,
+    displayName: row.displayName,
+    email: row.email,
+  }));
+}
+
+export interface EligibleApplicationResult {
+  id: string;
+  internshipTitle: string;
+  lifecycleStatus: string;
+  submittedAt: Date | null;
+}
+
+/**
+ * Submitted applications of one student eligible for placement linkage.
+ * Callers MUST enforce requireAdmin before invoking.
+ */
+export async function listEligibleApplicationsForStudent(
+  studentUserId: string,
+): Promise<EligibleApplicationResult[]> {
+  const rows = await db
+    .select({
+      id: applications.id,
+      lifecycleStatus: applications.lifecycleStatus,
+      submittedAt: applications.submittedAt,
+      internshipTitle: internships.title,
+    })
+    .from(applications)
+    .innerJoin(internships, eq(applications.internshipId, internships.id))
+    .where(
+      and(
+        eq(applications.applicantUserId, studentUserId),
+        eq(applications.isDraft, false),
+      ),
+    )
+    .orderBy(desc(applications.submittedAt), asc(applications.id))
+    .limit(50);
+  return rows;
+}
+
 // --------------------------------------------------------------- placements
 export async function listAdminPlacements(input: {
   q?: string;
@@ -737,3 +863,85 @@ export async function isAdmin(userId: string): Promise<boolean> {
 }
 
 export { formatSgd };
+
+// ---------------------------------------------------------------- contacts
+export type ContactHandlingFilter = "all" | "open" | "handled";
+
+/** Admin-only contact list with Open / Handled filtering. */
+export async function listAdminContacts(input: {
+  q?: string;
+  handling?: ContactHandlingFilter;
+  page: number;
+  pageSize: number;
+}) {
+  const conds = [];
+  if (input.handling === "open") conds.push(eq(contactSubmissions.handlingStatus, "Open"));
+  else if (input.handling === "handled") conds.push(eq(contactSubmissions.handlingStatus, "Handled"));
+  if (input.q) {
+    const term = `%${input.q}%`;
+    const match = or(
+      ilike(contactSubmissions.name, term),
+      ilike(contactSubmissions.email, term),
+      ilike(contactSubmissions.subject, term),
+    );
+    if (match) conds.push(match);
+  }
+  const where = conds.length > 0 ? and(...conds) : undefined;
+  const rows = await db
+    .select()
+    .from(contactSubmissions)
+    .where(where)
+    .orderBy(desc(contactSubmissions.createdAt), desc(contactSubmissions.id))
+    .limit(input.pageSize)
+    .offset((input.page - 1) * input.pageSize);
+  const totalRows = await db.select({ n: count() }).from(contactSubmissions).where(where);
+  const openRows = await db
+    .select({ n: count() })
+    .from(contactSubmissions)
+    .where(eq(contactSubmissions.handlingStatus, "Open"));
+  const handledRows = await db
+    .select({ n: count() })
+    .from(contactSubmissions)
+    .where(eq(contactSubmissions.handlingStatus, "Handled"));
+  return {
+    rows,
+    total: singleCount(totalRows),
+    openCount: singleCount(openRows),
+    handledCount: singleCount(handledRows),
+  };
+}
+
+/**
+ * Admin-only contact handling transition (A3). Mark handled or reopen.
+ * Audited; contact history is never modified or deleted.
+ */
+export async function setContactHandling(input: {
+  adminId: string;
+  contactId: string;
+  handled: boolean;
+}) {
+  return db.transaction(async (tx) => {
+    const rows = await tx
+      .select()
+      .from(contactSubmissions)
+      .where(eq(contactSubmissions.id, input.contactId))
+      .limit(1)
+      .for("update");
+    if (rows.length === 0) throw new DomainError("Enquiry not found.");
+    await tx
+      .update(contactSubmissions)
+      .set(
+        input.handled
+          ? { handlingStatus: "Handled", handledAt: new Date(), handledBy: input.adminId }
+          : { handlingStatus: "Open", handledAt: null, handledBy: null },
+      )
+      .where(eq(contactSubmissions.id, input.contactId));
+    await audit({
+      actorUserId: input.adminId,
+      entityType: "contact",
+      entityId: input.contactId,
+      action: input.handled ? "contact-handled" : "contact-reopened",
+      changes: {},
+    }, tx);
+  });
+}

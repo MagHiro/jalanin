@@ -13,6 +13,12 @@ interface Props {
     lifecycleStatus: string;
     [key: string]: unknown;
   } | null;
+  /** Owner-scoped CV metadata (filename + upload date; never a storage path). */
+  existingCv?: {
+    originalFilename: string;
+    byteSize: number;
+    createdAt: string;
+  } | null;
 }
 
 /**
@@ -20,7 +26,7 @@ interface Props {
  * idempotent). Drafts save explicitly per PRD (autosave undecided, B-caveat).
  * Grouped single-page layout; approved fields only — no new required fields.
  */
-export function ApplicationForm({ internshipId, existing }: Props) {
+export function ApplicationForm({ internshipId, existing, existingCv = null }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState<"draft" | "submit" | null>(null);
   const inFlight = useRef(false);
@@ -36,6 +42,9 @@ export function ApplicationForm({ internshipId, existing }: Props) {
     existing !== null &&
     !existing.isDraft &&
     !["New", "In Review"].includes(String(existing.lifecycleStatus));
+  const submittedExisting = existing !== null && !existing.isDraft;
+  const cvSizeLabel = (bytes: number) =>
+    bytes > 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
 
   async function collect(base: FormData): Promise<Record<string, unknown>> {
     return {
@@ -216,8 +225,14 @@ export function ApplicationForm({ internshipId, existing }: Props) {
         <section data-reveal aria-labelledby="documents" className="form-section">
           <h2 id="documents">{step("3", "Documents")}</h2>
           <label className="field-label mt-4" htmlFor="cv-upload">
-            <span>CV (PDF or DOCX, max 5 MB) *</span>
+            <span>{existingCv ? "Replace CV (PDF or DOCX, max 5 MB)" : "CV (PDF or DOCX, max 5 MB) *"}</span>
           </label>
+          {existingCv && !cvName && (
+            <p role="status" className="mt-2 rounded-lg bg-secondary px-3 py-2 text-sm text-foreground">
+              <span aria-hidden="true">📄 </span>Current CV: <b>{existingCv.originalFilename}</b>
+              <span className="text-muted-foreground"> · {cvSizeLabel(existingCv.byteSize)} · uploaded {new Date(existingCv.createdAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" })}</span>
+            </p>
+          )}
           <div className="upload-zone mt-3">
             <input
               id="cv-upload"
@@ -230,12 +245,13 @@ export function ApplicationForm({ internshipId, existing }: Props) {
             />
             {cvName ? (
               <p role="status" className="mt-2 text-sm text-foreground">
-                <span aria-hidden="true">📄 </span>Selected: <b>{cvName}</b>{cvSize && <span className="text-muted-foreground"> · {cvSize}</span>}
+                <span aria-hidden="true">📄 </span>{existingCv ? "Replacement selected" : "Selected"}: <b>{cvName}</b>{cvSize && <span className="text-muted-foreground"> · {cvSize}</span>}
+                {existingCv && <span className="block text-xs text-muted-foreground">Your current CV stays attached until you save. Choosing a file replaces it on save.</span>}
               </p>
             ) : (
-              <p className="mt-2 text-xs text-muted-foreground">Choose your latest CV to include with your application.</p>
+              <p className="mt-2 text-xs text-muted-foreground">{existingCv ? "Leave empty to keep your current CV. Choose a file only to replace it." : "Choose your latest CV to include with your application."}</p>
             )}
-            <p id="cv-upload-help" className="mt-2 text-xs text-muted-foreground">Private upload · PDF or DOCX, up to 5 MB. Only authorized Jalanin administrators can download your CV.</p>
+            <p id="cv-upload-help" className="mt-2 text-xs text-muted-foreground">Private upload · PDF or DOCX, up to 5 MB. Only authorized Jalanin administrators can download your CV.{submittedExisting && " Replacing the CV on a submitted application requires admin re-review."}</p>
           </div>
         </section>
 

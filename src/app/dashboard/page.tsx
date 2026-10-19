@@ -4,6 +4,7 @@ import { ArrowRight, BriefcaseBusiness, Check, Compass, FilePenLine, MapPin, Mov
 import { desc, eq } from "drizzle-orm";
 import { getSessionUser } from "@/lib/auth/require";
 import { listStudentApplications } from "@/features/applications/service";
+import { statusGuidanceFor, RE_REVIEW_GUIDANCE } from "@/lib/workflow/status-guidance";
 import { db } from "@/lib/db/client";
 import { placements } from "@/lib/db/schema";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -85,10 +86,15 @@ export default async function DashboardPage() {
         {apps.length > 0 ? <ul className="journey-records">
           {apps.slice(0, 4).map(({ application, internshipTitle, internshipCity, internshipCountry }) => {
             const href = application.isDraft ? `/apply/${application.internshipId}` : `/dashboard/applications/${application.id}`;
+            const guidance = application.isDraft
+              ? statusGuidanceFor("Draft")
+              : application.needsReReview
+                ? RE_REVIEW_GUIDANCE
+                : statusGuidanceFor(application.lifecycleStatus);
             return <li key={application.id}>
               <Link href={href} className="journey-record">
                 <span className="journey-record-symbol" aria-hidden="true">{application.isDraft ? <FilePenLine size={19} /> : <BriefcaseBusiness size={19} />}</span>
-                <span className="journey-record-main"><strong>{internshipTitle}</strong><small><MapPin size={13} aria-hidden="true" /> {internshipCity}, {internshipCountry}</small></span>
+                <span className="journey-record-main"><strong>{internshipTitle}</strong><small><MapPin size={13} aria-hidden="true" /> {internshipCity}, {internshipCountry}</small><small className="journey-record-guidance">{guidance.actionRequired ? guidance.action : "No action required"}</small></span>
                 <span className="journey-record-end"><StatusBadge status={application.isDraft ? "Draft" : application.lifecycleStatus} />{application.needsReReview && <small className="journey-review-note">Re-review needed</small>}</span>
                 <ArrowRight className="journey-record-arrow" size={17} aria-hidden="true" />
               </Link>
@@ -110,7 +116,7 @@ export default async function DashboardPage() {
           {studentPlacements.length > 0 ? <><p>Here’s the latest placement recorded for you.</p><div className="journey-destination-record"><strong>{studentPlacements[0].role}</strong><span>{studentPlacements[0].organization}</span><StatusBadge status={studentPlacements[0].placementStatus} /></div></> : <p>When your team arranges a placement, the details and next steps will appear here.</p>}
           <Link href="/dashboard/placements">View placements <ArrowRight size={16} aria-hidden="true" /></Link>
         </section>
-        <div className="journey-help"><span>NEED A HAND?</span><p>Questions along the way? We’re here to help you figure out your next step.</p><Link href="/contact">Get in touch <MoveUpRight size={16} aria-hidden="true" /></Link></div>
+        <div className="journey-help"><span>NEED A HAND?</span><p>Questions along the way? We’re here to help you figure out your next step.</p><Link href="/#contact">Get in touch <MoveUpRight size={16} aria-hidden="true" /></Link></div>
       </aside>
     </div>
   </div>;

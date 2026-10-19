@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth/require";
 import { getApplicationForStudent } from "@/features/applications/service";
+import { ApplicationStatusGuidance } from "@/components/applications/status-guidance";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { StatusTimeline } from "@/components/ui/status-timeline";
 import { BriefcaseBusiness, MapPin, CalendarDays } from "lucide-react";
@@ -90,6 +91,11 @@ export default async function StudentApplicationDetailPage({
       </section>
 
       <aside className="student-submission-progress" aria-label="Application progress">
+      <ApplicationStatusGuidance
+        status={application.lifecycleStatus}
+        isDraft={application.isDraft}
+        needsReReview={application.needsReReview}
+      />
       {application.isDraft && <section className="surface-card"><p className="eyebrow">Your next step</p><h2>Finish your application</h2><p>Your draft is saved. Resume it to review your details and submit it to the team.</p><Link href={`/apply/${application.internshipId}`} className="btn btn-primary">Continue application</Link></section>}
       {!application.isDraft && (
         <>

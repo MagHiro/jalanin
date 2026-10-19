@@ -49,7 +49,7 @@ export default async function StudentApplicationsPage({ searchParams }: { search
           <div className="crm-mobile-bottom"><span className="crm-record-sub">{application.submittedAt ? new Date(application.submittedAt).toLocaleDateString("en-SG") : "Not submitted"}</span><Link className="crm-row-link" href={application.isDraft ? `/apply/${application.internshipId}` : `/dashboard/applications/${application.id}`}>{application.isDraft ? "Resume draft" : "View details"}</Link></div>
         </li>)}</ul>
       </> : <div className="crm-empty"><EmptyState icon="☰" title={view === "drafts" ? "No saved drafts" : view === "submitted" ? "No submitted applications" : "No applications yet"} body={view === "drafts" ? "Drafts appear here after you save an application." : "Explore internships and apply when you find a good fit."} actionHref="/opportunities" actionLabel="Browse internships" /></div>}
-      {visible.length > 0 && <div className="crm-student-help">Your application status updates here as the team reviews it. Quotation terms are sent by email. <Link href="/contact">Need help? <ArrowRight size={13} /></Link></div>}
+      {visible.length > 0 && <div className="crm-student-help">Your application status updates here as the team reviews it. Quotation terms are sent by email. <Link href="/#contact">Need help? <ArrowRight size={13} /></Link></div>}
     </section>
   </div>;
 }

@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db/client";
-import { applications, internships } from "@/lib/db/schema";
+import { applicationDocuments, applications, internships } from "@/lib/db/schema";
 import { AuthError, requireStudent } from "@/lib/auth/require";
 import { applicationRequestSchema } from "@/features/applications/request";
 import { logServerError } from "@/lib/observability/logger";
@@ -44,7 +44,23 @@ export default async function ApplyPage({
       existing[0] ? undefined : eq(internships.publicationStatus, "Published"),
     ))
     .limit(1);
-    return { existing, listing };
+    // Owner-scoped CV metadata (filename + upload date only — never the
+    // private storage path). Students cannot download CVs (B05 interim).
+    const existingCv = existing[0]
+      ? await db
+        .select({
+          originalFilename: applicationDocuments.originalFilename,
+          byteSize: applicationDocuments.byteSize,
+          createdAt: applicationDocuments.createdAt,
+        })
+        .from(applicationDocuments)
+        .where(and(
+          eq(applicationDocuments.applicationId, existing[0].id),
+          eq(applicationDocuments.documentType, "cv"),
+        ))
+        .limit(1)
+      : [];
+    return { existing, listing, existingCv: (existingCv ?? [])[0] ?? null };
   })().catch(() => {
     const incidentId = logServerError("applications.apply.load.failed", null);
     return { incidentId };
@@ -95,7 +111,7 @@ export default async function ApplyPage({
           description={state}
         />
       </div>
-      <ApplicationForm internshipId={internship.id} existing={existing[0] ? { ...existing[0] } : null} />
+      <ApplicationForm internshipId={internship.id} existing={existing[0] ? { ...existing[0] } : null} existingCv={data.existingCv ? { originalFilename: data.existingCv.originalFilename, byteSize: data.existingCv.byteSize, createdAt: data.existingCv.createdAt instanceof Date ? data.existingCv.createdAt.toISOString() : String(data.existingCv.createdAt) } : null} />
     </div>
   );
 }

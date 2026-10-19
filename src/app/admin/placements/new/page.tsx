@@ -1,11 +1,20 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/require";
+import { getAdminStudent } from "@/features/admin/service";
 import { PlacementForm } from "@/components/admin/placement-form";
 
 export const metadata = { title: "New placement", robots: "noindex" };
 
-export default async function NewPlacementPage() {
+export default async function NewPlacementPage({ searchParams }: {
+  searchParams: { student?: string };
+}) {
   await requireAdmin();
+  const preselectedId = /^[0-9a-f-]{36}$/i.test(searchParams.student ?? "")
+    ? searchParams.student!
+    : undefined;
+  const preselectedLabel = preselectedId
+    ? (await getAdminStudent(preselectedId))?.profile.displayName ?? undefined
+    : undefined;
   return (
     <div className="workspace-editor-page">
       <div className="workspace-editor-heading">
@@ -16,13 +25,12 @@ export default async function NewPlacementPage() {
         </nav>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">New placement</h1>
         <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
-          Placements are created and managed manually. Find the student user ID on their{" "}
-          <Link href="/admin/students" className="font-medium text-primary hover:underline">student record</Link>.
-          New placements start as Preparing.
+          Search for the student by name or email, then optionally link one of
+          their submitted applications. New placements start as Preparing.
         </p>
       </div>
       <div className="workspace-editor-layout">
-      <PlacementForm />
+      <PlacementForm initial={preselectedId ? { studentUserId: preselectedId, studentLabel: preselectedLabel ?? undefined } : undefined} />
       <aside className="workspace-editor-aside" aria-label="Placement workflow">
         <h2>Placement workflow</h2>
         <p>Placements are linked to student profiles and visible to their owners. The status changes only through the recorded workflow.</p>

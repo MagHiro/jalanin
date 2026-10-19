@@ -38,10 +38,22 @@ it("limits the application lookup to the owner and filters unpublished listings 
 
 it("shows an unpublished title and preserved-draft guidance to an existing owner", async () => {
   mocks.limit.mockResolvedValueOnce([{ id: internshipId, isDraft: true }])
-    .mockResolvedValueOnce([{ id: internshipId, title: "Private listing title", publicationStatus: "Unpublished" }]);
+    .mockResolvedValueOnce([{ id: internshipId, title: "Private listing title", publicationStatus: "Unpublished" }])
+    .mockResolvedValueOnce([]);
   const html = renderToStaticMarkup(await ApplyPage({ params: { internshipId } }));
   expect(html).toContain("Private listing title");
   expect(html).toContain("not currently accepting applications");
+});
+
+it("loads owner-scoped CV metadata without exposing storage paths", async () => {
+  mocks.limit.mockResolvedValueOnce([{ id: internshipId, isDraft: true }])
+    .mockResolvedValueOnce([{ id: internshipId, title: "Listing", publicationStatus: "Published" }])
+    .mockResolvedValueOnce([{ originalFilename: "cv.pdf", byteSize: 1024, createdAt: new Date("2026-01-02") }]);
+  const html = renderToStaticMarkup(await ApplyPage({ params: { internshipId } }));
+  // Form is mocked; the page must render without leaking storage internals.
+  expect(html).not.toContain("storagePath");
+  expect(html).not.toContain("file:");
+  expect(mocks.limit).toHaveBeenCalledTimes(3);
 });
 
 it("does not expose DB exceptions in the page or incident logs", async () => {

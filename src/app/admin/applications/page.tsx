@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowDown, ArrowUp, Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
 import { getAdminOverview, listAdminApplications } from "@/features/admin/service";
+import { waitingDays, waitingLabel } from "@/lib/workflow/waiting-time";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -22,10 +23,11 @@ export default async function AdminApplicationsPage({ searchParams }: {
   const rawPage = Number(searchParams.page ?? 1);
   const page = Number.isSafeInteger(rawPage) ? Math.max(1, Math.min(100000, rawPage)) : 1;
   const pageSize = 20;
+  const sort = searchParams.sort === "oldest" ? "oldest" : searchParams.sort === "name" ? "name" : searchParams.sort === "waiting" ? "waiting" : "newest";
   const [{ rows, total }, overview, reReviewQueue] = await Promise.all([listAdminApplications({
     q: searchParams.q,
     status: searchParams.status,
-    sort: searchParams.sort === "oldest" ? "oldest" : searchParams.sort === "name" ? "name" : "newest",
+    sort,
     needsReReview: searchParams.rereview === "1" ? true : undefined,
     page, pageSize,
   }), getAdminOverview(), listAdminApplications({ needsReReview: true, page: 1, pageSize: 1 })]);
@@ -60,7 +62,7 @@ export default async function AdminApplicationsPage({ searchParams }: {
           <WorkspaceSelect name="status" ariaLabel="Filter by application status" defaultValue={filterStatus} options={[{ value: "", label: "All statuses" }, ...STATUSES.map(value => ({ value, label: value }))]} />
         </label>
         <label className="crm-toolbar-select"><span className="sr-only">Sort applications</span>
-          <WorkspaceSelect name="sort" ariaLabel="Sort applications" defaultValue={searchParams.sort ?? "newest"} options={[{ value: "newest", label: "Newest first" }, { value: "oldest", label: "Oldest first" }, { value: "name", label: "Applicant A–Z" }]} />
+          <WorkspaceSelect name="sort" ariaLabel="Sort applications" defaultValue={sort} options={[{ value: "newest", label: "Newest first" }, { value: "oldest", label: "Oldest first" }, { value: "waiting", label: "Oldest waiting" }, { value: "name", label: "Applicant A–Z" }]} />
         </label>
         <label className="crm-toolbar-check"><input type="checkbox" name="rereview" value="1" defaultChecked={reReview} /> Re-review</label>
         <button type="submit" className="btn btn-primary crm-apply">Apply</button>
@@ -73,24 +75,30 @@ export default async function AdminApplicationsPage({ searchParams }: {
             <thead><tr>
               <th scope="col"><Link href={listHref(path, searchParams, { sort: "name" })} className="crm-sort">Applicant {searchParams.sort === "name" && <ArrowDown size={13} />}</Link></th>
               <th scope="col">Internship</th><th scope="col">Lifecycle stage</th>
+              <th scope="col"><Link href={listHref(path, searchParams, { sort: "waiting" })} className="crm-sort">Waiting {sort === "waiting" ? <ArrowUp size={13} /> : <ArrowDown size={13} />}</Link></th>
               <th scope="col"><Link href={listHref(path, searchParams, { sort: searchParams.sort === "oldest" ? "newest" : "oldest" })} className="crm-sort">Submitted {searchParams.sort === "oldest" ? <ArrowUp size={13} /> : <ArrowDown size={13} />}</Link></th>
               <th scope="col" className="crm-col-numeric">Revision</th><th scope="col" className="crm-col-action">Action</th>
             </tr></thead>
-            <tbody>{rows.map(({ application, internshipTitle }) => <tr key={application.id}>
+            <tbody>{rows.map(({ application, internshipTitle, waitingSince }) => {
+              const label = waitingSince ? waitingLabel(waitingDays(waitingSince)) : null;
+              return <tr key={application.id}>
               <td><Link href={`/admin/applications/${application.id}`} className="crm-record-name">{application.firstName} {application.lastName}</Link><span className="crm-record-sub">{application.email}</span></td>
               <td><span className="crm-record-secondary">{internshipTitle}</span></td>
               <td><div className="crm-badge-stack"><StatusBadge status={application.lifecycleStatus} />{application.needsReReview && <span className="badge badge-rereview">Re-review</span>}</div></td>
+              <td className="crm-date">{label ? <time className="tnum" dateTime={waitingSince!.toISOString()} title={`Waiting since ${waitingSince!.toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" })}`}>{label}</time> : <span className="text-muted-foreground">—</span>}</td>
               <td className="crm-date">{application.submittedAt ? <time dateTime={new Date(application.submittedAt).toISOString()}>{new Date(application.submittedAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" })}</time> : "—"}</td>
               <td className="crm-col-numeric tnum">r{application.revision}</td>
               <td className="crm-col-action"><RecordActions primary={{ href: `/admin/applications/${application.id}`, label: "Review" }} items={[{ href: `mailto:${application.email}`, label: "Email applicant" }]} /></td>
-            </tr>)}</tbody>
+            </tr>;})}</tbody>
           </table>
         </div>
-        <ul className="crm-mobile-records md:hidden">{rows.map(({ application, internshipTitle }) => <li key={application.id}>
+        <ul className="crm-mobile-records md:hidden">{rows.map(({ application, internshipTitle, waitingSince }) => {
+          const label = waitingSince ? waitingLabel(waitingDays(waitingSince)) : null;
+          return <li key={application.id}>
           <div className="crm-mobile-top"><Link href={`/admin/applications/${application.id}`} className="crm-record-name">{application.firstName} {application.lastName}</Link><StatusBadge status={application.lifecycleStatus} /></div>
-          <p>{internshipTitle}</p><p className="crm-record-sub">{application.email} · r{application.revision}</p>
+          <p>{internshipTitle}</p><p className="crm-record-sub">{application.email} · r{application.revision}{label ? ` · waiting ${label.toLowerCase()}` : ""}</p>
           <div className="crm-mobile-bottom">{application.needsReReview && <span className="badge badge-rereview">Re-review</span>}<Link href={`/admin/applications/${application.id}`} className="crm-row-link">Review record</Link></div>
-        </li>)}</ul>
+        </li>;})}</ul>
       </> : <div className="crm-empty"><EmptyState icon="☰" title="No applications in this view" body="Adjust the search or filters to find an application." actionHref={path} actionLabel="Reset filters" /></div>}
       <Pagination page={page} totalPages={totalPages} pathname={path} searchParams={searchParams} total={total} pageSize={pageSize} />
     </section>

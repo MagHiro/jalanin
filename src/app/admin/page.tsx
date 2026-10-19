@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Activity, ArrowRight, ArrowRightLeft, Bell, BriefcaseBusiness, CheckCircle2, ChevronRight, CircleDot, ClipboardList, Clock3, FileCheck2, FilePenLine, FileText, Plus, Users } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
 import { getAdminOverview, listAdminApplications, recentAudit } from "@/features/admin/service";
+import { waitingDays, waitingLabel } from "@/lib/workflow/waiting-time";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { adminActivityHref, describeAdminActivity } from "@/lib/ui/admin-activity";
 
@@ -20,11 +21,15 @@ const stages = [
 
 export default async function AdminOverviewPage() {
   await requireAdmin();
-  const [overview, audit, recentApplications] = await Promise.all([
+  const [overview, audit, recentApplications, longestWaiting] = await Promise.all([
     getAdminOverview(),
     recentAudit(6),
     listAdminApplications({ page: 1, pageSize: 5, sort: "newest" }),
+    listAdminApplications({ page: 1, pageSize: 3, sort: "waiting" }),
   ]);
+  const waitingQueue = longestWaiting.rows.filter(
+    (row) => (row.application.lifecycleStatus === "New" || row.application.lifecycleStatus === "In Review") && row.waitingSince,
+  );
   const totalApplications = Object.values(overview.statusCounts).reduce((sum, value) => sum + value, 0);
   const totalPlacements = Object.values(overview.placementCounts).reduce((sum, value) => sum + value, 0);
   const newCount = overview.statusCounts.New ?? 0;
@@ -55,6 +60,21 @@ export default async function AdminOverviewPage() {
         <p>{newCount > 0 ? "Fresh submissions are ready for your team's first review." : "No new submissions to review right now."}</p>
         <Link href="/admin/applications?status=New">Go to review queue <ArrowRight size={18} aria-hidden="true" /></Link>
         <div className="ops-priority-foot"><span>{inReviewCount.toLocaleString("en-SG")} in review</span><Link href="/admin/applications?rereview=1">Re-review requests <ChevronRight size={15} aria-hidden="true" /></Link></div>
+        {waitingQueue.length > 0 && (
+          <div className="ops-priority-waiting">
+            <span>Longest waiting</span>
+            <ul>
+              {waitingQueue.map(({ application, waitingSince }) => (
+                <li key={application.id}>
+                  <Link href={`/admin/applications/${application.id}`}>
+                    {application.firstName} {application.lastName} · <span className="tnum">{waitingLabel(waitingDays(waitingSince))}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <Link href="/admin/applications?sort=waiting">Oldest waiting first <ChevronRight size={15} aria-hidden="true" /></Link>
+          </div>
+        )}
       </div>
     </section>
 

@@ -58,7 +58,7 @@ export default async function AdminStudentDetailPage({ params }: { params: { id:
           </div>
           {data.placements.length ? <ul className="workspace-record-rows">
             {data.placements.map(p => <li key={p.id}><div><Link href={"/admin/placements/" + p.id + "/edit"} className="workspace-record-row-title">{p.role}</Link><p>{p.organization} · {p.countryCode} · {p.startDate || "Dates to confirm"}</p></div><div className="workspace-record-row-actions"><StatusBadge status={p.placementStatus}/><Link href={"/admin/placements/" + p.id + "/edit"} aria-label={"Manage " + p.role}><ArrowRight size={17}/></Link></div></li>)}
-          </ul> : <div className="workspace-record-empty"><span className="student-record-item-icon" aria-hidden="true"><BriefcaseBusiness size={22}/></span><h3>No placements yet</h3><p>When an opportunity is arranged, its organization, role and progress will appear here.</p><Link href="/admin/placements/new">Create a placement <ArrowRight size={14}/></Link></div>}
+          </ul> : <div className="workspace-record-empty"><span className="student-record-item-icon" aria-hidden="true"><BriefcaseBusiness size={22}/></span><h3>No placements yet</h3><p>When an opportunity is arranged, its organization, role and progress will appear here.</p><Link href={`/admin/placements/new?student=${data.profile.userId}`}>Create a placement <ArrowRight size={14}/></Link></div>}
         </section>
       </div>
       <aside className="workspace-student-record-side" aria-label="Student information">
@@ -68,6 +68,7 @@ export default async function AdminStudentDetailPage({ params }: { params: { id:
             <div><dt><CalendarDays size={15}/> Joined</dt><dd className="tnum">{new Date(data.profile.createdAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" })}</dd></div>
             <div><dt><CalendarDays size={15}/> Last updated</dt><dd className="tnum">{new Date(data.profile.updatedAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" })}</dd></div>
           </dl>
+          <Link href={`/admin/placements/new?student=${data.profile.userId}`} className="btn btn-outline btn-sm mt-3 w-full">Create placement for this student</Link>
           <details className="student-record-reference"><summary>Account reference</summary><p className="tnum">{data.profile.userId}</p></details>
           <div className="workspace-student-privacy"><ShieldCheck size={17}/><span>Account details are visible only within the authorized admin workspace.</span></div>
         </section>

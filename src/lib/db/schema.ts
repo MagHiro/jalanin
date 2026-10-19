@@ -399,11 +399,20 @@ export const contactSubmissions = pgTable(
     subject: varchar("subject", { length: 200 }),
     message: text("message").notNull(),
     origin: varchar("origin", { length: 40 }).default("contact-form").notNull(),
+    // Enquiry handling state (A3): Open / Handled. Defaults to Open.
+    handlingStatus: varchar("handling_status", { length: 20 })
+      .default("Open")
+      .notNull(),
+    handledAt: timestamp("handled_at", { withTimezone: true }),
+    handledBy: uuid("handled_by"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
   },
-  (t) => [index("contact_created_idx").on(t.createdAt)],
+  (t) => [
+    index("contact_created_idx").on(t.createdAt),
+    index("contact_handling_idx").on(t.handlingStatus, t.createdAt),
+  ],
 );
 
 export const consentRecords = pgTable("consent_records", {

@@ -10,8 +10,8 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/db/schema", () => Object.fromEntries([
   "adminNotifications", "adminUsers", "applicationDocuments", "applicationRevisions",
-  "applicationStatusEvents", "applications", "auditEvents", "categories", "internships",
-  "placements", "profiles", "quotations",
+  "applicationStatusEvents", "applications", "auditEvents", "categories", "contactSubmissions",
+  "internships", "placements", "profiles", "quotations", "users",
 ].map((name) => [name, new Proxy({ table: name }, {
   get: (target, key) => key === "table" ? target.table : `${name}.${String(key)}`,
 })])));

@@ -4,12 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { allowedNextPlacementStatusesUI } from "./statuses";
+import { StudentPlacementPicker } from "./student-placement-picker";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { DateInput } from "@/components/ui/date-input";
 
 interface Initial {
   id?: string;
   studentUserId?: string;
+  studentLabel?: string;
   applicationId?: string | null;
   organization?: string;
   role?: string;
@@ -97,12 +99,10 @@ export function PlacementForm({ initial }: { initial?: Initial }) {
       <form onSubmit={onSubmit} aria-label={initial?.id ? "Edit placement" : "New placement"} className="form-section">
         <div className="grid gap-4 md:grid-cols-2">
           {!initial?.id && (
-            <>
-              <label className="field-label"><span>Student user ID *</span>
-                <input name="studentUserId" required defaultValue={v("studentUserId")} placeholder="UUID from student record" className="field font-mono text-[13px]" /></label>
-              <label className="field-label"><span>Application ID <span className="font-normal text-muted-foreground">(optional)</span></span>
-                <input name="applicationId" defaultValue={v("applicationId")} placeholder="Link to application" className="field font-mono text-[13px]" /></label>
-            </>
+            <StudentPlacementPicker
+              preselectedStudentId={initial?.studentUserId || undefined}
+              preselectedStudentLabel={initial?.studentLabel}
+            />
           )}
           <label className="field-label"><span>Organization *</span>
             <input name="organization" required defaultValue={v("organization")} className="field" placeholder="Marina Hotel" /></label>
