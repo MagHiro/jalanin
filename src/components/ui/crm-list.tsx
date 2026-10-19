@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, LayoutList, X } from "lucide-react";
+import { ArrowRight, LayoutList, X } from "lucide-react";
 
 /** URL-backed record views preserve pagination, browser history and shareable filters. */
 export function listHref(pathname: string, params: Record<string, string | undefined>, changes: Record<string, string | null>) {
@@ -43,6 +43,6 @@ export function CrmTableMeta({ total, page, pageSize, noun, note }: {
   const last = Math.min(page * pageSize, total);
   return <div className="crm-table-meta" role="status">
     <span className="crm-table-meta-count tnum">{total === 0 ? `0 ${noun}` : `${first}–${last} of ${total} ${noun}`}</span>
-    {note && <span className="crm-table-meta-note">{note} <ArrowUpRight size={13} aria-hidden="true" /></span>}
+    {note && <span className="crm-table-meta-note">{note} <ArrowRight size={13} aria-hidden="true" /></span>}
   </div>;
 }
