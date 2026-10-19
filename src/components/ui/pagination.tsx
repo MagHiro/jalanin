@@ -5,11 +5,15 @@ export function Pagination({
   totalPages,
   pathname,
   searchParams,
+  total,
+  pageSize = 20,
 }: {
   page: number;
   totalPages: number;
   pathname: string;
   searchParams: Record<string, string | undefined>;
+  total?: number;
+  pageSize?: number;
 }) {
   if (totalPages <= 1 && page <= 1) return null;
   const pageHref = (target: number) => {
@@ -22,9 +26,9 @@ export function Pagination({
   };
 
   return (
-    <nav aria-label="Pagination" className="flex flex-wrap items-center justify-center gap-3 text-sm">
+    <nav aria-label="Pagination" className="crm-pagination">
       {page > 1 && <Link href={pageHref(Math.min(page - 1, totalPages))} className="btn btn-outline btn-sm">Previous</Link>}
-      <span className="tnum text-muted-foreground" role="status">Page {page} of {totalPages}</span>
+      <span className="tnum text-muted-foreground" role="status">{total !== undefined ? `${Math.min((page - 1) * pageSize + 1, total)}–${Math.min(page * pageSize, total)} of ${total}` : `Page ${page} of ${totalPages}`}</span>
       {page < totalPages && <Link href={pageHref(page + 1)} className="btn btn-outline btn-sm">Next</Link>}
     </nav>
   );
