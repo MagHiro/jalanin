@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { DomainIcon } from "./domain-icon";
 
-/** Full record-page masthead, shared by the Attio-like workspace views. */
+/** Editorial masthead shared by record lists and operational editors. */
 export function PageHeader({ eyebrow, title, description, actions, icon }: {
   eyebrow?: string; title: string; description?: ReactNode; actions?: ReactNode; icon?: ReactNode;
 }) {

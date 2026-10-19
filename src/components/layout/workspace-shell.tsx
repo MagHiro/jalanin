@@ -105,7 +105,7 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
   }, [searchOpen]);
 
   const brand = <Link href={home} className="workspace-brand" aria-label="Jalanin workspace home">
-    <span className="workspace-brand-mark" aria-hidden="true">j<span>.</span></span>
+    <span className="workspace-brand-mark" aria-hidden="true">j.</span>
     <span className="workspace-brand-name">jalanin<span className="workspace-brand-role">{isAdmin ? "Admin workspace" : "Student workspace"}</span></span>
   </Link>;
 
@@ -125,8 +125,8 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
 
   const bottom = <div className="workspace-rail-bottom">
     <div className="workspace-sidebar-shortcuts">
-      <Link href={switchLink} className="workspace-sidebar-shortcut">{isAdmin ? <LayoutGrid size={17} /> : <Compass size={17} />}<span>{switchLabel}</span></Link>
-      <Link href="/" className="workspace-sidebar-shortcut"><ArrowLeft size={17} /><span>Back to website</span></Link>
+      <Link href={switchLink} className="workspace-sidebar-shortcut" aria-label={switchLabel} title={switchLabel}>{isAdmin ? <LayoutGrid size={20} /> : <Compass size={20} />}<span>{switchLabel}</span></Link>
+      <Link href="/" className="workspace-sidebar-shortcut" aria-label="Back to website" title="Back to website"><ArrowLeft size={20} /><span>Back to website</span></Link>
     </div>
     <div className="workspace-account">
       <span className="workspace-avatar" aria-hidden="true">{(email?.[0] ?? (isAdmin ? "A" : "S")).toUpperCase()}</span>

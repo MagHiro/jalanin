@@ -30,7 +30,7 @@ export default async function DashboardPage() {
 
   return <div className="workspace-overview">
     <section className="workspace-page-heading workspace-hero workspace-student-hero" aria-labelledby="dashboard-title">
-      <div><p className="workspace-kicker">My workspace / Overview</p><h1 id="dashboard-title">My dashboard</h1><p className="workspace-intro">One place for the opportunities you’ve found, the applications you’ve sent, and the steps ahead.</p></div>
+      <div><p className="workspace-kicker">My workspace / Overview</p><h1 id="dashboard-title">Your next chapter.</h1><p className="workspace-intro">One place for the opportunities you’ve found, the applications you’ve sent, and the steps ahead.</p></div>
       <div className="workspace-hero-aside"><span>YOUR JOURNEY SO FAR</span><strong className="tnum">{apps.length} {apps.length === 1 ? "application" : "applications"} on file</strong><Link href="/opportunities" className="btn btn-primary"><Compass size={17} /> Browse internships</Link></div>
     </section>
 

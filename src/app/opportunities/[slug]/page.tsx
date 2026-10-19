@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Compass } from "lucide-react";
+import { ArrowLeft, ArrowRight, Compass, MapPin, CalendarDays } from "lucide-react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
@@ -67,7 +67,9 @@ export default async function InternshipDetailPage({
             )}
           </p>
 
-          <div className="mt-10 space-y-10 border-t border-border pt-10">
+          <div className="internship-detail-facts"><div><MapPin size={20}/><span>Based in<strong>{internship.city}, {country}</strong></span></div><div><CalendarDays size={20}/><span>Internship dates<strong>{internship.startDate} — {internship.endDate}</strong></span></div></div>
+          <nav className="internship-detail-index" aria-label="Internship sections"><a href="#about-placement">01 · Overview</a><a href="#responsibilities">02 · Responsibilities</a><a href="#requirements">03 · Requirements</a></nav>
+          <div className="internship-detail-content mt-10 space-y-10 border-t border-border pt-10">
             <section aria-labelledby="about-placement" className="max-w-2xl">
               <h2 id="about-placement" className="text-xl font-semibold tracking-tight text-foreground">About this placement</h2>
               <p className="mt-3 whitespace-pre-line text-base leading-7 text-muted-foreground">{internship.description}</p>

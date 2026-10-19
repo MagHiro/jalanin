@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LogOut } from "lucide-react";
 
 export function SignOutButton() {
   const [busy, setBusy] = useState(false);
@@ -10,7 +11,9 @@ export function SignOutButton() {
       <button
         type="button"
         disabled={busy}
-        className="inline-flex min-h-10 items-center rounded-lg px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
+        className="workspace-sign-out inline-flex min-h-10 items-center gap-3 rounded-lg px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
+        aria-label={busy ? "Logging out…" : "Log out"}
+        title="Log out"
         onClick={async () => {
           if (busy) return;
           setBusy(true);
@@ -26,7 +29,8 @@ export function SignOutButton() {
           }
         }}
       >
-        {busy ? "Logging out…" : "Log out"}
+        <LogOut size={20} aria-hidden="true" />
+        <span>{busy ? "Logging out…" : "Log out"}</span>
       </button>
       {error && <p role="alert" className="mt-1 max-w-48 text-xs text-error">{error}</p>}
     </div>

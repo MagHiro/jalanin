@@ -9,6 +9,7 @@ import { InternshipCard } from "@/components/ui/internship-card";
 import { ActiveFilterChips } from "@/components/ui/active-filter-chips";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Reveal } from "@/components/motion/reveal";
+import { WorkspaceSelect } from "@/components/ui/workspace-select";
 
 export const metadata: Metadata = {
   title: "Browse internships",
@@ -86,7 +87,7 @@ export default async function OpportunitiesPage({
     sort === "title" ? "Title A–Z" : sort === "start" ? "Soonest start" : "Newest published";
 
   return (
-    <div className="space-y-9">
+    <div className="opportunity-directory space-y-9">
       <div className="learn-directory-heading">
         <div><p className="eyebrow">Explore opportunities</p><h1 className="section-title mt-4 max-w-2xl">Find an experience that moves you forward.</h1></div>
         <div><p className="mb-4 max-w-sm leading-7 text-muted-foreground">A new city. Real-world experience. Discover a placement that fits your next chapter.</p><span role="status" className="tnum text-sm text-muted-foreground">
@@ -114,30 +115,16 @@ export default async function OpportunitiesPage({
         </label>
         <label className="field-label">
           <span>Country</span>
-          <select name="country" defaultValue={searchParams.country ?? ""} className="field">
-            <option value="">All countries</option>
-            {countries.map((c) => (
-              <option key={c} value={c}>{COUNTRY_NAMES[c] ?? c}</option>
-            ))}
-          </select>
+          <WorkspaceSelect name="country" ariaLabel="Country" defaultValue={searchParams.country ?? ""} options={[{ value: "", label: "All countries" }, ...countries.map(c => ({ value: c, label: COUNTRY_NAMES[c] ?? c }))]} />
         </label>
         <label className="field-label">
           <span>Category</span>
-          <select name="category" defaultValue={searchParams.category ?? ""} className="field">
-            <option value="">All categories</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.slug}>{c.name}</option>
-            ))}
-          </select>
+          <WorkspaceSelect name="category" ariaLabel="Category" defaultValue={searchParams.category ?? ""} options={[{ value: "", label: "All categories" }, ...categories.map(c => ({ value: c.slug, label: c.name }))]} />
         </label>
-        <div className="grid grid-cols-[1fr_auto] items-end gap-2 md:col-span-2">
+        <div className="grid min-w-0 grid-cols-1 items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto] md:col-span-2">
           <label className="field-label">
             <span>Sort</span>
-            <select name="sort" defaultValue={sort} className="field">
-              <option value="newest">Newest published</option>
-              <option value="title">Title A–Z</option>
-              <option value="start">Soonest start</option>
-            </select>
+            <WorkspaceSelect name="sort" ariaLabel="Sort" defaultValue={sort} options={[{ value: "newest", label: "Newest published" }, { value: "title", label: "Title A–Z" }, { value: "start", label: "Soonest start" }]} />
           </label>
           <div className="flex gap-2 pb-0.5">
             <button type="submit" className="btn btn-primary btn-sm min-h-11">

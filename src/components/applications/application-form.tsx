@@ -158,7 +158,11 @@ export function ApplicationForm({ internshipId, existing }: Props) {
   );
 
   return (
-    <Reveal stagger={0.05}>
+    <Reveal stagger={0.05} className="application-workbench">
+    <nav className="application-index" aria-label="Application sections">
+      {[["personal", "Your details"], ["education", "Education & dates"], ["documents", "Your CV"], ["notes", "Additional notes"], ["consent", "Consent & review"]].map(([id, label], index) => <a key={id} href={`#${id}`}><span>0{index + 1}</span>{label}</a>)}
+      <p>Take your time. Use Save draft to keep your progress, then return whenever you’re ready.</p>
+    </nav>
     <form
       onSubmit={(e) => onAction("submit", e)}
       className="space-y-5"
@@ -200,7 +204,7 @@ export function ApplicationForm({ internshipId, existing }: Props) {
               <input name="course" required defaultValue={get("course")} className="field" placeholder="Hospitality Management" /></label>
             <label className="field-label"><span>Graduation year *</span>
               <input name="graduationYear" type="number" required min={1950} max={2100} defaultValue={get("graduationYear")} className="field" placeholder="2026" /></label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="application-date-range">
               <label className="field-label"><span>Preferred start *</span>
                 <DateInput name="preferredStart" type="date" required defaultValue={get("preferredStart")} ariaLabel="Preferred start date" /></label>
               <label className="field-label"><span>Preferred end *</span>
@@ -214,12 +218,13 @@ export function ApplicationForm({ internshipId, existing }: Props) {
           <label className="field-label mt-4" htmlFor="cv-upload">
             <span>CV (PDF or DOCX, max 5 MB) *</span>
           </label>
-          <div className="mt-1 rounded-xl border border-dashed border-border bg-background p-4">
+          <div className="upload-zone mt-3">
             <input
               id="cv-upload"
               name="cv"
               type="file"
               accept=".pdf,.docx"
+              aria-describedby="cv-upload-help"
               onChange={onCvChange}
               className="w-full text-sm text-foreground file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary hover:file:bg-secondary"
             />
@@ -228,8 +233,9 @@ export function ApplicationForm({ internshipId, existing }: Props) {
                 <span aria-hidden="true">📄 </span>Selected: <b>{cvName}</b>{cvSize && <span className="text-muted-foreground"> · {cvSize}</span>}
               </p>
             ) : (
-              <p className="mt-2 text-xs text-muted-foreground">Private upload — only authorized Jalanin administrators can download your CV.</p>
+              <p className="mt-2 text-xs text-muted-foreground">Choose your latest CV to include with your application.</p>
             )}
+            <p id="cv-upload-help" className="mt-2 text-xs text-muted-foreground">Private upload · PDF or DOCX, up to 5 MB. Only authorized Jalanin administrators can download your CV.</p>
           </div>
         </section>
 

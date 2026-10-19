@@ -11,6 +11,7 @@ import { StatusTimeline } from "@/components/ui/status-timeline";
 import { TransitionControls } from "@/components/admin/transition-controls";
 import { ReopenControl } from "@/components/admin/reopen-control";
 import { cn } from "@/components/ui/cn";
+import { FileText, GraduationCap, CalendarDays, ArrowDownToLine } from "lucide-react";
 
 export const metadata = { title: "Review application", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -34,13 +35,17 @@ export default async function AdminApplicationDetailPage({
   ));
 
   return (
-    <div className="workspace-record-detail workspace-mobbin-record min-w-0 space-y-6 [overflow-wrap:anywhere]">
-      <div>
+    <div className="application-review workspace-record-detail workspace-mobbin-record min-w-0 space-y-6 [overflow-wrap:anywhere]">
+      <header className="application-review-header">
         <nav aria-label="Breadcrumb">
           <Link href="/admin/applications" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
             <span aria-hidden="true">←</span> All applications
           </Link>
         </nav>
+        <div className="application-review-identity">
+        <span className="application-review-avatar" aria-hidden="true">{application.firstName?.[0]}{application.lastName?.[0]}</span>
+        <div className="min-w-0">
+        <p className="eyebrow">Application review · Revision {application.revision}</p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">
           {application.firstName} {application.lastName}
         </h1>
@@ -57,15 +62,16 @@ export default async function AdminApplicationDetailPage({
             </span>
           )}
         </p>
+        </div>
+        </div>
         {/* Lifecycle chain (incident.io-informed status chain, DL-04) */}
         {!application.isDraft && (
           <ol aria-label="Application lifecycle" className="mt-3 flex flex-wrap items-center gap-1 text-xs">
-            {APPLICATION_STATUSES.map((s, i) => {
+            {APPLICATION_STATUSES.map((s) => {
                const reached = reachedStatuses.has(s);
                const current = s === application.lifecycleStatus;
               return (
                 <li key={s} className="flex items-center gap-1">
-                  {i > 0 && <span aria-hidden="true" className="text-muted-foreground">›</span>}
                   <span
                     aria-current={current ? "step" : undefined}
                     className={cn(
@@ -84,12 +90,16 @@ export default async function AdminApplicationDetailPage({
             })}
           </ol>
         )}
-      </div>
+      </header>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="application-review-grid">
         <div className="min-w-0 space-y-5">
+          <div className="application-review-highlights">
+            <div><GraduationCap size={20} aria-hidden="true" /><span>Education<strong>{application.university}</strong><small>{application.course} · Class of {application.graduationYear}</small></span></div>
+            <div><CalendarDays size={20} aria-hidden="true" /><span>Preferred availability<strong>{application.preferredStart}</strong><small>to {application.preferredEnd}</small></span></div>
+          </div>
           <section aria-labelledby="snapshot-h" className="surface-card p-5 md:p-6">
-            <h2 id="snapshot-h" className="text-base font-semibold tracking-tight text-foreground">Submitted snapshot</h2>
+            <div className="application-review-section-title"><h2 id="snapshot-h">Submitted snapshot</h2><span>Revision {application.revision}</span></div>
             <dl className="mt-3 grid gap-x-8 text-sm md:grid-cols-2">
               {[["Nationality", application.nationality],
                 ["University", application.university],
@@ -104,7 +114,7 @@ export default async function AdminApplicationDetailPage({
               ))}
             </dl>
             {application.additionalInformation && (
-              <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{application.additionalInformation}</p>
+              <div className="application-review-note"><h3>Student note</h3><p className="whitespace-pre-line">{application.additionalInformation}</p></div>
             )}
           </section>
 
@@ -115,8 +125,9 @@ export default async function AdminApplicationDetailPage({
             ) : (
               <ul className="mt-3 space-y-2">
                 {documents.map((d) => (
-                  <li key={d.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3 text-sm">
-                    <span className="font-medium text-foreground">{d.originalFilename}
+                  <li key={d.id} className="application-review-document">
+                    <span className="application-review-file-icon"><FileText size={22} aria-hidden="true" /></span>
+                    <span className="application-review-file-name">{d.originalFilename}
                       <span className="tnum ml-2 text-xs font-normal text-muted-foreground">
                         {(d.byteSize / 1024).toFixed(0)} KB · {new Date(d.createdAt).toLocaleDateString("en-SG")}
                       </span>
@@ -125,7 +136,7 @@ export default async function AdminApplicationDetailPage({
                       href={`/api/documents/download?documentId=${d.id}`}
                       className="btn btn-outline btn-sm"
                     >
-                      Download
+                      <ArrowDownToLine size={16} aria-hidden="true" /> Download
                     </a>
                   </li>
                 ))}
@@ -183,9 +194,11 @@ export default async function AdminApplicationDetailPage({
           </section>
         </div>
 
-        <div className="min-w-0 space-y-5">
-          <section aria-labelledby="actions-h" className="surface-card h-fit p-5 md:p-6 xl:sticky xl:top-28">
+        <aside className="application-review-actions min-w-0 space-y-5" aria-label="Review controls and internship">
+          <section aria-labelledby="actions-h" className="surface-card h-fit p-5 md:p-6">
+            <p className="eyebrow">Manage application</p>
             <h2 id="actions-h" className="text-base font-semibold tracking-tight text-foreground">Workflow actions</h2>
+            <p className="application-review-action-hint">Current status: <strong>{application.isDraft ? "Draft" : application.lifecycleStatus}</strong>. Changes are recorded in the audit history.</p>
             <div className="mt-3">
               {application.isDraft ? (
                 <p className="text-sm text-muted-foreground">Drafts cannot transition until the student submits.</p>
@@ -210,7 +223,7 @@ export default async function AdminApplicationDetailPage({
               View public listing →
             </Link>
           </section>
-        </div>
+        </aside>
       </div>
     </div>
   );

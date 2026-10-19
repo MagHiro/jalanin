@@ -4,6 +4,7 @@ import { getSessionUser } from "@/lib/auth/require";
 import { getApplicationForStudent } from "@/features/applications/service";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { StatusTimeline } from "@/components/ui/status-timeline";
+import { BriefcaseBusiness, MapPin, CalendarDays } from "lucide-react";
 
 // Student application detail: own record only (IDOR-safe: service returns
 // null for other students' ids → 404, never a leak).
@@ -31,13 +32,15 @@ export default async function StudentApplicationDetailPage({
           <p className="mt-0.5 text-sm">Our team will review it and contact you. You can track the status here.</p>
         </div>
       )}
-      <div>
+      <header className="student-submission-header">
         <nav aria-label="Breadcrumb">
           <Link href="/dashboard/applications" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
             <span aria-hidden="true">←</span> All applications
           </Link>
         </nav>
-        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">{internship.title}</h1>
+        <div className="student-submission-identity"><span className="student-submission-mark" aria-hidden="true"><BriefcaseBusiness size={28}/></span><div><p className="eyebrow">Your internship application</p>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">{internship.title}</h1></div></div>
+        <div className="student-submission-context"><span><MapPin size={16} aria-hidden="true"/>{internship.city}, {internship.countryCode}</span><span><CalendarDays size={16} aria-hidden="true"/>{internship.startDate} — {internship.endDate}</span><Link href={`/opportunities/${internship.slug}`}>View opportunity →</Link></div>
         <p className="mt-2 flex flex-wrap gap-1.5">
           <StatusBadge status={application.isDraft ? "Draft" : application.lifecycleStatus} />
           {application.needsReReview && (
@@ -47,9 +50,11 @@ export default async function StudentApplicationDetailPage({
             </span>
           )}
         </p>
-      </div>
+      </header>
 
+      <div className="student-submission-grid">
       <section aria-labelledby="submission-h" className="surface-card p-5 md:p-6">
+        <p className="eyebrow">Application details · Revision {application.revision}</p>
         <h2 id="submission-h" className="text-base font-semibold tracking-tight text-foreground">Your submission</h2>
         <dl className="mt-3 text-sm">
           {[["Name", `${application.firstName} ${application.lastName}`],
@@ -67,7 +72,7 @@ export default async function StudentApplicationDetailPage({
           ))}
         </dl>
         {application.additionalInformation && (
-          <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{application.additionalInformation}</p>
+          <div className="student-submission-note"><h3>Your additional information</h3><p className="whitespace-pre-line">{application.additionalInformation}</p></div>
         )}
         <div className="mt-4">
           {application.isDraft ? (
@@ -84,10 +89,13 @@ export default async function StudentApplicationDetailPage({
         </div>
       </section>
 
+      <aside className="student-submission-progress" aria-label="Application progress">
+      {application.isDraft && <section className="surface-card"><p className="eyebrow">Your next step</p><h2>Finish your application</h2><p>Your draft is saved. Resume it to review your details and submit it to the team.</p><Link href={`/apply/${application.internshipId}`} className="btn btn-primary">Continue application</Link></section>}
       {!application.isDraft && (
         <>
           <section aria-labelledby="timeline-h" className="surface-card p-5 md:p-6">
             <h2 id="timeline-h" className="text-base font-semibold tracking-tight text-foreground">Status timeline</h2>
+            <p className="student-submission-timeline-caption">Updates recorded by the Jalanin team.</p>
             <div className="mt-4">
               <StatusTimeline
                 events={events.map((e) => ({
@@ -121,6 +129,8 @@ export default async function StudentApplicationDetailPage({
           </section>
         </>
       )}
+      </aside>
+      </div>
     </div>
   );
 }

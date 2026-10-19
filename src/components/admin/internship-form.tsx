@@ -76,9 +76,15 @@ export function InternshipForm({
   const v = (k: keyof Initial): string => String(initial?.[k] ?? "");
 
   return (
-    <form onSubmit={onSubmit} className="max-w-3xl space-y-5" aria-label={initial?.id ? "Edit internship" : "New internship"}>
+    <form onSubmit={onSubmit} className="internship-editor" aria-label={initial?.id ? "Edit internship" : "New internship"}>
+      <nav className="internship-editor-index" aria-label="Listing sections">
+        <a href="#listing-basics"><span>01</span> Essentials</a>
+        <a href="#listing-dates"><span>02</span> Dates</a>
+        <a href="#listing-content"><span>03</span> Role details</a>
+        <a href="#listing-publishing"><span>04</span> Publishing</a>
+      </nav>
       <section aria-labelledby="listing-basics" className="form-section">
-        <h2 id="listing-basics" className="text-base font-semibold tracking-tight text-foreground">Listing basics</h2>
+        <div className="internship-section-heading"><span>01</span><div><h2 id="listing-basics">Listing basics</h2><p>Give the opportunity a clear identity and location.</p></div></div>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <label className="field-label"><span>Title *</span>
             <input name="title" required defaultValue={v("title")} className="field" placeholder="Hotel Operations Intern" /></label>
@@ -90,28 +96,41 @@ export function InternshipForm({
             <input name="countryCode" required minLength={2} maxLength={2} defaultValue={v("countryCode")} className="field" placeholder="SG" /></label>
           <label className="field-label"><span>Category</span>
             <WorkspaceSelect name="categoryId" ariaLabel="Category" defaultValue={initial?.categoryId ?? ""} options={[{ value: "", label: "No category" }, ...categories.map(c => ({ value: c.id, label: c.name }))]} /></label>
-          <label className="field-label"><span>Publication status *</span>
-            <WorkspaceSelect name="publicationStatus" ariaLabel="Publication status" defaultValue={initial?.publicationStatus ?? "Draft"} options={["Draft", "Published", "Unpublished"].map(v => ({ value: v, label: v }))} /></label>
+        </div>
+      </section>
+      <section aria-labelledby="listing-dates" className="form-section">
+        <div className="internship-section-heading"><span>02</span><div><h2 id="listing-dates">Dates & timing</h2><p>Help students plan their internship and application.</p></div></div>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
           <label className="field-label"><span>Start date *</span>
             <DateInput name="startDate" type="date" ariaLabel="Start date" defaultValue={v("startDate")} required /></label>
           <label className="field-label"><span>End date *</span>
             <DateInput name="endDate" type="date" ariaLabel="End date" defaultValue={v("endDate")} required /></label>
           <label className="field-label"><span>Application deadline <span className="font-normal text-muted-foreground">(optional, informational)</span></span>
             <DateInput name="applicationDeadline" type="datetime-local" ariaLabel="Application deadline" defaultValue={v("applicationDeadline")}  /></label>
-          <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm font-medium">
-            <input type="checkbox" name="featured" defaultChecked={initial?.featured} className="size-4 accent-primary" /> Featured on landing
-          </label>
         </div>
       </section>
       <section aria-labelledby="listing-content" className="form-section">
-        <h2 id="listing-content" className="text-base font-semibold tracking-tight text-foreground">Role content</h2>
+        <div className="internship-section-heading"><span>03</span><div><h2 id="listing-content">Role content</h2><p>Describe the experience, everyday work and who should apply.</p></div></div>
         <div className="mt-4 space-y-4">
           <label className="field-label"><span>Description *</span>
-            <textarea name="description" required rows={4} defaultValue={v("description")} className="field" /></label>
+            <textarea name="description" required rows={5} defaultValue={v("description")} className="field" placeholder="Introduce the role, team and what students will learn." /></label>
           <label className="field-label"><span>Responsibilities *</span>
-            <textarea name="responsibilities" required rows={4} defaultValue={v("responsibilities")} className="field" /></label>
+            <textarea name="responsibilities" required rows={5} defaultValue={v("responsibilities")} className="field" placeholder="Outline the main tasks and projects, one per line." /></label>
           <label className="field-label"><span>Requirements *</span>
-            <textarea name="requirements" required rows={4} defaultValue={v("requirements")} className="field" /></label>
+            <textarea name="requirements" required rows={5} defaultValue={v("requirements")} className="field" placeholder="List the skills, experience and availability needed." /></label>
+        </div>
+      </section>
+      <section aria-labelledby="listing-publishing" className="form-section">
+        <div className="internship-section-heading"><span>04</span><div><h2 id="listing-publishing">Publishing</h2><p>Choose how this opportunity appears to students.</p></div></div>
+        <div className="internship-publishing-fields">
+          <label className="field-label"><span>Publication status *</span>
+            <WorkspaceSelect name="publicationStatus" ariaLabel="Publication status" defaultValue={initial?.publicationStatus ?? "Draft"} options={["Draft", "Published", "Unpublished"].map(v => ({ value: v, label: v }))} />
+            <small>Draft stays private. Published appears in the catalogue.</small>
+          </label>
+          <label className="internship-featured-option">
+            <input type="checkbox" name="featured" defaultChecked={initial?.featured} />
+            <span><strong>Featured on landing</strong><small>Highlight this opportunity on the homepage when published.</small></span>
+          </label>
         </div>
       </section>
       {error && <p role="alert" className="alert alert-error">{error}</p>}

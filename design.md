@@ -1,109 +1,232 @@
-# Jalanin / Chapters — implemented product design system
+# Jalanin — Fieldnotes
 
-Updated: 19 October 2026
-Implementation branch: `feat/mobbin-editorial-overhaul-20261019`
-Status: frontend design implementation and verification in progress.
+Implemented product design system · 19 October 2026
 
-## 1. Creative direction
+## Direction
 
-**Chapters** is Jalanin's original editorial/product design direction: an expressive public experience for finding an internship and a focused, high-density operating environment for applications and administrative work. The governing principles are precise typography, inviting spaciousness, quiet field surfaces, purposeful motion, and visible progress. The public site tells a career-journey story; authenticated interfaces make actual records and actions the center of attention.
+Homepage hero refinement: the stepped-path hero is replaced by the existing
+local `work-together.jpg` photograph, priority-loaded through Next Image. A large
+asymmetric crop and restrained caption pair with the original headline and CTA.
+The Pathway graphic remains available for other existing uses.
 
-Borderless by default does **not** mean deleting accessible focus treatments. Use contrast, grouping and proximity first. Use lines only where information scanning or safety requires them. Do not use the ornamental diagonal arrow as a routine action symbol.
+Fieldnotes pairs editorial discovery with a focused operational workspace. Large,
+closely tracked Google Sans Flex headings, off-white space, deep Jalanin blue,
+and an original stepped-path illustration communicate movement and possibility.
+Surfaces group related information; outlines are reserved for focus, date-today
+indicators, and cases where separation is functionally necessary.
 
-## 2. Foundations and canonical implementation
+This document replaces all earlier visual directions. Functional requirements,
+authorization, data contracts, and lifecycle rules remain authoritative in their
+existing product and engineering documents.
 
-The original local Google Sans Flex variable font is retained in `src/app/layout.tsx` and `src/app/fonts/google-sans-flex-latin.woff2`. Do not substitute Inter/Geist for the primary interface. Use features already provided by the local font rather than downloading a third-party file.
+## Research actually consulted
 
-The existing deep-blue identity `oklch(0.27 0.09 265.54)` remains the primary anchor (`--jalanin-900`). The system extends it through muted blue and near-white surfaces, as implemented in `src/app/chapters.css` (imported last in the root layout).
+Mobbin MCP searches included website sections, individual screens and flows.
+The returned preview images were examined. These are principles, not replicas:
 
-Current core tokens:
+| Source | Applied principle |
+|---|---|
+| [SSENSE editorial](https://mobbin.com/sites/sections/4de98a06-dbff-4e54-83c6-a301c519bba0) | Confident typography and open negative space; its serif is not adopted |
+| [Ditto homepage](https://mobbin.com/sites/sections/0fad7b67-08fd-4559-abbf-32eb65f84e01) | One coherent graphic composition; its purple palette is not adopted |
+| [Braintrust jobs](https://mobbin.com/screens/82f14032-d3bf-45d7-85ba-0611f75b0a59) | Role-first hierarchy and immediately available filters |
+| [SuperHi learning](https://mobbin.com/screens/86e8f0df-ce01-4176-bdf8-3e7f93e4b161) | A clear next action alongside current work |
+| [Twingate resources](https://mobbin.com/screens/3d0051cf-fdf8-4bed-a8d8-863efff311f5) | Quiet tables, lightweight views and generous row spacing |
+| [Tripadvisor dates](https://mobbin.com/screens/70cfee88-b811-4e75-9384-d750fedb42f6) | Uncluttered month grid with distinct navigation and selection |
+| [Employment Hero select](https://mobbin.com/screens/44ea903e-55c1-4a02-8430-30682ec50acc) | Search inside a constrained option surface |
+| [Qatalog confirmation](https://mobbin.com/screens/ebd304f8-fab1-4804-be7c-dce121a6966d) | Concise confirmation with one clear continuation |
+| [Deputy application flow](https://mobbin.com/flows/39b243dd-d98c-4a7b-aa0a-53598cee249f) | Persistent section orientation, focused fields and explicit document feedback |
+| [Meetup login flow](https://mobbin.com/flows/01a754b1-44fe-4ef7-99c7-54722f920822) | Focused account task and clear recovery route; no new identity providers |
+| [Basedash filtering flow](https://mobbin.com/flows/5484023f-abe7-43ca-b5d1-460350ed6fc9) | Keep filter context close to data; render only real counts |
+| [Hootsuite account drawer](https://mobbin.com/screens/155a6fa5-52e6-466e-b3b3-6333eb747dd6) | Separate navigation from account actions; this is a desktop reference |
 
-| Purpose | Token | Value |
-| --- | --- | --- |
-| Deep brand | `--jalanin-900` / `--primary` | `oklch(0.27 0.09 265.54)` |
-| Brand dark | `--jalanin-950` | `#111f48` |
-| Interactive mid-blue | `--jalanin-600` | `#345bb9` |
-| Soft primary surface | `--jalanin-50` | `#eef3ff` |
-| Canvas | `--background` | `#f7f9fd` |
-| Ink | `--foreground` | `#182447` |
-| Surface | `--surface` | `#ffffff` |
-| Secondary surface | `--secondary` | `#edf2fb` |
-| Muted text | `--muted-foreground` | `#65728e` |
-| Focus | `--ring` | `#537ce6` |
+The WRITER result from the initial mobile-navigation search was unrelated and
+was excluded. Static screenshots cannot establish animation timing; motion
+choreography is original rather than claimed to reproduce reference behavior.
 
-Other implemented tokens cover elevation, corners, interactive timing and reduced-motion overrides.
+## Implementation ownership
 
-## 3. Typography and composition
+- `src/app/fieldnotes.css`: authoritative presentation, responsive layouts,
+  surface tokens and control states.
+- `src/app/globals.css`: Tailwind and lower-priority structural compatibility
+  rules, contained in the base cascade layer.
+- `src/app/layout.tsx`: imports only these two stylesheets; retains the exact
+  locally hosted Google Sans Flex variable font implementation.
+- `src/components/graphics/pathway.tsx`: original decorative route diagram.
+- `src/components/motion/`: scoped GSAP enhancement and motion tokens.
 
-- Display: Google Sans Flex, 650–720 weight, tight tracking (about -0.045em to -0.079em), short editorial lines.
-- Section headings: responsive `clamp` sizing, controlled line-length and generous section separation.
-- Operations: strong page headings, compact metadata, tabular numerals and legible data density.
-- Labels: 0.68–0.82rem where appropriate, high-contrast text, selective uppercase tracked overlines.
-- Default body: 16px, proportional line-height 1.55; longer public copy runs at about 1.65–1.7.
+Do not reintroduce the retired public-design, workspace-refinement,
+mobbin-replica, workspace-studio or chapters stylesheet imports.
 
-The public desktop hero is asymmetric, with content and a purpose-drawn SVG illustrating discovery, application, and growth. It becomes a stacked composition on small screens. No invented opportunity, testimonial or conversion metric is introduced by the art. The original SVG lives in `src/components/graphics/journey-illustration.tsx`.
+## Color
 
-Public cards are list items with title/location/date metadata and a horizontal action. The filters remain URL-backed GET forms. The public legal, auth, detail, apply and empty/error surfaces share the same ink/surface/spacing decisions.
+| Token | Value / purpose |
+|---|---|
+| `--primary` | Existing `--jalanin-900`, `oklch(0.27 0.09 265.54)` |
+| `--primary-hover` | Existing `--jalanin-700` |
+| `--background` | `#f6f7f9`, main canvas |
+| `--foreground` | `#17243c`, ink |
+| `--surface` | `#ffffff`, grouped content |
+| `--secondary` | `#e9eef6`, supportive surfaces |
+| `--muted` | `#edf0f5`, input surfaces |
+| `--muted-foreground` | `#59677c`, secondary text |
+| `--accent` | `#aac8ff`, light-blue accents on dark blue |
+| `--ring` | `#426fca`, visible keyboard focus |
+| `--border` | `#e1e7ef`, only purposeful separators |
 
-Workspaces use a navy navigation rail and an airy command surface. Admin and student overview mastheads use different blue tints and display live values derived from existing data, never placeholder KPIs. CRM listing tables use quiet headers, accessible alignment, hover rows and responsive mobile records.
+The original Jalanin blue ramp is retained. Semantic success, error, warning and
+information tokens continue to describe actual states. Status badges include
+text, so meaning never relies on color alone. No fabricated metrics or claims.
 
-## 4. Components
+## Type and space
 
-The shared `chapters.css` stylesheet styles the existing functional components. These are the implemented control conventions:
+Google Sans Flex remains the sole primary family, locally served at weights
+100–1000. Display type is typically 48–96px, weight 500–520, line-height
+0.99–1.08, tracking −0.06 to −0.075em. Page headings are 34–52px; section titles
+36–68px. Operational section headings are 22–24px. Body is 14–16px with generous
+line-height; editorial supporting copy can be 19px. Uppercase metadata is
+10–11px with 0.1–0.14em tracking. Numeric data uses tabular numerals.
 
-| Component | Implemented rule |
-| --- | --- |
-| Buttons and links | Pill primary/secondary actions, unambiguous labels, tactile press and hover; horizontal arrow only when informative |
-| Inputs, search, textarea | Filled blue-gray surfaces, transparent default border, clear hover and high-contrast focus ring |
-| Native selects | Same field geometry; retain browser keyboard and screen-reader support |
-| WorkspaceSelect | Rounded combobox trigger and option list, selected/active states, search, keyboard controls and multi-select footer |
-| DateInput | Calendar popover with styled days/month controls, date bounds, today semantic state and native form field submission |
-| Form group/step | Numbered editorial section headings, structured field groups and accessible native HTML validation |
-| Upload | Soft inset upload area and refined native file picker; MIME/size checks remain enforced at submission and server |
-| Tables/CRM records | Low-noise headers, restrained separators, row emphasis, responsive list presentation |
-| Dialogs/search palette | Elevated surfaces, native dialog semantics, backdrop, focus restoration and Escape handling |
-| Status/timelines | Existing status components and workflow contracts retained; pills, progress and typography follow the unified palette |
-| Empty/validation/loading | Consistent backgrounds, readable feedback, existing skeleton and alert mechanisms |
-| Navigation | Public responsive panel and admin/student workspace rail/mobile navigation, keyboard-focus visibility |
+Public content has a 1440px maximum including gutters, with 20px mobile gutters
+and up to 80px desktop gutters. Section rhythm is 48px mobile / 72px desktop.
+Workspace navigation is 224px desktop, collapsible to 76px. Workspace content
+uses responsive 24–64px gutters and a 1500px maximum. Most grouped surfaces
+use 24–32px internal space. Radii are 6–8px for controls, 10–12px for panels,
+and circles only for avatars and calendar dates. Shadows are limited to floating
+menus and dialogs.
 
-The application form retains explicit save-draft and final-submit behavior, ordered groups, validation, upload and consent. This implementation does not silently convert the approved single-page form into a hidden-step wizard; doing so requires a dedicated validation and end-to-end review to preserve the existing draft/revision semantics.
+## Page compositions
 
-## 5. GSAP motion
+Discovery refinements: a compact blue-tinted directory masthead, role-icon cards,
+and a detail page with location/date facts, section anchors and a dark-blue apply
+panel. Student placements are responsive record cards with expandable notes;
+the empty state provides direct application and discovery actions. Individual
+student placement information stays within each card rather than a new route.
 
-- `src/components/motion/public-motion.tsx` uses `useGSAP` and scoped `ScrollTrigger` reveals for text, the hero composition, and public sections.
-- `src/components/layout/workspace-shell.tsx` retains scoped GSAP context page entrances and dialog response animations. The component-specific select/calendar open interactions also use GSAP.
-- Motion favors opacity and transforms. Context cleanup is required whenever GSAP creates a timeline or triggers.
-- No scroll hijacking and no perpetual hidden content. The static DOM is readable before animation initializes.
-- `prefers-reduced-motion: reduce` removes decorative animation and smooth scrolling at the CSS level; JS also skips reveal animations.
-- Implemented timing tokens: `--motion-fast: .16s`, `--motion-base: .28s`, `--motion-slow: .56s`.
+Student profiles use a blue identity mark, linked count strip, application cards
+with submitted education context, placement outcomes and a compact account
+sidebar. The technical account reference is available in a disclosure.
+Student application details pair a location/date opportunity header and compact
+submission grid with a connected event timeline and quotation guidance. Drafts
+show a continuation card; existing editing eligibility remains unchanged.
 
-## 6. Responsive patterns
+Admin application records use an applicant identity masthead, education and
+availability highlights, stacked-label snapshot fields, file rows and a connected
+audit timeline. A separate review column holds existing workflow controls and
+internship context. Status highlighting uses committed events, not an assumed
+linear progression; all transitions still come from the workflow module.
 
-At 1440px, editorial columns and readable workspace grid density. At 1024px, narrower rail and adapted content. At 768px, public hero stacks and the workspace uses mobile navigation. At 375px, cards become one-column entries, long admin records have dedicated mobile versions, inputs remain touch sized and the file/date control areas adapt to viewport width. Approximate breakpoints in CSS: 1200, 1024, 768 and 420 pixels.
+- **Home:** asymmetric display headline and original path diagram; a quiet
+  editorial introduction; two-column opportunity index; stacked process steps;
+  split blue story/photo section; contact form and large footer invitation.
+- **Directory:** wide two-column heading, contextual count, filter workspace,
+  two-column role entries. URL-backed GET filtering and pagination are retained.
+- **Opportunity:** editorial title, labelled content sections and sticky desktop
+  application summary; fixed mobile application action.
+- **Accounts:** focused form beside original path artwork. Mobile puts the
+  account task before supporting artwork. Recovery, verification and error
+  screens use the same controls and typography.
+- **Application:** anchored section index beside the real form. All sections
+  remain mounted, preserving native validation, FormData and explicit draft
+  saving. This is a guided single-page form, not a new multi-step state machine.
+- **Student:** open masthead, grouped real counts, recent applications and a
+  blue next-action panel, followed by progress and placements.
+- **Admin:** compact light navigation, open masthead, grouped metrics, real
+  pipeline, review queue and recent submissions. Record lists use views,
+  contextual filters and airy tables. Detail and editor routes use the same
+  white/blue surface hierarchy.
+- **Legal/support:** document navigation and readable text column; shared
+  error, not-found, empty and loading presentation.
 
-## 7. Accessibility rules
+## Components
 
-Use proper button, input, form, dialog, table, and landmark elements; never represent record actions with inert art. Keyboard navigation and programmatic labels are required. Focus-visible outlines must remain visible regardless of the borderless default. The calendar annotates today's date with `aria-current="date"` in addition to its selection state. Empty states and errors provide language and actionable next steps. Honor both native validation and backend guards; styling must not weaken security or authorization.
+Input values use regular-weight 15px text; labels own the 8px control gap.
+Date inputs and their 44px calendar triggers share a grid cell, avoiding inherited
+offsets. Application date pairs stack on narrow phones. Upload guidance persists
+after selection and is associated with the native file input.
 
-## 8. Mobbin research consulted
+Internship creation and editing share four numbered sections: essentials, dates,
+role details and publishing. Anchor shortcuts orient the editor; writing prompts
+and publication guidance sit next to the relevant fields. Sidebar navigation,
+secondary links and logout use matching 14px labels and 20px icon columns.
+Collapsed desktop logout uses a labelled icon button; mobile retains its label.
 
-Research was performed through the connected Mobbin integration, across website sections, individual screens and complete flows. The references informed information architecture and interaction strategy; no screen was copied wholesale.
+**Buttons:** 44–48px minimum primary interaction height, 8px radius, iconless
+where practical. Primary blue, secondary muted blue. Hover changes surface;
+press scales subtly. Disabled controls retain native disabled semantics.
 
-- Editorial product composition: [Contractbook website section](https://mobbin.com/sites/sections/9457282b-ec69-42d8-836c-b2ee708a9d18) and [Customer.io website section](https://mobbin.com/sites/sections/c74125df-8280-4579-9289-6255600499f1)
-- Opportunity discovery: [Upwork screen](https://mobbin.com/screens/3e496996-8cc0-41f2-a144-785213fa5711), [Remote screen](https://mobbin.com/screens/583a50de-3cf4-4391-a7e5-fa0f6b5e528c)
-- Workspace overview: [Mintlify screen](https://mobbin.com/screens/4e5e24d5-edf6-4895-9a0c-b8634c37a34c), [Arcade screen](https://mobbin.com/screens/278852c6-e966-405a-a58d-b813ea7dcc80)
-- Operations filtering: [Remote management screen](https://mobbin.com/screens/9ad0d8b8-ccfc-4176-a185-4397ec212720)
-- Auth entry: [Gusto screen](https://mobbin.com/screens/faab7a02-dc26-462b-b0f9-0a4a5245a65e)
-- Date selection: [Square screen](https://mobbin.com/screens/241c60f9-e2fa-4e9a-a422-01aeffb99f58)
-- Progressive onboarding: [Melio account setup flow](https://mobbin.com/flows/19e7920f-cdc3-4612-bc67-2660ed342ece), [Customer.io onboarding](https://mobbin.com/flows/9264db59-22a9-4b4d-8beb-eaeb96e3ce5d)
-- Mobile account and tab navigation: [Linear Mobile flow](https://mobbin.com/flows/dcec3f35-a716-43a3-9bac-e4b21f64108e)
+**Fields:** borderless muted surfaces, 50px default height, 15px text, 13px
+labels, visible 2px focus ring with offset. Textareas resize vertically. Native
+select fallback receives the same surface and chevron. Validation uses the
+existing server errors and native constraints; no business rules moved client-side.
 
-## 9. Screen coverage and architecture constraints
+**Select/multi-select:** shared searchable popover, 44px option rows, selected
+checkmark and tint, Arrow/Home/End/Enter/Escape handling, active option scroll,
+selected-count summary, Clear/Done actions. Hidden values retain FormData
+contracts and are disabled along with the control. Long lists scroll locally.
 
-The global style layer is applied by the shared root layout on every public route, including home, discovery/detail, apply, auth, legal, errors and not-found pages. It is also applied to the existing student `/dashboard/**` and admin `/admin/**` shells, their record detail pages, CRUD forms, loading/empty states and responsive views. Both overview route components now expose real contextual hero counts. This is a shared visual and layout system, **not a claim that every route's JSX was individually replaced**.
+**Calendar:** 7-column month grid, outside-month muting, circular selection,
+outlined today, disabled min/max dates, 44px month actions. Arrow keys move
+between visible days; editable native date values remain available. Date-time
+uses an explicit local-time input and Apply. Mobile picker is viewport-centered.
 
-Existing Next.js 14 App Router / React 18 / Tailwind / Drizzle architecture, security, authorization, native authentication, backend validation, private file storage, SGD minor-unit quotation behavior, notifications and application/placement state machines remain authoritative and unmodified.
+**Uploads:** a neutral upload surface, clear file selector, filename/size
+feedback, existing PDF/DOCX and 5MB checks, unchanged private server upload.
+The file input is functional; no unsupported drag-and-drop behavior is advertised.
 
-## 10. Maintenance
+**Records:** borderless outer table surface, restrained header tint, 22px row
+padding, clear name/secondary metadata hierarchy and local horizontal scrolling.
+Existing mobile record lists replace desktop tables where implemented.
 
-Prefer `chapters.css` and the shared component tree for future changes. Do not copy Mobbin imagery into the product. Any further migration should gradually consolidate the legacy CSS layers after screenshot-based verification, instead of deleting styles needed by functional routes prematurely. Keep the design documentation synchronized with code shipped and record build, unit and Playwright results from an actual run rather than assuming success.
+**Dialogs:** native modal dialog focus containment and restoration, dimmed
+backdrop, limited elevation. Existing busy-dismiss prevention is retained.
+Workspace mobile navigation and command search use native dialogs.
+
+**Feedback:** status text and badges, inline alerts with live roles, functional
+empty-state action, skeleton loading boundaries. Notifications continue through
+the existing inbox/outbox behavior rather than a new notification subsystem.
+
+## Motion
+
+`motion/tokens.ts` defines quick 180ms, control 240ms, reveal 550ms and story
+850ms durations, `power3.out`, 55ms stagger and 16px default movement.
+`PublicMotion` uses `useGSAP` and ScrollTrigger for hero copy/graphic entrances,
+progressive section reveals and a small diagram parallax. Path nodes receive a
+coordinated scale reveal. `Reveal` uses `useGSAP` for grouped form sections.
+Workspace page changes, command search, select/calendar opening and confirmation
+dialogs retain scoped GSAP contexts/tweens with cleanup. CSS handles small button
+and surface hover/press responses.
+
+HTML starts visible. Reduced motion disables animation and CSS transitions.
+There is no scroll hijacking, indefinite decorative loop or pinned narrative.
+Reference previews are static: no claim is made that their motion was observed.
+
+## Responsive and accessibility
+
+Primary breakpoints: 767px mobile, 1024px desktop workspace navigation, and a
+1100px composition adjustment. Mobile uses one-column discovery, stacked
+sections, horizontal application-section links, a navigation dialog and a
+bottom workspace shortcut bar with safe-area space. Controls and popovers stay
+within viewport bounds. Keyboard focus is explicit even without borders.
+
+Retain semantic headings, labels, landmarks, skip links, aria-current navigation,
+live feedback, native field constraints and Escape dismissal. Decorative SVG is
+hidden from assistive technology. Never infer application lifecycle history
+from a visual ordinal: continue using the shared workflow logic and real events.
+
+## Route coverage
+
+Public: `/`, `/opportunities`, `/opportunities/[slug]`, `/privacy`, `/terms`.
+Accounts: `/auth/login`, `/auth/sign-up`, `/auth/verify`,
+`/auth/forgot-password`, `/auth/reset-password`, `/dev/login`.
+Application: `/apply/[internshipId]`.
+Student: `/dashboard`, `/dashboard/applications`,
+`/dashboard/applications/[id]`, `/dashboard/placements`.
+Admin: `/admin`, `/admin/internships`, `/admin/internships/new`,
+`/admin/internships/[id]/edit`, `/admin/applications`,
+`/admin/applications/[id]`, `/admin/students`, `/admin/students/[id]`,
+`/admin/placements`, `/admin/placements/new`, `/admin/placements/[id]/edit`,
+`/admin/contacts`, `/admin/notifications`.
+Shared: root error/not-found and admin/dashboard/apply loading boundaries.
+
+Verification evidence and qualifications are tracked in
+`docs/design/fieldnotes-verification.md` and `docs/requirements-matrix.md`.

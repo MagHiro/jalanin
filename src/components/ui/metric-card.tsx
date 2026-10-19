@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { cn } from "./cn";
 
 /**
@@ -39,7 +39,7 @@ export function MetricCard({
         href={href}
         className="mt-1 inline-flex min-h-10 items-center gap-1 text-sm font-semibold text-primary hover:underline"
       >
-        {label} <ArrowUpRight size={15} aria-hidden="true" />
+        {label} <ArrowRight size={15} aria-hidden="true" />
       </Link>
       {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
     </li>

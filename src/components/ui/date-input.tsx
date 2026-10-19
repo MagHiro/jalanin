@@ -116,7 +116,17 @@ export function DateInput({ name, defaultValue, required, disabled, min, max, ty
         <div><button type="button" aria-label="Previous month" onClick={() => setMonth(current => new Date(current.getFullYear(), current.getMonth() - 1, 1))}><ChevronLeft size={17} /></button>
         <button type="button" aria-label="Next month" onClick={() => setMonth(current => new Date(current.getFullYear(), current.getMonth() + 1, 1))}><ChevronRight size={17} /></button></div>
       </div>
-      <div className="workspace-calendar-grid" role="group" aria-label="Calendar days">
+      <div className="workspace-calendar-grid" role="group" aria-label="Calendar days" onKeyDown={event => {
+        const moves: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
+        if (!(event.key in moves)) return;
+        const buttons = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("button"));
+        const current = buttons.indexOf(event.target as HTMLButtonElement);
+        if (current < 0) return;
+        event.preventDefault();
+        let next = current + moves[event.key];
+        while (next >= 0 && next < buttons.length && buttons[next].disabled) next += moves[event.key];
+        buttons[next]?.focus();
+      }}>
         {["Mo","Tu","We","Th","Fr","Sa","Su"].map(day => <span className="workspace-calendar-weekday" key={day}>{day}</span>)}
         {days.map(day => {
           const date = isoDate(day);

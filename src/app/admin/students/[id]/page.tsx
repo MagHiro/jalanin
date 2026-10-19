@@ -24,13 +24,13 @@ export default async function AdminStudentDetailPage({ params }: { params: { id:
         <div>
           <p className="workspace-kicker">People / Student profile</p>
           <h1>{name}</h1>
-          <p className="workspace-record-reference tnum">Profile ID · {data.profile.userId}</p>
+          <p className="student-record-intro">Applications, placement outcomes and account information.</p>
         </div>
       </div>
       <div className="workspace-student-record-stats">
-        <div><span>Applications</span><strong className="tnum">{data.applications.length}</strong></div>
-        <div><span>Submitted</span><strong className="tnum">{submitted}</strong></div>
-        <div><span>Placements</span><strong className="tnum">{data.placements.length}</strong></div>
+        <a href="#student-applications"><span>Applications</span><strong className="tnum">{data.applications.length}</strong><small>View records <ArrowRight size={14} /></small></a>
+        <a href="#student-applications"><span>Submitted</span><strong className="tnum">{submitted}</strong><small>{data.applications.length - submitted} saved drafts</small></a>
+        <a href="#student-placements"><span>Placements</span><strong className="tnum">{data.placements.length}</strong><small>View outcomes <ArrowRight size={14} /></small></a>
       </div>
     </div>
 
@@ -43,9 +43,11 @@ export default async function AdminStudentDetailPage({ params }: { params: { id:
           </div>
           {data.applications.length ? <ul className="workspace-record-rows">
             {data.applications.map(({ application, internshipTitle }) => <li key={application.id}>
-              <div><Link className="workspace-record-row-title" href={"/admin/applications/" + application.id}>{internshipTitle}</Link>
+              <div className="student-application-card-body"><span className="student-record-item-icon" aria-hidden="true"><ClipboardList size={20} /></span><div><Link className="workspace-record-row-title" href={"/admin/applications/" + application.id}>{internshipTitle}</Link>
               <p>Revision r{application.revision} · {application.submittedAt ? new Date(application.submittedAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" }) : "Saved draft"}</p></div>
-              <div className="workspace-record-row-actions"><StatusBadge status={application.isDraft ? "Draft" : application.lifecycleStatus} /><Link href={"/admin/applications/" + application.id} aria-label={"Review " + internshipTitle}><ArrowRight size={17}/></Link></div>
+              </div>
+              <dl className="student-application-context"><div><dt>Education</dt><dd>{application.university || "Not provided"}</dd></div><div><dt>Course</dt><dd>{application.course || "Not provided"}</dd></div></dl>
+              <div className="workspace-record-row-actions"><StatusBadge status={application.isDraft ? "Draft" : application.lifecycleStatus} /><Link href={"/admin/applications/" + application.id} aria-label={"Review " + internshipTitle}>Review application <ArrowRight size={17}/></Link></div>
             </li>)}
           </ul> : <div className="workspace-record-empty"><p>No linked applications yet. Submitted student applications will appear here when available.</p><Link href="/admin/applications">Browse application queue <ArrowRight size={14}/></Link></div>}
         </section>
@@ -56,7 +58,7 @@ export default async function AdminStudentDetailPage({ params }: { params: { id:
           </div>
           {data.placements.length ? <ul className="workspace-record-rows">
             {data.placements.map(p => <li key={p.id}><div><Link href={"/admin/placements/" + p.id + "/edit"} className="workspace-record-row-title">{p.role}</Link><p>{p.organization} · {p.countryCode} · {p.startDate || "Dates to confirm"}</p></div><div className="workspace-record-row-actions"><StatusBadge status={p.placementStatus}/><Link href={"/admin/placements/" + p.id + "/edit"} aria-label={"Manage " + p.role}><ArrowRight size={17}/></Link></div></li>)}
-          </ul> : <div className="workspace-record-empty"><p>Placements are created by the team when an opportunity is arranged.</p><Link href="/admin/placements/new">Create a placement <ArrowRight size={14}/></Link></div>}
+          </ul> : <div className="workspace-record-empty"><span className="student-record-item-icon" aria-hidden="true"><BriefcaseBusiness size={22}/></span><h3>No placements yet</h3><p>When an opportunity is arranged, its organization, role and progress will appear here.</p><Link href="/admin/placements/new">Create a placement <ArrowRight size={14}/></Link></div>}
         </section>
       </div>
       <aside className="workspace-student-record-side" aria-label="Student information">
@@ -66,6 +68,7 @@ export default async function AdminStudentDetailPage({ params }: { params: { id:
             <div><dt><CalendarDays size={15}/> Joined</dt><dd className="tnum">{new Date(data.profile.createdAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" })}</dd></div>
             <div><dt><CalendarDays size={15}/> Last updated</dt><dd className="tnum">{new Date(data.profile.updatedAt).toLocaleDateString("en-SG", { day: "2-digit", month: "short", year: "numeric" })}</dd></div>
           </dl>
+          <details className="student-record-reference"><summary>Account reference</summary><p className="tnum">{data.profile.userId}</p></details>
           <div className="workspace-student-privacy"><ShieldCheck size={17}/><span>Account details are visible only within the authorized admin workspace.</span></div>
         </section>
         <nav className="workspace-record-section workspace-student-links" aria-label="Related management">

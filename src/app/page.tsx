@@ -6,7 +6,6 @@ import { ContactForm } from "@/components/contact/contact-form";
 import { InternshipCard } from "@/components/ui/internship-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PublicMotion } from "@/components/motion/public-motion";
-import { JourneyIllustration } from "@/components/graphics/journey-illustration";
 
 export const revalidate = 120;
 
@@ -21,10 +20,10 @@ export default async function LandingPage() {
   const featured = await listFeaturedInternships(6);
   return (
     <PublicMotion>
-      <section aria-labelledby="hero-heading" className="learn-hero">
+      <section aria-labelledby="hero-heading" className="learn-hero learn-photo-hero">
         <div className="learn-hero-content">
-          <p data-hero-copy className="learn-kicker">Your next chapter starts here</p>
-          <h1 data-hero-copy id="hero-heading">Go beyond<br />what you <span>know.</span></h1>
+          <p data-hero-copy className="learn-kicker">Jalanin / Internships across Southeast Asia</p>
+          <h1 data-hero-copy id="hero-heading">A little further.<br /><span>A lot more possible.</span></h1>
           <p data-hero-copy className="learn-hero-description">
             An internship can change your perspective. Discover opportunities across Southeast Asia,
             find a direction that fits, and take the next step with guidance.
@@ -33,7 +32,10 @@ export default async function LandingPage() {
             Browse internships <ArrowRight size={18} aria-hidden="true" />
           </Link>
         </div>
-        <div className="learn-hero-visual" data-hero-visual><JourneyIllustration /></div>
+        <figure className="learn-hero-visual hero-workplace-photo" data-hero-visual>
+          <Image src="/images/work-together.jpg" alt="People collaborating around a table with laptops in a shared workspace" fill priority sizes="(min-width: 1440px) 640px, (min-width: 768px) 50vw, 100vw" className="object-cover" />
+          <figcaption><span>BEYOND THE CLASSROOM</span><strong>New people.<br />Real experience.</strong></figcaption>
+        </figure>
       </section>
 
       <div className="learn-intro-strip">

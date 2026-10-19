@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motion } from "./tokens";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -31,6 +32,8 @@ export function PublicMotion({ children }: { children: React.ReactNode }) {
     if (illustration) {
       gsap.fromTo(illustration, { opacity: 0, x: 28 },
         { opacity: 1, x: 0, duration: 1.1, delay: .13, ease: "power3.out", clearProps: "all" });
+      gsap.fromTo("[data-path-node]", { scale: .65, transformOrigin: "center" }, { scale: 1, duration: motion.duration.story, stagger: .15, ease: motion.ease });
+      gsap.to(illustration, { y: -22, ease: "none", scrollTrigger: { trigger: illustration, start: "top top", end: "bottom top", scrub: 1 } });
     }
     items.forEach(node => {
       gsap.fromTo(node, { opacity: 0, y: 22 }, {

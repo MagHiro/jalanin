@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Structural compatibility rules have deliberately lower cascade priority
+   than the authoritative, unlayered Fieldnotes presentation system. */
+@layer base {
+
 :root {
   color-scheme: light;
 
@@ -1739,3 +1743,4 @@ html { scroll-padding-top: 116px; }
 .workspace-shell .crm-records { overflow: visible; }
 .workspace-shell .crm-toolbar { position: relative; z-index: 5; }
 .workspace-shell .crm-views { position: relative; z-index: 1; }
+}
