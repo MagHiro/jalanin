@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, MoveUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export function SiteFooter() {
   return (
@@ -9,12 +9,12 @@ export function SiteFooter() {
           <p className="learn-footer-kicker">The next chapter is yours</p>
           <p>Make room for<br /><span>what&apos;s possible.</span></p>
         </div>
-        <Link href="/opportunities" className="btn btn-primary">Browse internships <ArrowUpRight size={19} aria-hidden="true" /></Link>
+        <Link href="/opportunities" className="btn btn-primary">Browse internships <ArrowRight size={19} aria-hidden="true" /></Link>
       </div>
       <div className="learn-footer-content mx-auto grid gap-10 px-5 py-16 md:grid-cols-[2fr_1fr_1fr] md:px-10">
         <div className="learn-footer-brand">
           <p className="flex items-center gap-2 text-lg font-bold tracking-tight text-primary">
-            <MoveUpRight aria-hidden="true" size={26} />
+
             <span className="text-3xl tracking-[-.06em]">jalanin.</span>
           </p>
           <p className="mt-4 max-w-sm text-sm leading-7 text-muted-foreground">
@@ -33,7 +33,7 @@ export function SiteFooter() {
               ["/#contact", "Contact us"],
             ].map(([href, label]) => (
               <li key={href}>
-                <Link className="learn-footer-link" href={href}>{label}<ArrowUpRight size={14} aria-hidden="true" /></Link>
+                <Link className="learn-footer-link" href={href}>{label}<ArrowRight size={14} aria-hidden="true" /></Link>
               </li>
             ))}
           </ul>
@@ -46,7 +46,7 @@ export function SiteFooter() {
               ["/terms", "Terms of service"],
             ].map(([href, label]) => (
               <li key={href}>
-                <Link className="learn-footer-link" href={href}>{label}<ArrowUpRight size={14} aria-hidden="true" /></Link>
+                <Link className="learn-footer-link" href={href}>{label}<ArrowRight size={14} aria-hidden="true" /></Link>
               </li>
             ))}
           </ul>
