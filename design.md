@@ -149,6 +149,7 @@ role details and publishing. Anchor shortcuts orient the editor; writing prompts
 and publication guidance sit next to the relevant fields. Sidebar navigation,
 secondary links and logout use matching 14px labels and 20px icon columns.
 Collapsed desktop logout uses a labelled icon button; mobile retains its label.
+Workspace sidebar places the rail toggle beside the logo in a shared header row.
 
 **Buttons:** 44–48px minimum primary interaction height, 8px radius, iconless
 where practical. Primary blue, secondary muted blue. Hover changes surface;

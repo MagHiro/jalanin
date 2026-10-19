@@ -138,7 +138,7 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
 
   return <div ref={root} className={`workspace-shell workspace-${role}${collapsed ? " workspace-collapsed" : ""}`}>
     <a href="#main" className="workspace-skip-link">Skip to main content</a>
-    <aside className="workspace-sidebar">{brand}<button type="button" className="workspace-rail-toggle" onClick={toggleRail} aria-label={collapsed ? "Expand navigation" : "Collapse navigation"} title={collapsed ? "Expand navigation" : "Collapse navigation"}>{collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}</button>{navigation}{bottom}</aside>
+    <aside className="workspace-sidebar"><div className="workspace-sidebar-head">{brand}<button type="button" className="workspace-rail-toggle" onClick={toggleRail} aria-label={collapsed ? "Expand navigation" : "Collapse navigation"} title={collapsed ? "Expand navigation" : "Collapse navigation"}>{collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}</button></div>{navigation}{bottom}</aside>
     <div className="workspace-body">
       <header className="workspace-topbar">
         <div className="workspace-topbar-start">

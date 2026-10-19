@@ -14,6 +14,10 @@ Chromium runs against localhost:3101 with E2E_MODE enabled.
 Photographic homepage hero: lint/typecheck passed and public-design suite passed
 6/6. Updated the obsolete SVG expectation to verify the hero image loads with
 nonzero natural width at 320/375/768/1440px. Desktop screenshot inspected.
+Sidebar header follow-up: lint/typecheck passed; browser geometry confirms the
+collapse toggle overlaps the logo row in expanded mode and matches its 36px
+bounds in collapsed mode. Collapsed refinement stacks the logo above a 36px
+toggle within the rail.
 
 Placement/public discovery follow-up: typecheck/lint pass. Initial targeted run
 failed five checks (missing route content and placement creation); the subsequent
