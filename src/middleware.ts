@@ -12,7 +12,21 @@ export function middleware(request: NextRequest) {
     let invalidOrigin = false;
     if (origin) {
       try {
-        invalidOrigin = new URL(origin).origin !== request.nextUrl.origin;
+        // Compare host only: TLS terminates at nginx, so the browser sends
+        // `Origin: https://<host>` while the app behind the proxy sees
+        // `http://<host>`. `Host` is set to $host by nginx
+        // (see deploy/nginx/*.conf), so it is proxy-controlled — unlike
+        // X-Forwarded-Host, which nginx currently passes through from the
+        // client and must NOT be trusted here.
+        const expectedHost = (
+          request.headers.get("host") ?? request.nextUrl.host
+        )
+          .split(",")[0]
+          .split(":")[0]
+          .trim()
+          .toLowerCase();
+        const originHost = new URL(origin).hostname.toLowerCase();
+        invalidOrigin = originHost !== expectedHost;
       } catch {
         invalidOrigin = true;
       }
