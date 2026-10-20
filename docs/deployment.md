@@ -21,9 +21,18 @@ Copy `.env.example` to `.env.prod` (untracked) and set real secrets.
 Required keys: `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`,
 `DATABASE_URL` (host `postgres`, e.g.
 `postgresql://USER:PASS@postgres:5432/DB`), `NEXT_PUBLIC_APP_URL`,
-`EMAIL_PROVIDER=smtp` + SMTP settings, `ADMIN_ALERT_EMAIL`, `CRON_SECRET`,
-`RATE_LIMIT_PEPPER`, Turnstile production keys. See `.env.example` for the
-full reference. Never commit `.env.prod`.
+`NEXT_PUBLIC_TURNSTILE_SITE_KEY` (+ `NEXT_PUBLIC_ANALYTICS_ENABLED=false`
+unless analytics is wanted), `EMAIL_PROVIDER=smtp` + SMTP settings,
+`ADMIN_ALERT_EMAIL`, `CRON_SECRET`, `RATE_LIMIT_PEPPER`, Turnstile
+production `TURNSTILE_SECRET_KEY`. See `.env.example` for the full
+reference. Never commit `.env.prod`.
+
+> `NEXT_PUBLIC_*` values are inlined into client JS at **build time** and
+> cannot come from `env_file` at runtime. `compose.prod.yml` forwards them
+> from `.env.prod` as Docker build args, so a domain/key change requires a
+> rebuild (`up -d --build`). Server secrets (`DATABASE_URL`, `SMTP_*`,
+> `CRON_SECRET`, `RATE_LIMIT_PEPPER`, `TURNSTILE_SECRET_KEY`) stay
+> runtime-only via `env_file` and are never build args.
 
 ## 2. First deploy / release procedure
 

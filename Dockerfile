@@ -12,7 +12,17 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-# Build-time placeholder: runtime env comes from compose secrets/env_file.
+# Public (NEXT_PUBLIC_*) values are inlined into client JS at build time and
+# CANNOT be supplied via env_file at runtime. They arrive as build args from
+# compose.prod.yml (sourced from .env.prod). Server secrets (DATABASE_URL,
+# SMTP_*, CRON_SECRET, ...) must NEVER become build args — they stay
+# runtime-only via env_file on the app/migrate services.
+ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
+ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
+ARG NEXT_PUBLIC_ANALYTICS_ENABLED=false
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL \
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY \
+  NEXT_PUBLIC_ANALYTICS_ENABLED=$NEXT_PUBLIC_ANALYTICS_ENABLED
 RUN corepack enable && pnpm build
 
 FROM node:20-alpine AS runner

@@ -4,6 +4,10 @@ import { internships } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 // Published internships only (JOB-11). Private/admin routes never indexed.
+// force-dynamic: this route queries the database, so it must NOT be
+// prerendered at build time (docker build has no DATABASE_URL). It renders
+// on first request after migrations have run.
+export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
   const rows = await db

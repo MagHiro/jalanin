@@ -49,12 +49,25 @@ jobs:
       - run: pnpm test:e2e
       - name: Validate production compose config
         run: |
-          # Only for static Compose interpolation. Never use or commit real production secrets.
+          # Static Compose validation with the full key set (placeholder
+          # values). Must cover every :? required variable in
+          # compose.prod.yml. Never use or commit real production secrets.
           cat > .env.prod <<'EOF'
           POSTGRES_USER=jalanin
           POSTGRES_PASSWORD=ci-placeholder-not-production
           POSTGRES_DB=jalanin
           DATABASE_URL=postgresql://jalanin:ci-placeholder-not-production@postgres:5432/jalanin
+          NEXT_PUBLIC_APP_URL=http://localhost:3000
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
+          NEXT_PUBLIC_ANALYTICS_ENABLED=false
+          EMAIL_PROVIDER=smtp
+          SMTP_HOST=localhost
+          SMTP_PORT=1025
+          EMAIL_FROM=ci@example.com
+          ADMIN_ALERT_EMAIL=ci@example.com
+          CRON_SECRET=ci-test-secret
+          RATE_LIMIT_PEPPER=ci-test-pepper
+          TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
           EOF
           trap 'rm -f .env.prod' EXIT
           docker compose --env-file .env.prod -f compose.prod.yml config --quiet
