@@ -32,7 +32,11 @@ reference. Never commit `.env.prod`.
 > from `.env.prod` as Docker build args, so a domain/key change requires a
 > rebuild (`up -d --build`). Server secrets (`DATABASE_URL`, `SMTP_*`,
 > `CRON_SECRET`, `RATE_LIMIT_PEPPER`, `TURNSTILE_SECRET_KEY`) stay
-> runtime-only via `env_file` and are never build args.
+> runtime-only via `env_file` and are never build args. The builder itself
+> needs NO database: `src/lib/db/client.ts` uses a placeholder connection
+> string when `DATABASE_URL` is absent (any real query still fails loudly),
+> and `src/app/sitemap.ts` is `force-dynamic` so it renders on first request
+> after migrations instead of at build time.
 
 ## 2. First deploy / release procedure
 

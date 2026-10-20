@@ -19,10 +19,16 @@ declare global {
 
 function getPool(): Pool {
   if (!global.__jalaninPool) {
-    const connectionString = process.env.DATABASE_URL;
-    if (!connectionString) {
-      throw new Error("DATABASE_URL is not configured. See .env.example.");
-    }
+    // NOTE: this module is imported by every service/route, including at
+    // Next.js build time when DATABASE_URL is absent (docker build has no
+    // database). The pool is created lazily on first query, but drizzle's
+    // Proxy evaluates `db` eagerly at import time via getPool() below — so
+    // throwing here hard-fails `pnpm build`. Instead fall back to a dummy
+    // connection string; any real query attempt will fail loudly at runtime
+    // (and build-time page collection never issues queries for force-dynamic
+    // / dynamic routes — only static prerenders do, which we avoid).
+    const connectionString =
+      process.env.DATABASE_URL ?? "postgresql://build:build@localhost:1/jalanin_build_placeholder";
     // Pooling defaults for a single Node process (local dev + Docker prod).
     global.__jalaninPool = new Pool({
       connectionString,

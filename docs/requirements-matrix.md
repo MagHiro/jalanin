@@ -59,6 +59,15 @@ migration scripts validated against fixtures with counts + FK + size checks;
 backup (`pg_dump`) + restore into scratch DB verified. Live production data
 has NOT been migrated — see `docs/migration-cutover.md` §7 blockers.
 
+Docker build fix (2026-10-20): `src/lib/db/client.ts` no longer throws at
+import time when `DATABASE_URL` is absent — it falls back to a placeholder
+connection string (real queries still fail loudly), because Next.js imports
+every route module during `Collecting page data` even for dynamic routes.
+`src/app/sitemap.ts` is now `force-dynamic`. Verified: `pnpm build` exits 0
+with `DATABASE_URL` unset and no `.env` files present (Docker builder
+condition); `compose.prod.yml` forwards only `NEXT_PUBLIC_*` as build args,
+server secrets stay runtime-only via `env_file`.
+
 ## Decisions D01–D20 (all Confirmed)
 
 | ID | Requirement | Implementation | Acceptance | Verify | Status |
