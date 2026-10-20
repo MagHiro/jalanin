@@ -17,10 +17,14 @@ test("admin overview has a restrained, responsive hierarchy", async ({ page }) =
     await expect(page.locator(".ops-stage-fill").first()).toHaveCSS("background-color", "rgb(129, 148, 191)");
     await expect(page.locator(".ops-priority > a")).toBeVisible();
     await expect(page.locator(".ops-panel-head .ops-label")).toHaveCount(0);
-    await expect(page.locator(".ops-placement-summary .ops-placement-action")).toHaveCSS("background-color", "rgb(16, 37, 104)");
-    if (await page.locator(".ops-placement-empty").count()) {
-      await expect(page.locator(".ops-placement-graphic")).toBeVisible();
-      await expect(page.locator(".ops-placement-empty")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(page.locator(".ops-placement-summary .ops-placement-action, .ops-placement-summary .discovery-empty-action")).toHaveCSS("background-color", "rgb(16, 37, 104)");
+    if (await page.locator(".ops-placement-summary .discovery-empty").count()) {
+      await expect(page.locator(".ops-placement-summary .placement-line-graphic")).toBeVisible();
+      await expect(page.locator(".ops-placement-summary .discovery-empty h2")).toHaveText("No placements yet");
+    }
+    if (await page.locator(".ops-activity .discovery-empty").count()) {
+      await expect(page.locator(".ops-activity-footer")).toHaveCount(0);
+      await expect(page.locator(".ops-activity .discovery-empty-action")).toHaveCount(0);
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
   }

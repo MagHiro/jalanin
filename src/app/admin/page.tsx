@@ -1,12 +1,13 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Activity, ArrowRight, ArrowRightLeft, Bell, BriefcaseBusiness, CheckCircle2, ChevronRight, ClipboardList, Clock3, FileCheck2, FilePenLine, FileText, Plus, Users } from "lucide-react";
+import { Activity, ArrowRight, ArrowRightLeft, Bell, BriefcaseBusiness, CheckCircle2, ChevronRight, ClipboardList, FileCheck2, FilePenLine, FileText, Plus, Users } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
 import { getAdminOverview, listAdminApplications, recentAudit } from "@/features/admin/service";
 import { waitingDays, waitingLabel } from "@/lib/workflow/waiting-time";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { adminActivityHref, describeAdminActivity } from "@/lib/ui/admin-activity";
 import "./overview-calm.css";
+import { DiscoveryEmptyState } from "@/components/ui/discovery-empty-state";
 
 export const metadata: Metadata = { title: "Admin overview", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -159,7 +160,7 @@ export default async function AdminOverviewPage() {
             </Link>
           </li>)}
         </ul>
-      </> : <div className="ops-records-empty"><FileText size={25} aria-hidden="true" /><div><h3>No submissions just yet</h3><p>As students apply, their newest submissions will land here for review.</p></div><Link href="/admin/internships">Manage internships <ArrowRight size={15} aria-hidden="true" /></Link></div>}
+      </> : <DiscoveryEmptyState variant="application" title="No submissions yet" description="New student applications will appear here when they’re ready for review." href="/admin/internships" action="Manage internships" />}
     </section>
 
     <div className="ops-bottom-grid">
@@ -187,8 +188,8 @@ export default async function AdminOverviewPage() {
               {href && <Link href={href} className="ops-activity-open" aria-label={`View ${item.title.toLowerCase()} record`}><ArrowRight size={16} /></Link>}
             </li>;
           })}</ol>
-          : <div className="ops-activity-empty"><span className="ops-activity-symbol"><Clock3 size={19} /></span><div><strong>Nothing to report yet</strong><p>New submissions and record changes will show here automatically.</p></div></div>}
-        <div className="ops-activity-footer"><span><span className="ops-activity-footer-dot" /> Showing the {audit.length} most recent {audit.length === 1 ? "event" : "events"}</span><span>Recorded automatically</span></div>
+          : <DiscoveryEmptyState variant="application" title="No activity yet" description="Submissions and record changes will appear here automatically. There’s nothing to review right now." />}
+        {audit.length > 0 && <div className="ops-activity-footer"><span><span className="ops-activity-footer-dot" /> Showing the {audit.length} most recent {audit.length === 1 ? "event" : "events"}</span><span>Recorded automatically</span></div>}
       </section>
 
       <section className="ops-panel ops-placement-summary" aria-labelledby="ops-placements-title">
@@ -200,21 +201,7 @@ export default async function AdminOverviewPage() {
           <div className="ops-placement-total"><strong className="tnum">{totalPlacements}</strong><span>recorded {totalPlacements === 1 ? "placement" : "placements"}</span></div>
           <ul className="ops-placement-statuses">{Object.entries(overview.placementCounts).map(([status, value]) => <li key={status}><StatusBadge status={status} /><strong className="tnum">{value}</strong></li>)}</ul>
           <Link href="/admin/placements/new" className="ops-placement-action"><Plus size={16} aria-hidden="true" /> New placement <ArrowRight size={16} aria-hidden="true" /></Link>
-        </> : <div className="ops-placement-empty">
-          <div className="ops-placement-empty-top">
-            <svg className="ops-placement-graphic" viewBox="0 0 100 72" fill="none" aria-hidden="true">
-              <rect x="14" y="23" width="66" height="40" rx="7" fill="#f5f7fc" stroke="#8194bf" strokeWidth="1.5" />
-              <path d="M36 23V16C36 13.8 37.8 12 40 12H54C56.2 12 58 13.8 58 16V23M14 37C34 46 60 46 80 37" stroke="#8194bf" strokeWidth="1.5" />
-              <rect x="41" y="38" width="12" height="9" rx="2" fill="white" stroke="#8194bf" strokeWidth="1.5" />
-              <circle cx="79" cy="19" r="11" fill="white" stroke="#d9e0ee" />
-              <path d="M75 19H83M79 15V23" stroke="#102568" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            <span className="ops-placement-empty-count tnum">0 on record</span>
-          </div>
-          <h3>No placements yet</h3>
-          <p>Record an arranged placement to keep the student, host and role together.</p>
-          <Link href="/admin/placements/new" className="ops-placement-action"><Plus size={16} aria-hidden="true" /> Record a placement <ArrowRight size={16} aria-hidden="true" /></Link>
-        </div>}
+        </> : <DiscoveryEmptyState variant="placement" title="No placements yet" description="Record an arranged placement to keep the student, host and role together." href="/admin/placements/new" action="Record a placement" />}
       </section>
     </div>
   </div>;
