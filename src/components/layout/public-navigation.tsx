@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, BriefcaseBusiness, ChevronDown, Info, ListOrdered, Mail, Menu, X } from "lucide-react";
-import { SignOutButton } from "./sign-out-button";
+import { ArrowRight, BriefcaseBusiness, Info, ListOrdered, Mail, Menu, X } from "lucide-react";
 
 const links = [
   { href: "/opportunities", label: "Internships", description: "Find your next opportunity", icon: BriefcaseBusiness },
@@ -14,15 +13,13 @@ const links = [
   { href: "/#contact", label: "Contact", description: "Start a conversation", icon: Mail },
 ];
 
-export function PublicNavigation({ signedIn, admin }: { signedIn: boolean; admin: boolean }) {
+export function PublicNavigation({ signedIn }: { signedIn: boolean; admin: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [explore, setExplore] = useState(false);
   const [hash, setHash] = useState("");
   const toggle = useRef<HTMLButtonElement>(null);
-  const exploreToggle = useRef<HTMLButtonElement>(null);
   const header = useRef<HTMLElement>(null);
-  const closeMenus = () => { setOpen(false); setExplore(false); };
+  const closeMenus = () => setOpen(false);
 
   useEffect(() => {
     const update = () => setHash(window.location.hash);
@@ -32,19 +29,18 @@ export function PublicNavigation({ signedIn, admin }: { signedIn: boolean; admin
   }, [pathname]);
 
   useEffect(() => {
-    if (!open && !explore) return;
+    if (!open) return;
     const dismiss = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setOpen(false);
-        setExplore(false);
-        (explore ? exploreToggle : toggle).current?.focus();
+        toggle.current?.focus();
       }
     };
     const outside = (event: PointerEvent) => {
-      if (!header.current?.contains(event.target as Node)) { setOpen(false); setExplore(false); }
+      if (!header.current?.contains(event.target as Node)) setOpen(false);
     };
     const desktop = window.matchMedia("(min-width: 1024px)");
-    const resize = () => { setOpen(false); setExplore(false); };
+    const resize = () => setOpen(false);
     document.addEventListener("keydown", dismiss);
     document.addEventListener("pointerdown", outside);
     desktop.addEventListener("change", resize);
@@ -53,7 +49,7 @@ export function PublicNavigation({ signedIn, admin }: { signedIn: boolean; admin
       document.removeEventListener("pointerdown", outside);
       desktop.removeEventListener("change", resize);
     };
-  }, [open, explore]);
+  }, [open ]);
 
   const active = (href: string) => href.includes("#")
     ? pathname === "/" && hash === href.slice(1)
@@ -63,30 +59,25 @@ export function PublicNavigation({ signedIn, admin }: { signedIn: boolean; admin
     <>
       {signedIn ? (
         <>
-          {admin && <Link href="/admin" className="public-account-link" onClick={closeMenus}>Admin</Link>}
-          <SignOutButton />
-          <Link href="/dashboard" className="btn btn-primary public-header-cta" onClick={closeMenus}>Dashboard <ArrowRight size={17} strokeWidth={1.6} aria-hidden="true" /></Link>
+          <Link href="/dashboard" className="btn btn-primary public-header-cta" onClick={closeMenus}>Dashboard <ArrowRight size={20} strokeWidth={1.7} aria-hidden="true" /></Link>
         </>
       ) : (
         <>
           <Link href="/auth/login" className="public-account-link" onClick={closeMenus}>Log in</Link>
-          <Link href="/auth/sign-up" className="btn btn-primary public-header-cta" onClick={closeMenus}>Sign up <ArrowRight size={17} strokeWidth={1.6} aria-hidden="true" /></Link>
+          <Link href="/auth/sign-up" className="btn btn-primary public-header-cta" onClick={closeMenus}>Get started <ArrowRight size={20} strokeWidth={1.7} aria-hidden="true" /></Link>
         </>
       )}
     </>
   );
 
   return (
-    <header ref={header} className="public-header sticky z-40" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closeMenus(); }}>
+    <header ref={header} className={`public-header origin-nav sticky z-40${pathname === "/" ? " origin-nav-home" : ""}`} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closeMenus(); }}>
       <div className="public-header-inner mx-auto px-5 md:px-10">
         <Link href="/" aria-label="Jalanin Internships — home" className="public-brand" onClick={closeMenus}>
-          <span className="chapters-wordmark"><span className="chapters-wordmark-symbol" aria-hidden="true">j.</span><span>jalanin<span className="chapters-wordmark-dot">.</span></span></span>
+          <Image src="/logo.png" alt="Jalanin Internship Program" width={2996} height={688} priority sizes="(max-width: 767px) 160px, 200px" className="public-nav-logo" />
         </Link>
-        <nav aria-label="Primary" className="hidden items-center gap-1 xl:gap-2 lg:flex">
-          <button ref={exploreToggle} type="button" className="public-nav-link" aria-expanded={explore} aria-controls="public-explore-navigation" onClick={() => setExplore(!explore)}>
-            Explore <ChevronDown size={16} strokeWidth={1.6} aria-hidden="true" className={explore ? "rotate-180" : ""} />
-          </button>
-          {links.filter(({label}) => label !== "Contact").map(({ href, label }) => (
+        <nav aria-label="Primary" className="hidden items-center gap-2 xl:gap-5 lg:flex">
+          {links.map(({ href, label }) => (
             <Link key={href} href={href} aria-current={active(href) ? (href.includes("#") ? "location" : "page") : undefined} className="public-nav-link" onClick={() => { closeMenus(); setHash(href.includes("#") ? href.slice(1) : ""); }}>
               {label}
             </Link>
@@ -97,36 +88,6 @@ export function PublicNavigation({ signedIn, admin }: { signedIn: boolean; admin
           {open ? "Close" : "Menu"}
           {open ? <X size={20} strokeWidth={1.6} aria-hidden="true" /> : <Menu size={20} strokeWidth={1.6} aria-hidden="true" />}
         </button>
-      </div>
-      <div id="public-explore-navigation" hidden={!explore} className="public-mega-panel">
-        <nav aria-label="Explore Jalanin" className="public-mega-links">
-          <div>
-            <p className="public-menu-label">Find your next step</p>
-            {links.slice(0, 2).map(({ href, label, description, icon: Icon }) => (
-              <Link key={href} href={href} className="public-mega-link" onClick={closeMenus}>
-                <Icon size={20} strokeWidth={1.6} aria-hidden="true" />
-                <span><span className="block font-medium">{label}</span><span className="block text-sm text-muted-foreground">{description}</span></span>
-              </Link>
-            ))}
-          </div>
-          <div>
-            <p className="public-menu-label">Meet Jalanin</p>
-            {links.slice(2).map(({ href, label, description, icon: Icon }) => (
-              <Link key={href} href={href} className="public-mega-link" onClick={closeMenus}>
-                <Icon size={20} strokeWidth={1.6} aria-hidden="true" />
-                <span><span className="block font-medium">{label}</span><span className="block text-sm text-muted-foreground">{description}</span></span>
-              </Link>
-            ))}
-          </div>
-        </nav>
-        <Link href="/opportunities" className="public-menu-feature" onClick={closeMenus}>
-          <Image src="/images/singapore.jpg" alt="Singapore skyline overlooking Marina Bay" fill sizes="(min-width: 1024px) 400px, 100vw" className="object-cover" />
-          <div className="public-menu-feature-shade" />
-          <span className="relative z-10 flex h-full flex-col justify-between p-6">
-            <span className="self-start rounded-full border border-white/50 px-3 py-1 text-xs tracking-[.08em]">A new perspective</span>
-            <span><span className="block text-[28px] font-medium leading-[1.1] tracking-[-.045em]">Your next chapter starts here.</span><span className="mt-4 flex items-center gap-3 text-sm">Browse internships <ArrowRight size={18} strokeWidth={1.6} aria-hidden="true" /></span></span>
-          </span>
-        </Link>
       </div>
       <div id="public-mobile-navigation" hidden={!open} className="public-mobile-panel lg:hidden">
         <div className="mx-auto max-w-[1280px] px-5 pb-6 pt-3 md:px-10">

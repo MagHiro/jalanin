@@ -8,8 +8,9 @@ Supabase Auth/Storage clients · Zod (server is source of truth) · pnpm only.
 
 ## Non-negotiable rules
 
-1. **PRD v0.4 + confirmed decisions D01–D20 are authoritative.**
-   `docs/open-decisions.md` (B01–B10) lists what is *pending* — never ship
+1. **`docs/Jalanin_Internship_Platform_PRD_v0.4.md` is the sole product
+   documentation source of truth**, including confirmed decisions D01–D20
+   and pending decisions B01–B10. Never ship
    placeholder behavior as a confirmed requirement, and never invent scope
    (no payments, portals, CRM, i18n, ML, exports).
 2. **Authorization is server-side + RLS, never UI-only.**
@@ -27,10 +28,10 @@ Supabase Auth/Storage clients · Zod (server is source of truth) · pnpm only.
    the dispatcher sends with retries. Status changes never depend on delivery.
 6. **Documents are private.** Server-validated (MIME + magic bytes + size),
    random keys, admin-only download by default (B05 pending).
-7. **Update the traceability docs with every feature:**
-   `docs/requirements-matrix.md` status, plus tests (unit → integration → e2e).
+7. **Validate every feature with appropriate tests (unit → integration → e2e).**
    A feature is done only when UI + backend + DB + authz + validation +
-   states + tests + matrix update all hold.
+   states + tests all hold. Supplementary documentation was intentionally
+   removed to avoid conflicting guidance; do not recreate it unless requested.
 
 ## Commands
 
@@ -40,7 +41,7 @@ Supabase Auth/Storage clients · Zod (server is source of truth) · pnpm only.
 
 ## Environment
 
-Local PostgreSQL on port 54322 (Docker `postgres` service, or the documented
-user-space fallback). Never mix local/prod credentials. `.env` is git-ignored;
+Local PostgreSQL on port 54322 (Docker `postgres` service). Never mix
+local/prod credentials. `.env` is git-ignored;
 `.env.example` is the canonical variable list. `E2E_MODE=1` tooling
 (`src/app/api/dev/session`) is test-only and 404s otherwise.

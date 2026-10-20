@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("editorial shell respects the 1440px content boundary and full-bleed navigation", async ({ page }) => {
+test("editorial shell keeps centered hero copy and inset Coda-inspired navigation", async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
@@ -10,15 +10,39 @@ test("editorial shell respects the 1440px content boundary and full-bleed naviga
     expect(box?.x, selector).toBe(240);
   }
   const header = await page.locator(".public-header").boundingBox();
-  expect(header?.width).toBe(1920);
-  expect(header?.x).toBe(0);
-  for (const selector of [".learn-hero", ".learn-intro-strip", ".learn-section", ".learn-about"]) {
+  expect(header?.width).toBe(1600);
+  expect(header?.x).toBe(160);
+  await expect(page.locator(".public-header")).toHaveCSS("border-radius", "32px");
+  await expect(page.locator(".public-header")).toHaveCSS("backdrop-filter", "blur(20px) saturate(1.2)");
+  const navigation = await page.locator('nav[aria-label="Primary"]').boundingBox();
+  expect(Math.abs(navigation!.x + navigation!.width / 2 - 960)).toBeLessThanOrEqual(1);
+  await expect(page.locator(".public-header")).toHaveCSS("border-top-width", "0px");
+  await expect(page.locator(".public-brand img")).toHaveAttribute("alt", "Jalanin Internship Program");
+  await expect(page.locator('.public-header nav[aria-label="Primary"] a').first()).toHaveCSS("font-weight", "550");
+  await expect(page.locator(".public-header-cta").first()).toHaveCSS("border-radius", "17px");
+  await expect(page.locator(".public-header-cta").first().locator("svg")).toHaveCount(1);
+  await expect(page.locator('.public-header a[href="/admin"]')).toHaveCount(0);
+  await expect(page.locator(".public-header").getByRole("button", { name: /log out|sign out/i })).toHaveCount(0);
+  for (const selector of [".learn-intro-strip", ".learn-section", ".learn-about"]) {
     for (const section of await page.locator(selector).all()) {
       const box = await section.boundingBox();
       expect(box!.x).toBeGreaterThanOrEqual(232);
       expect(box!.x + box!.width).toBeLessThanOrEqual(1688);
     }
   }
+  const hero = await page.locator(".learn-hero").boundingBox();
+  expect(hero?.x).toBe(0);
+  expect(hero?.width).toBe(1920);
+  await expect(page.locator(".learn-intro-strip")).toHaveCount(0);
+  expect(hero?.y).toBe(0);
+  expect(header!.y).toBeGreaterThan(hero!.y);
+  expect(header!.y + header!.height).toBeLessThan(hero!.y + hero!.height);
+  const heading = await page.locator("#hero-heading").boundingBox();
+  expect(Math.abs(heading!.x + heading!.width / 2 - 960)).toBeLessThanOrEqual(1);
+  await expect(page.locator("#hero-heading")).toHaveCSS("font-weight", "600");
+  await expect(page.locator("#hero-heading em")).toHaveCSS("font-weight", "400");
+  await expect(page.locator(".origin-hero-description")).toHaveText("New places. Real experience. Your next chapter.");
+  await expect(page.locator(".origin-hero-proof")).toHaveCount(0);
   await page.goto("/missing-public-page");
   await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
   await expect(page.locator(".public-state")).toHaveCSS("border-radius", "12px");
@@ -65,6 +89,7 @@ test("mobile navigation dismisses with Escape and landing sections render", asyn
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const menu = page.locator('button[aria-controls="public-mobile-navigation"]');
+  await expect(page.locator(".origin-hero-description")).toHaveCSS("font-size", "16px");
   await menu.click();
   await expect(menu).toHaveAttribute("aria-expanded", "true");
   await page.keyboard.press("Escape");
