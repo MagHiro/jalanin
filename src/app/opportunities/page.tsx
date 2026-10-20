@@ -8,7 +8,7 @@ import {
   COUNTRY_NAMES,
 } from "@/features/internships/service";
 import { ActiveFilterChips } from "@/components/ui/active-filter-chips";
-import { EmptyState } from "@/components/ui/empty-state";
+import { DiscoveryEmptyState } from "@/components/ui/discovery-empty-state";
 import { Reveal } from "@/components/motion/reveal";
 import { WorkspaceSelect } from "@/components/ui/workspace-select";
 import { DestinationMotion } from "@/components/motion/destination-motion";
@@ -168,12 +168,11 @@ export default async function OpportunitiesPage({
       </div>
 
       {rows.length === 0 ? (
-        <EmptyState
-          icon="○"
-          title="No internships match your filters."
-          body="Try widening the search or clearing a filter — new placements are added regularly."
-          actionHref="/opportunities"
-          actionLabel="Clear all filters"
+        <DiscoveryEmptyState
+          title={chips.length ? "No matching internships" : "No internships available right now"}
+          description={chips.length ? "Try a broader search or clear your filters to explore other opportunities." : "There are no published opportunities to explore at the moment. Contact the Jalanin team if you need guidance."}
+          href={chips.length ? "/opportunities" : "/#contact"}
+          action={chips.length ? "Clear filters" : "Contact Jalanin"}
         />
       ) : (
         <Reveal>

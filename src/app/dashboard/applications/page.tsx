@@ -5,7 +5,7 @@ import { getSessionUser } from "@/lib/auth/require";
 import { listStudentApplications } from "@/features/applications/service";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { EmptyState } from "@/components/ui/empty-state";
+import { DiscoveryEmptyState } from "@/components/ui/discovery-empty-state";
 import { CrmViews, CrmTableMeta, listHref } from "@/components/ui/crm-list";
 import { StudentRecordsMotion } from "@/components/motion/student-records-motion";
 import "../student-records.css";
@@ -50,7 +50,12 @@ export default async function StudentApplicationsPage({ searchParams }: { search
           <p>{internshipCity}, {internshipCountry}</p>{application.needsReReview && <span className="badge badge-rereview">Re-review required</span>}
           <div className="crm-mobile-bottom"><span className="crm-record-sub">{application.submittedAt ? new Date(application.submittedAt).toLocaleDateString("en-SG") : "Not submitted"}</span><Link className="crm-row-link" href={application.isDraft ? `/apply/${application.internshipId}` : `/dashboard/applications/${application.id}`}>{application.isDraft ? "Resume draft" : "View details"}</Link></div>
         </li>)}</ul>
-      </> : <div className="crm-empty"><EmptyState icon="☰" title={view === "drafts" ? "No saved drafts" : view === "submitted" ? "No submitted applications" : "No applications yet"} body={view === "drafts" ? "Drafts appear here after you save an application." : "Explore internships and apply when you find a good fit."} actionHref="/opportunities" actionLabel="Browse internships" /></div>}
+      </> : <DiscoveryEmptyState variant="application"
+        title={view === "drafts" ? "No saved drafts" : view === "submitted" ? "No submitted applications" : "Your next step starts here"}
+        description={view === "drafts" ? "Save an application as a draft and return to it here whenever you’re ready." : view === "submitted" ? "Applications appear here after you submit them. You can continue any saved drafts from the Drafts view." : "Explore internships that interest you. Your applications and saved drafts will be kept here."}
+        href={view === "submitted" && drafts.length > 0 ? listHref(path, searchParams, { view: "drafts", draft: null }) : "/opportunities"}
+        action={view === "submitted" && drafts.length > 0 ? "Continue a draft" : "Browse internships"}
+      />}
       {visible.length > 0 && <div className="crm-student-help">Your application status updates here as the team reviews it. Quotation terms are sent by email. <Link href="/#contact">Need help? <ArrowRight size={13} /></Link></div>}
     </section>
   </StudentRecordsMotion>;
