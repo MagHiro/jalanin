@@ -19,6 +19,7 @@
     "db:seed": "tsx scripts/seed.ts",
     "db:seed:test": "tsx scripts/seed.ts --test",
     "db:seed:demo": "tsx scripts/seed-demo.ts",
+    "db:seed:internships": "tsx scripts/seed-internships.ts",
     "migrate:supabase-pg": "tsx scripts/migrate-supabase-pg.ts",
     "migrate:supabase-storage": "tsx scripts/migrate-supabase-storage.ts",
     "backup:db": "./scripts/backup-db.sh",

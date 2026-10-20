@@ -1,0 +1,59 @@
+/* Admin-only adaptations of the approved /dashboard/applications list system. */
+.workspace-shell .admin-records-page .crm-views {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+}
+.workspace-shell .admin-records-page .crm-toolbar {
+  gap: 12px; padding: 24px 28px; background: #fff;
+  border-bottom: 1px solid #f0f2f5; flex-wrap: wrap;
+}
+.workspace-shell .admin-records-page .crm-search {
+  min-height: 48px; min-width: 0; flex: 1 1 260px;
+  padding: 10px 14px; border: 1px solid #e2e6ec;
+  border-radius: 8px; background: #fafbfc; color: #656565;
+}
+.workspace-shell .admin-records-page .crm-search input {
+  font-size: 15px; font-weight: 400; line-height: 1.6;
+  letter-spacing: normal; color: #222; background: transparent;
+}
+.workspace-shell .admin-records-page .crm-toolbar-select { flex: 1 1 180px; min-width: 0; }
+.workspace-shell .admin-records-page .workspace-select-trigger {
+  min-height: 48px; padding: 11px 14px; border-color: #e2e6ec;
+  border-radius: 8px; background: #fafbfc; color: #222;
+  font-size: 15px; font-weight: 400; line-height: 1.6; letter-spacing: normal;
+}
+.workspace-shell .admin-records-page :is(.workspace-select-option, .workspace-row-menu-link, .crm-toolbar-check) {
+  color: #222; font-size: 15px; font-weight: 400; line-height: 1.6; letter-spacing: normal;
+}
+.workspace-shell .admin-records-page .crm-filter-chips { padding: 16px 28px; background: #fff; }
+.workspace-shell .admin-records-page .crm-filter-chip {
+  padding: 6px 12px; border-radius: 999px; background: #eef1f8;
+  color: #102568; font-size: 13px; font-weight: 400; letter-spacing: normal;
+}
+.workspace-shell .admin-records-page .crm-sort { color: inherit; font-weight: 400; }
+.workspace-shell .admin-records-page .crm-table tbody tr:hover { background: #fafbfc; }
+.workspace-shell .admin-records-page .crm-table .crm-row-unread { background: #f5f7fc; }
+.workspace-shell .admin-records-page :is(.crm-inbox-details summary, .crm-inbox-message) {
+  color: #222; font-size: 15px; font-weight: 400; line-height: 1.6; letter-spacing: normal;
+}
+.workspace-shell .admin-records-page .crm-inbox-message { white-space: pre-wrap; overflow-wrap: anywhere; }
+.workspace-shell .admin-records-page :is(.crm-record-name, .crm-record-sub, .crm-record-secondary) { overflow-wrap: anywhere; }
+.workspace-shell .admin-records-page .crm-pagination {
+  padding: 22px 28px; gap: 12px; background: #fff; border-top: 1px solid #f0f2f5;
+  color: #656565; font-size: 15px; font-weight: 400; line-height: 1.6; flex-wrap: wrap;
+}
+.workspace-shell .admin-records-page .crm-pagination .btn { min-height: 44px; padding: 10px 18px; }
+.workspace-shell .admin-records-page .crm-empty { padding: 40px 24px; }
+.workspace-shell .admin-records-page .empty-state-title { font-size: 25px; font-weight: 400; }
+.workspace-shell .admin-records-page .admin-placement-empty { display: flex; flex-direction: column; align-items: center; padding: 48px 24px 56px; text-align: center; }
+.workspace-shell .admin-records-page .admin-placement-empty h2 { margin: 20px 0 12px; color: #111; font-size: 25px; font-weight: 400; line-height: 1.3; letter-spacing: -.025em; }
+.workspace-shell .admin-records-page .admin-placement-empty p { max-width: 460px; margin: 0 0 24px; color: #656565; font-size: 15px; line-height: 1.6; }
+.workspace-shell .admin-records-page .admin-placement-empty > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+@media (max-width: 767px) {
+  .workspace-shell .admin-records-page .crm-views { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .workspace-shell .admin-records-page .crm-view { padding: 18px 16px; }
+  .workspace-shell .admin-records-page :is(.crm-toolbar, .crm-pagination, .crm-filter-chips) { padding: 20px; }
+  .workspace-shell .admin-records-page .crm-search { flex-basis: 100%; }
+  .workspace-shell .admin-records-page .crm-toolbar-select { flex-basis: 100%; }
+  .workspace-shell .admin-records-page .crm-apply { width: 100%; }
+  .workspace-shell .admin-records-page .crm-mobile-bottom { flex-wrap: wrap; gap: 12px; }
+}

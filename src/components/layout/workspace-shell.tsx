@@ -3,11 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowLeft, ArrowRight, Bell, BriefcaseBusiness, ChevronRight, Command, Compass, LayoutGrid, Menu, PanelLeftClose, PanelLeftOpen, Plus, Search, ShieldCheck, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Bell, BriefcaseBusiness, ChevronRight, Compass, LayoutGrid, Menu, PanelLeftClose, PanelLeftOpen, Plus, Search, ShieldCheck, X } from "lucide-react";
 import { gsap } from "gsap";
 import { DomainIcon } from "@/components/ui/domain-icon";
 import { SignOutButton } from "./sign-out-button";
 import type { RailItem } from "./workspace-rail";
+import "./workspace-navigation.css";
+import "./workspace-surfaces.css";
 
 type NavGroup = { label: string; items: RailItem[] };
 
@@ -28,6 +30,8 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
   const [searchOpen, setSearchOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [query, setQuery] = useState("");
+  const previousCollapsed = useRef<boolean | null>(null);
+  const previousIndicatorTop = useRef<number | null>(null);
   const isAdmin = role === "admin";
   const home = isAdmin ? "/admin" : "/dashboard";
   const placementContext = pathname.startsWith("/admin/placements");
@@ -43,10 +47,32 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
         { label: "Communication", items: items.filter(item => ["/admin/contacts", "/admin/notifications"].includes(item.href)) },
       ]
     : [
-        { label: "Home", items: items.filter(item => item.href === home) },
-        { label: "My journey", items: items.filter(item => item.href.startsWith("/dashboard/")) },
-        { label: "More", items: items.filter(item => item.href === "/admin") },
+        { label: "Your workspace", items: items.filter(item => item.href === home || item.href.startsWith("/dashboard/")) },
+        { label: "Workspace access", items: items.filter(item => item.href === "/admin") },
       ];
+
+  useEffect(() => {
+    const sidebar = root.current?.querySelector<HTMLElement>(".workspace-sidebar");
+    const previous = previousCollapsed.current;
+    previousCollapsed.current = collapsed;
+    if (!sidebar || previous === null || previous === collapsed || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !window.matchMedia("(min-width: 1024px)").matches) return;
+    const tween = gsap.fromTo(sidebar,
+      { width: previous ? 72 : 256, flexBasis: previous ? 72 : 256 },
+      { width: collapsed ? 72 : 256, flexBasis: collapsed ? 72 : 256, duration: 0.28, ease: "power2.inOut", clearProps: "width,flexBasis" });
+    return () => { tween.kill(); sidebar.style.removeProperty("width"); sidebar.style.removeProperty("flex-basis"); };
+  }, [collapsed, isAdmin]);
+
+  useEffect(() => {
+    const sidebar = root.current?.querySelector<HTMLElement>(".workspace-sidebar");
+    const indicator = sidebar?.querySelector<HTMLElement>("[aria-current=page] .workspace-nav-indicator");
+    if (!sidebar || !indicator) return;
+    const top = indicator.getBoundingClientRect().top - sidebar.getBoundingClientRect().top;
+    const previous = previousIndicatorTop.current;
+    previousIndicatorTop.current = top;
+    if (previous === null || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const tween = gsap.fromTo(indicator, { y: previous - top }, { y: 0, duration: 0.18, ease: "power2.out", clearProps: "transform" });
+    return () => { tween.kill(); };
+  }, [pathname, isAdmin, collapsed]);
 
   useEffect(() => {
     try { setCollapsed(window.localStorage.getItem("jalanin:rail-collapsed") === "1"); } catch { /* optional preference */ }
@@ -58,6 +84,32 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
       try { window.localStorage.setItem("jalanin:rail-collapsed", next ? "1" : "0"); } catch { /* storage disabled */ }
       return next;
     });
+  }
+
+  function openMobileNavigation() {
+    if (mobile.current?.open) return;
+    mobile.current?.showModal();
+    const panel = mobile.current?.querySelector(".workspace-mobile-panel");
+    if (panel && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      gsap.fromTo(panel, { x: -20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.22, ease: "power2.out", clearProps: "transform,opacity", overwrite: true });
+    }
+  }
+
+  function navigateSearch(event: React.KeyboardEvent<HTMLDialogElement>) {
+    if (!["ArrowDown", "ArrowUp", "Enter"].includes(event.key)) return;
+    const links = Array.from(palette.current?.querySelectorAll<HTMLAnchorElement>(".workspace-command-item") ?? []);
+    if (!links.length) return;
+    const index = links.findIndex(link => link === document.activeElement);
+    if (event.key === "Enter") {
+      if (document.activeElement === paletteInput.current) {
+        event.preventDefault();
+        links[0].click();
+      }
+      return;
+    }
+    event.preventDefault();
+    const next = index < 0 ? (event.key === "ArrowDown" ? 0 : links.length - 1) : (index + (event.key === "ArrowDown" ? 1 : -1) + links.length) % links.length;
+    links[next].focus();
   }
 
   useEffect(() => {
@@ -91,7 +143,7 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
     if (!node || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const context = gsap.context(() => {
       const sections = gsap.utils.toArray<HTMLElement>(".workspace-content .workspace-page-heading, .workspace-content .workspace-welcome, .workspace-content .workspace-stat, .workspace-content .workspace-data-card, .workspace-content .page-heading, .workspace-content .table-shell, .workspace-content .crm-records, .workspace-content .workspace-record-section, .workspace-content .toolbar, .workspace-content .form-section");
-      gsap.fromTo(sections.slice(0, 18), { opacity: 0, y: 9 }, { opacity: 1, y: 0, duration: 0.36, ease: "power2.out", stagger: 0.027, clearProps: "all", overwrite: "auto" });
+      gsap.fromTo(sections.filter(section => !section.closest(".student-records-page, .application-review-calm, .student-profile-calm, .internship-editor-calm")).slice(0, 18), { opacity: 0, y: 9 }, { opacity: 1, y: 0, duration: 0.36, ease: "power2.out", stagger: 0.027, clearProps: "all", overwrite: "auto" });
     }, node);
     return () => context.revert();
   }, [pathname]);
@@ -105,7 +157,6 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
   }, [searchOpen]);
 
   const brand = <Link href={home} className="workspace-brand" aria-label="Jalanin workspace home">
-    <span className="workspace-brand-mark" aria-hidden="true">j.</span>
     <span className="workspace-brand-name">jalanin<span className="workspace-brand-role">{isAdmin ? "Admin workspace" : "Student workspace"}</span></span>
   </Link>;
 
@@ -116,6 +167,7 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
         const active = item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
         return <Link key={item.href} href={item.href} className="workspace-nav-item" title={item.label} aria-label={item.label} aria-current={active ? "page" : undefined} onClick={() => mobile.current?.close()}>
           <span className="workspace-nav-icon"><DomainIcon name={item.icon} size={18} /></span>
+          {active && <span className="workspace-nav-indicator" aria-hidden="true" />}
           <span className="workspace-nav-text">{item.label}</span>
           {!!item.badge && <span className="workspace-nav-count tnum" aria-label={`${item.badge} unread`}>{item.badge}</span>}
         </Link>;
@@ -136,14 +188,14 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
     <div className="workspace-account-actions"><SignOutButton /></div>
   </div>;
 
-  return <div ref={root} className={`workspace-shell workspace-${role}${collapsed ? " workspace-collapsed" : ""}`}>
+  return <div ref={root} className={`workspace-shell workspace-confluence workspace-${role}${collapsed ? " workspace-collapsed" : ""}`}>
     <a href="#main" className="workspace-skip-link">Skip to main content</a>
-    <aside className="workspace-sidebar"><div className="workspace-sidebar-head">{brand}<button type="button" className="workspace-rail-toggle" onClick={toggleRail} aria-label={collapsed ? "Expand navigation" : "Collapse navigation"} title={collapsed ? "Expand navigation" : "Collapse navigation"}>{collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}</button></div>{navigation}{bottom}</aside>
+    <aside className="workspace-sidebar"><div className="workspace-sidebar-head">{brand}<button type="button" className="workspace-rail-toggle" onClick={toggleRail} aria-expanded={!collapsed} aria-label={collapsed ? "Expand navigation" : "Collapse navigation"} title={collapsed ? "Expand navigation" : "Collapse navigation"}>{collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}</button></div>{navigation}{bottom}</aside>
     <div className="workspace-body">
       <header className="workspace-topbar">
         <div className="workspace-topbar-start">
-          <button type="button" className="workspace-menu-button" onClick={() => { if (!mobile.current?.open) mobile.current?.showModal(); }} aria-label="Open workspace navigation" aria-controls="workspace-mobile-navigation" aria-haspopup="dialog"><Menu size={20} /></button>
-          <div className="workspace-breadcrumb"><span className="workspace-breadcrumb-root">{isAdmin ? "Workspace / Admin" : "Workspace / Student"}</span><ChevronRight size={15} aria-hidden="true" /><b>{current?.label ?? "Overview"}</b></div>
+          <button type="button" className="workspace-menu-button" onClick={openMobileNavigation} aria-label="Open workspace navigation" aria-controls="workspace-mobile-navigation" aria-haspopup="dialog"><Menu size={20} /></button>
+          <div className="workspace-breadcrumb"><span className="workspace-breadcrumb-root">{isAdmin ? "Admin workspace" : "Student workspace"}</span><ChevronRight size={15} aria-hidden="true" /><b>{current?.label ?? "Overview"}</b></div>
         </div>
         <div className="workspace-topbar-end">
           <button ref={searchTrigger} type="button" className="workspace-search-trigger" onClick={() => setSearchOpen(true)} aria-label="Search workspace pages" aria-haspopup="dialog"><Search size={17} /><span>Search pages</span><kbd>⌘ K</kbd></button>
@@ -157,15 +209,15 @@ export function WorkspaceShell({ children, role, items, switchLink, switchLabel,
     <dialog ref={mobile} id="workspace-mobile-navigation" className="workspace-mobile-dialog" aria-label="Workspace navigation" onClick={event => { if (event.target === mobile.current) mobile.current.close(); }}>
       <div className="workspace-mobile-panel"><div className="flex items-center justify-between gap-2">{brand}<button type="button" className="workspace-close-button" aria-label="Close workspace navigation" onClick={() => mobile.current?.close()}><X size={20} /></button></div>{navigation}{bottom}</div>
     </dialog>
-    <dialog ref={palette} className="workspace-command-dialog" aria-label="Quick navigation" onClose={() => { setSearchOpen(false); setQuery(""); searchTrigger.current?.focus(); }} onClick={event => { if (event.target === palette.current) setSearchOpen(false); }}>
+    <dialog ref={palette} className="workspace-command-dialog" aria-label="Quick navigation" onKeyDown={navigateSearch} onClose={() => { setSearchOpen(false); setQuery(""); searchTrigger.current?.focus(); }} onClick={event => { if (event.target === palette.current) setSearchOpen(false); }}>
       <div className="workspace-command-inner">
         <div className="workspace-command-search"><Search size={20} aria-hidden="true" /><input ref={paletteInput} aria-label="Search destinations" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search workspace pages…" autoComplete="off" /><button type="button" aria-label="Close search" onClick={() => setSearchOpen(false)}><X size={18} /></button></div>
         <div className="workspace-command-results">
-          <p className="workspace-command-label">Pages</p>
+          <p className="workspace-command-label">{query ? "Matching pages" : "Your workspace"}</p>
           {filtered.length ? filtered.map(item => <Link key={item.href} href={item.href} className="workspace-command-item" onClick={() => setSearchOpen(false)}><span className="workspace-command-icon"><DomainIcon name={item.icon} size={18} /></span><span>{item.label}</span><ArrowRight size={15} /></Link>) : <p className="workspace-command-empty">No matching pages. Try another search.</p>}
           {!query && <><p className="workspace-command-label">Quick action</p><Link href={quickHref} className="workspace-command-item" onClick={() => setSearchOpen(false)}><span className="workspace-command-icon"><Plus size={18} /></span><span>{quickLabel}</span><ArrowRight size={15} /></Link></>}
         </div>
-        <div className="workspace-command-footer"><span><Command size={13} /> K to open</span><span>Esc to close</span></div>
+        <div className="workspace-command-footer"><span>↑ ↓ to navigate · Enter to open</span><span>Esc to close</span></div>
       </div>
     </dialog>
   </div>;

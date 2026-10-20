@@ -1,0 +1,57 @@
+/* Complete application form treatment, scoped away from the public header/footer. */
+html .application-page-calm { width: 100%; max-width: 1120px; margin: 0 auto; padding: 16px 0 40px; color: #222; font-family: var(--font-google-sans-flex), sans-serif; }
+html .application-page-calm .learn-application-heading { margin: 0 0 28px; padding: 32px; border-radius: 16px; background: #fff; box-shadow: 0 2px 12px -6px rgb(19 35 78 / .12); }
+html .application-page-calm .learn-application-heading > a { color: #656565; font-size: 15px; font-weight: 400; line-height: 1.6; }
+html .application-page-calm .page-heading { margin: 20px 0 0; padding: 0; border: 0; background: transparent; box-shadow: none; }
+html .application-page-calm .page-heading h1 { margin: 8px 0 16px; color: #111; font-size: 37.5px; font-weight: 400; line-height: 1.25; letter-spacing: -.025em; }
+html .application-page-calm :is(.page-heading-overline,.eyebrow) { color: #656565; font-size: 13px; font-weight: 400; line-height: 1.6; letter-spacing: normal; text-transform: none; }
+html .application-page-calm .page-heading-description { max-width: 720px; color: #656565; font-size: 17.5px; line-height: 1.6; letter-spacing: normal; }
+html .application-page-calm .application-workbench { display: grid; grid-template-columns: 210px minmax(0,1fr); gap: 28px; align-items: start; }
+html .application-page-calm .application-index { position: sticky; top: 110px; padding: 20px 0; align-self: start; }
+html .application-page-calm .application-index a { display: flex; gap: 12px; align-items: center; min-height: 48px; padding: 10px 12px; border-radius: 6px; color: #444; font-size: 15px; font-weight: 400; line-height: 1.6; }
+html .application-page-calm .application-index a:hover { background: #e9f0ff; color: #102568; }
+html .application-page-calm .application-index a span { color: #8194bf; font-size: 13px; }
+html .application-page-calm .application-index p { margin: 20px 12px 0; color: #656565; font-size: 13px; line-height: 1.6; }
+html .application-page-calm .application-workbench form { min-width: 0; }
+html .application-page-calm :is(fieldset,.form-section) { min-width: 0; }
+html .application-page-calm .form-section { padding: 28px; border: 0; border-radius: 12px; background: #fff; box-shadow: 0 2px 12px -6px rgb(19 35 78 / .12); scroll-margin-top: 110px; }
+html .application-page-calm .form-section h2 { margin: 0 0 24px; color: #111; font-size: 22px; font-weight: 400; line-height: 1.3; letter-spacing: -.025em; }
+html .application-page-calm .form-section h2 > span > span:first-child { background: #f5f7fc; color: #8194bf; font-size: 13px; font-weight: 400; }
+html .application-page-calm .form-section h2 > span > span:last-child { font-weight: 400; color: #111; }
+html .application-page-calm .field-label { gap: 8px; color: #222; font-size: 15px; font-weight: 400; line-height: 1.6; }
+html .application-page-calm :is(.field,.workspace-date-trigger) { width: 100%; min-width: 0; min-height: 48px; padding: 11px 14px; border: 1px solid #e2e6ec; border-radius: 8px; background: #fff; color: #222; font: inherit; font-size: 15px; font-weight: 400; line-height: 1.6; letter-spacing: normal; box-shadow: none; }
+html .application-page-calm .field::placeholder { color: #89919f; }
+html .application-page-calm textarea.field { min-height: 140px; resize: vertical; }
+html .application-page-calm fieldset:disabled :is(.field,.workspace-date-trigger) { background: #f7f8fa; color: #656565; opacity: 1; cursor: not-allowed; }
+html .application-page-calm .application-date-range { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; min-width: 0; }
+html .application-page-calm .upload-zone { padding: 20px; background: #fafbfc; border: 1px dashed #cbd3e2; border-radius: 8px; }
+html .application-page-calm .upload-zone input[type=file] { max-width: 100%; color: #444; font-size: 15px; }
+html .application-page-calm .upload-zone input::file-selector-button { padding: 10px 16px; margin-right: 12px; background: #eef1f8; border: 0; border-radius: 999px; color: #102568; font: inherit; font-weight: 400; }
+html .application-page-calm .upload-zone p { color: #656565; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+html .application-page-calm .form-section > p[role=status] { padding: 14px; border-radius: 8px; background: #f5f7fc; color: #444; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+html .application-page-calm .consent-panel { background: #fff; }
+html .application-page-calm .consent-panel label { color: #444; font-size: 15px; line-height: 1.6; }
+html .application-page-calm .consent-panel a { color: #102568; font-weight: 400; text-decoration: underline; text-underline-offset: 3px; }
+html .application-page-calm .alert { padding: 20px; border-radius: 10px; font-size: 15px; line-height: 1.6; }
+html .application-page-calm .alert-warning { background: #fff9ec; color: #715218; border: 1px solid #f0e4c5; }
+html .application-page-calm .alert-info { background: #edf2fc; color: #102568; border: 1px solid #dbe4f5; }
+html .application-page-calm .application-save-actions { padding: 24px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px -6px rgb(19 35 78 / .12); }
+html .application-page-calm .btn { min-height: 48px; padding: 12px 22px; border-radius: 999px; font-size: 15px; font-weight: 400; line-height: 1.5; letter-spacing: normal; }
+html .application-page-calm .btn-primary { background: #102568; color: #fff; }
+html .application-page-calm .btn-primary:hover:not(:disabled) { background: #243966; }
+html .application-page-calm .btn-outline { background: #eef1f6; border-color: transparent; color: #102568; }
+html .application-page-calm button:disabled { cursor: not-allowed; }
+html .application-page-calm form > p:last-child { color: #656565; font-size: 13px; line-height: 1.6; }
+html .application-page-calm :is(a,button,input,textarea,summary):focus-visible { outline: 2px solid #102568; outline-offset: 3px; }
+@media (max-width: 1023px) {
+  html .application-page-calm .application-workbench { grid-template-columns: minmax(0,1fr); gap: 20px; }
+  html .application-page-calm .application-index { position: static; display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 0; }
+  html .application-page-calm .application-index p { flex-basis: 100%; margin: 8px 12px; }
+}
+@media (max-width: 767px) {
+  html .application-page-calm { padding-top: 0; }
+  html .application-page-calm :is(.learn-application-heading,.form-section,.application-save-actions) { padding: 24px 20px; }
+  html .application-page-calm .page-heading h1 { font-size: 35px; overflow-wrap: anywhere; }
+  html .application-page-calm .application-date-range { grid-template-columns: minmax(0,1fr); }
+  html .application-page-calm .application-index a { padding-inline: 8px; font-size: 13px; }
+}

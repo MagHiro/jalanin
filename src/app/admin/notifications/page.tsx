@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/require";
 import { listAdminNotifications, markNotificationRead } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
+import { AdminRecords } from "@/components/admin/admin-records";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { CrmViews, CrmTableMeta, listHref } from "@/components/ui/crm-list";
@@ -32,8 +33,8 @@ export default async function AdminNotificationsPage({ searchParams }: {
     redirect(returnHref);
   }
 
-  return <div className="crm-list-page">
-    <PageHeader icon="●" eyebrow="Communication / Alerts" title="Notifications" description="Application submissions and revisions requiring team attention." />
+  return <AdminRecords filters={searchParams}>
+    <PageHeader title="Notifications" description="Application submissions and revisions requiring team attention." />
     <CrmViews label="Notification views" items={[
       { label: "All notifications", href: listHref(path, searchParams, { unread: null }), active: !unreadOnly },
       { label: "Unread", href: listHref(path, searchParams, { unread: "1" }), active: unreadOnly },
@@ -62,5 +63,5 @@ export default async function AdminNotificationsPage({ searchParams }: {
       </> : <div className="crm-empty"><EmptyState icon="●" title={unreadOnly ? "No unread alerts" : "No notifications yet"} body="New applications and revision events appear here when there is something to review." actionHref={path} actionLabel="Show all notifications" /></div>}
       <Pagination page={page} totalPages={Math.max(1, Math.ceil(total / pageSize))} pathname={path} searchParams={searchParams} total={total} pageSize={pageSize} />
     </section>
-  </div>;
+  </AdminRecords>;
 }

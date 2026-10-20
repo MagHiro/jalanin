@@ -2,6 +2,7 @@ import { Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
 import { listAdminContacts, type ContactHandlingFilter } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
+import { AdminRecords } from "@/components/admin/admin-records";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { CrmFilterChips, CrmTableMeta, CrmViews, listHref } from "@/components/ui/crm-list";
@@ -29,8 +30,8 @@ export default async function AdminContactsPage({ searchParams }: { searchParams
     ...(query ? [{ label: `Search: ${query}`, href: listHref(path, searchParams, { q: null }) }] : []),
     ...(handling !== "all" ? [{ label: `State: ${handling === "open" ? "Open" : "Handled"}`, href: listHref(path, searchParams, { handling: null }) }] : []),
   ];
-  return <div className="crm-list-page">
-    <PageHeader icon="✉" eyebrow="Communication / Inbox" title="Contact inbox" description="Incoming enquiries from the public website. Reply using the sender’s email address." />
+  return <AdminRecords filters={searchParams}>
+    <PageHeader title="Contact inbox" description="Incoming enquiries from the public website. Reply using the sender’s email address." />
     <CrmViews label="Enquiry states" items={[
       { label: "All", href: listHref(path, searchParams, { handling: null }), active: handling === "all", count: total },
       { label: "Open", href: listHref(path, searchParams, { handling: "open" }), active: handling === "open", count: openCount },
@@ -63,5 +64,5 @@ export default async function AdminContactsPage({ searchParams }: { searchParams
       </> : <div className="crm-empty"><EmptyState icon="✉" title="No enquiries in this view" body="New messages will appear here as they arrive through the contact form." actionHref="/#contact" actionLabel="View contact section" /></div>}
       <Pagination page={page} totalPages={Math.max(1,Math.ceil(total/pageSize))} pathname={path} searchParams={searchParams} total={total} pageSize={pageSize} />
     </section>
-  </div>;
+  </AdminRecords>;
 }

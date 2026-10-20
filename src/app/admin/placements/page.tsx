@@ -3,8 +3,9 @@ import { Plus, Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
 import { getAdminOverview, listAdminPlacements } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
+import { AdminRecords } from "@/components/admin/admin-records";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { EmptyState } from "@/components/ui/empty-state";
+import { PlacementGraphic } from "@/components/ui/placement-graphic";
 import { Pagination } from "@/components/ui/pagination";
 import { RecordActions } from "@/components/ui/record-actions";
 import { WorkspaceSelect } from "@/components/ui/workspace-select";
@@ -28,8 +29,8 @@ export default async function AdminPlacementsPage({ searchParams }: {
     ...(searchParams.q ? [{ label: `Search: ${searchParams.q}`, href: listHref(path, searchParams, { q: null }) }] : []),
     ...(searchParams.status ? [{ label: `Status: ${searchParams.status}`, href: listHref(path, searchParams, { status: null }) }] : []),
   ];
-  return <div className="crm-list-page">
-    <PageHeader icon="✦" eyebrow="Operations / Outcomes" title="Placements" description="Manage team-arranged placements, schedules, and lifecycle progress." actions={<Link href="/admin/placements/new" className="btn btn-primary btn-sm"><Plus size={16} /> New placement</Link>} />
+  return <AdminRecords filters={searchParams}>
+    <PageHeader title="Placements" description="Manage team-arranged placements, schedules, and lifecycle progress." actions={<Link href="/admin/placements/new" className="btn btn-primary btn-sm"><Plus size={16} /> New placement</Link>} />
     <CrmViews label="Placement status views" items={[
       { label: "All placements", href: listHref(path, searchParams, { status: null }), active: !searchParams.status, count: allPlacementsCount },
       ...STATUSES.map(status => ({ label: status, href: listHref(path, searchParams, { status }), active: searchParams.status === status, count: overview.placementCounts[status] ?? 0 })),
@@ -54,8 +55,13 @@ export default async function AdminPlacementsPage({ searchParams }: {
           </tr>)}</tbody>
         </table></div>
         <ul className="crm-mobile-records md:hidden">{rows.map(p => <li key={p.id}><div className="crm-mobile-top"><Link className="crm-record-name" href={`/admin/placements/${p.id}/edit`}>{p.role}</Link><StatusBadge status={p.placementStatus} /></div><p>{p.organization} · {p.countryCode}</p><p className="crm-record-sub tnum">{p.startDate ?? "Start TBC"} – {p.endDate ?? "End TBC"}</p><div className="crm-mobile-bottom"><Link className="crm-row-link" href={`/admin/placements/${p.id}/edit`}>Manage placement</Link></div></li>)}</ul>
-      </> : <div className="crm-empty"><EmptyState icon="✦" title="No placements in this view" body="Change your filters or add a placement to start tracking outcomes." actionHref="/admin/placements/new" actionLabel="New placement" /></div>}
+      </> : <div className="admin-placement-empty">
+        <PlacementGraphic />
+        <h2>{filters.length ? "No matching placements" : "No placements in this view"}</h2>
+        <p>{filters.length ? "Try another search or clear your filters to see other records." : "Record an arranged placement to start tracking student outcomes."}</p>
+        <div><Link href="/admin/placements/new" className="btn btn-primary">New placement <Plus size={16} aria-hidden="true" /></Link>{filters.length > 0 && <Link href={path} className="btn btn-outline">Clear filters</Link>}</div>
+      </div>}
       <Pagination page={page} totalPages={Math.max(1,Math.ceil(total/pageSize))} pathname={path} searchParams={searchParams} total={total} pageSize={pageSize} />
     </section>
-  </div>;
+  </AdminRecords>;
 }

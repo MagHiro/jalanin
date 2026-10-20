@@ -41,17 +41,22 @@ test.describe("Mobbin-derived workspace structure", () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
   });
 
-  test("student overview provides genuine journey milestones and next action", async ({ page }) => {
+  test("student overview provides activity counts and a clear next action", async ({ page }) => {
     const response = await page.request.post("/api/dev/session", {
       data: { userId: "00000000-0000-0000-0000-000000000091" },
     });
     expect(response.ok()).toBeTruthy();
     await page.setViewportSize({ width: 375, height: 850 });
     await page.goto("/dashboard");
-    await expect(page.getByRole("heading", { name: /The next chapter/ })).toBeVisible();
-    await expect(page.locator(".journey-path > li")).toHaveCount(3);
-    await expect(page.locator(".journey-metrics .journey-metric")).toHaveCount(3);
-    const action = page.locator(".journey-primary-link");
+    await expect(page.locator("#dashboard-title")).toBeVisible();
+    await expect(page.locator(".next-metrics a")).toHaveCount(3);
+    await expect(page.locator(".next-focus .next-primary")).toHaveCount(1);
+    for (const selector of [".next-focus", ".next-metrics a", ".next-placement", ".next-help"]) {
+      const card = page.locator(selector).first();
+      await expect(card).toHaveCSS("border-top-width", "0px");
+      await expect(card).not.toHaveCSS("box-shadow", "none");
+    }
+    const action = page.locator(".next-primary");
     await expect(action).toBeVisible();
     expect(await action.getAttribute("href")).toMatch(new RegExp("^/(?:apply|dashboard|opportunities)"));
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);

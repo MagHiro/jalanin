@@ -1,0 +1,56 @@
+/* Student application and placement lists share the overview's quiet card system. */
+.workspace-shell .student-records-page { width: 100%; max-width: none; min-width: 0; margin: 0; gap: 24px; color: #111111; }
+.workspace-shell .student-records-page .page-heading { padding: 32px; margin: 0; border: 0; border-radius: 16px; background: #ffffff; box-shadow: 0 2px 12px -6px rgb(19 35 78 / .12); }
+.workspace-shell .student-records-page .page-heading h1 { color: #111111; font-size: 37.5px; line-height: 1.25; letter-spacing: -.025em; font-weight: 400; }
+.workspace-shell .student-records-page .page-heading-description { margin-top: 16px; max-width: 680px; color: #222222; font-size: 17.5px; line-height: 1.6; }
+.workspace-shell .student-records-page .btn { min-height: 48px; padding: 12px 22px; border-radius: 999px; font-size: 15px; font-weight: 400; line-height: 1.5; letter-spacing: normal; box-shadow: none; }
+.workspace-shell .student-records-page .btn-primary { border-color: transparent; background: #102568; color: #ffffff; }
+.workspace-shell .student-records-page .btn-primary:hover { background: #243966; }
+.workspace-shell .student-records-page .btn-outline { background: #eef1f6; border-color: transparent; color: #102568; }
+.workspace-shell .student-records-page :is(a,button,summary):focus-visible { outline: 3px solid #7892ed; outline-offset: 4px; }
+.workspace-shell .student-records-page .crm-views { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; padding: 0; border: 0; background: transparent; }
+.workspace-shell .student-records-page .crm-view-type { display: none; }
+.workspace-shell .student-records-page .crm-view { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 24px; min-width: 0; border: 0; border-radius: 12px; background: #ffffff; color: #656565; font-size: 15px; line-height: 1.6; font-weight: 400; box-shadow: 0 2px 12px -6px rgb(19 35 78 / .12); }
+.workspace-shell .student-records-page .crm-view[aria-current=page] { background: #eef1f8; color: #102568; }
+.workspace-shell .student-records-page .crm-view::after { display: none; }
+.workspace-shell .student-records-page .crm-view-count { padding: 0; background: transparent; color: inherit; font-size: 22px; line-height: 1.25; font-weight: 400; }
+.workspace-shell .student-records-page .crm-records { border: 0; border-radius: 12px; background: #ffffff; box-shadow: 0 2px 12px -6px rgb(19 35 78 / .12); overflow: hidden; }
+.workspace-shell .student-records-page .crm-table-meta { padding: 22px 28px; background: transparent; border: 0; color: #656565; font-size: 15px; line-height: 1.6; }
+.workspace-shell .student-records-page .crm-table-meta-note { color: #656565; font-size: 15px; }
+.workspace-shell .student-records-page .crm-table-meta-note svg { display: none; }
+.workspace-shell .student-records-page .crm-table thead { background: #fafbfc; }
+.workspace-shell .student-records-page .crm-table th { padding: 16px 24px; color: #656565; font-size: 15px; line-height: 1.6; font-weight: 400; letter-spacing: normal; text-transform: none; border: 0; }
+.workspace-shell .student-records-page .crm-table td { padding: 24px; font-size: 15px; line-height: 1.6; border-color: #f0f2f5; color: #222222; }
+.workspace-shell .student-records-page .crm-record-name { color: #111111; font-size: 15px; font-weight: 400; line-height: 1.6; }
+.workspace-shell .student-records-page .crm-record-sub { color: #656565; font-size: 15px; font-weight: 400; line-height: 1.6; }
+.workspace-shell .student-records-page .crm-row-link { color: #102568; font-size: 15px; font-weight: 400; }
+.workspace-shell .student-records-page .crm-student-help { padding: 22px 28px; margin: 0; border: 0; color: #656565; font-size: 15px; line-height: 1.6; background: transparent; }
+.workspace-shell .student-records-page .crm-student-help a { color: #102568; }
+.workspace-shell .student-records-page .placement-collection-heading { margin-bottom: 16px; color: #656565; font-size: 15px; line-height: 1.6; }
+.workspace-shell .student-records-page .eyebrow { color: #656565; font-size: 15px; line-height: 1.6; font-weight: 400; letter-spacing: normal; text-transform: none; }
+.workspace-shell .student-records-page .student-placement-cards { gap: 16px; }
+.workspace-shell .student-records-page :is(.student-placement-card,.placement-empty-state) { padding: 32px; border: 0; border-radius: 12px; background: #ffffff; box-shadow: 0 2px 12px -6px rgb(19 35 78 / .12); }
+.workspace-shell .student-records-page .placement-empty-state { display: flex; justify-content: center; text-align: center; padding: 56px 32px; min-height: 0; }
+.workspace-shell .student-records-page .placement-empty-state > div { max-width: 580px; }
+.workspace-shell .student-records-page .placement-empty-state h2 { margin: 0; color: #111111; font-size: 37.5px; font-weight: 400; line-height: 1.25; letter-spacing: -.025em; }
+.workspace-shell .student-records-page .placement-empty-state p { color: #656565; font-size: 17.5px; line-height: 1.6; margin: 18px 0 26px; }
+.workspace-shell .student-records-page .placement-empty-actions { justify-content: center; gap: 12px; }
+.workspace-shell .student-records-page .student-placement-card h2 { color: #111111; font-size: 27px; font-weight: 400; line-height: 1.3; letter-spacing: -.025em; }
+.workspace-shell .student-records-page .placement-role-icon { display: none; }
+.workspace-shell .student-records-page .student-placement-card header { justify-content: flex-end; }
+.workspace-shell .student-records-page .student-placement-card :is(dt,dd,summary,.placement-record-details p) { font-size: 15px; line-height: 1.6; font-weight: 400; letter-spacing: normal; }
+@media (max-width: 767px) {
+  .workspace-shell .student-records-page { gap: 20px; }
+  .workspace-shell .student-records-page .page-heading { padding: 24px 20px; }
+  .workspace-shell .student-records-page .page-heading h1,
+  .workspace-shell .student-records-page .placement-empty-state h2 { font-size: 35px; }
+  .workspace-shell .student-records-page .page-heading-toolbar { align-items: flex-start; gap: 20px; }
+  .workspace-shell .student-records-page .crm-views { gap: 8px; }
+  .workspace-shell .student-records-page .crm-view { flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px 12px; }
+  .workspace-shell .student-records-page .crm-mobile-records li { padding: 24px 20px; background: #ffffff; border-color: #f0f2f5; }
+  .workspace-shell .student-records-page .crm-mobile-records .crm-record-name { font-size: 17.5px; }
+  .workspace-shell .student-records-page .crm-mobile-records p { color: #656565; font-size: 15px; line-height: 1.6; }
+  .workspace-shell .student-records-page :is(.crm-table-meta,.crm-student-help,.student-placement-card) { padding: 20px; }
+  .workspace-shell .student-records-page .placement-empty-state { padding: 36px 20px; }
+  .workspace-shell .student-records-page .placement-empty-actions { flex-direction: column; align-items: stretch; }
+}

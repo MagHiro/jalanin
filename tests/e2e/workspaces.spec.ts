@@ -18,8 +18,8 @@ for (const role of ["admin", "student"] as const) {
       await page.setViewportSize({ width, height: 960 });
       await page.goto(route);
       await expect(page.locator("main#main h1")).toBeVisible();
-      await expect(page.locator(role === "admin" ? ".ops-priority > a" : ".journey-primary-link")).toBeVisible();
-      if (width === 1440) await expect(page.locator("main#main h1")).toHaveCSS("font-weight", "500");
+      await expect(page.locator(role === "admin" ? ".ops-priority > a" : ".next-primary")).toBeVisible();
+      if (width === 1440) await expect(page.locator("main#main h1")).toHaveCSS("font-weight", role === "admin" ? "500" : "400");
       await expect(page.locator(".public-header")).toHaveCount(0);
       await expect(page.locator(".workspace-topbar .workspace-topbar-cta")).toHaveCount(0);
       await expect(page.locator(".workspace-topbar").getByRole("link", { name: /New internship|New placement|Explore internships/i })).toHaveCount(0);
@@ -33,9 +33,9 @@ for (const role of ["admin", "student"] as const) {
           await expect(page.locator(".ops-metrics .ops-metric")).toHaveCount(4);
           await expect(page.locator(".ops-stage-list .ops-stage")).toHaveCount(6);
         } else {
-          await expect(page.locator(".journey-masthead")).toBeVisible();
-          await expect(page.locator(".journey-path > li")).toHaveCount(3);
-          await expect(page.locator(".journey-metrics .journey-metric")).toHaveCount(3);
+          await expect(page.locator(".next-focus")).toBeVisible();
+          await expect(page.locator(".next-metrics a")).toHaveCount(3);
+          await expect(page.getByRole("heading", { name: "Your placement", exact: true })).toBeVisible();
         }
         await expect(page.locator(".workspace-sidebar .workspace-nav-label").first()).toBeVisible();
         await expect(page.locator(".workspace-quick-card")).toHaveCount(0);
@@ -56,6 +56,36 @@ for (const role of ["admin", "student"] as const) {
     await expect(page.locator(".workspace-sidebar a[aria-current=page]")).toContainText("Applications");
     await expect(page.locator(".crm-records")).toBeVisible();
     await expect(page.locator(".crm-view[aria-current=page]")).toHaveCount(1);
+    if (role === "student") {
+      await expect(page.locator(".page-heading h1")).toHaveCSS("font-weight", "400");
+      await expect(page.locator(".crm-records")).toHaveCSS("border-top-width", "0px");
+      await expect(page.locator(".crm-records")).not.toHaveCSS("box-shadow", "none");
+      await expect(page.locator(".crm-view")).toHaveCount(3);
+      for (const width of [320, 767, 1440]) {
+        await page.setViewportSize({ width, height: 960 });
+        await page.goto("/dashboard/placements");
+        await expect(page.getByRole("heading", { name: "My placements", exact: true })).toBeVisible();
+        await expect(page.locator(".placement-empty-art")).toHaveCount(0);
+        await expect(page.locator(".student-placement-card, .placement-empty-state").first()).toHaveCSS("border-top-width", "0px");
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+      }
+      await page.setViewportSize({ width: 1440, height: 960 });
+      await page.goto("/dashboard/applications");
+      const detailLink = page.getByRole("link", { name: "View details", exact: true }).first();
+      if (await detailLink.count()) {
+        await detailLink.click();
+        await expect(page.locator(".student-submission-header h1")).toHaveCSS("font-weight", "400");
+        await expect(page.locator(".student-submission-header")).not.toHaveCSS("box-shadow", "none");
+        for (const width of [320, 767, 1440]) {
+          await page.setViewportSize({ width, height: 960 });
+          await expect(page.locator("#submission-h")).toBeVisible();
+          await expect(page.locator(".student-submission-grid > section")).toHaveCSS("border-top-width", "0px");
+          expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+        }
+        await page.setViewportSize({ width: 1440, height: 960 });
+        await page.goto("/dashboard/applications");
+      }
+    }
     if (role === "admin") {
       await expect(page.getByRole("form", { name: "Filter applications" })).toBeVisible();
       await page.getByRole("navigation", { name: "Application queues" }).getByRole("link", { name: "New", exact: true }).click();

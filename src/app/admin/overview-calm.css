@@ -1,0 +1,97 @@
+/* A quieter overview: neutral surfaces, one accent and data-led graphics. */
+html .workspace-shell.workspace-admin .ops-overview { gap: 32px; }
+html .workspace-shell.workspace-admin .ops-masthead { gap: 40px; }
+html .workspace-shell.workspace-admin .ops-heading { position: relative; }
+html .workspace-shell.workspace-admin .ops-quiet-graphic { display: block; width: 180px; height: 64px; margin: 20px 0; color: #102568; }
+html .workspace-shell.workspace-admin .ops-heading-actions { margin-top: 20px; }
+html .workspace-shell.workspace-admin .ops-priority {
+  background: transparent; border: 0; border-left: 1px solid #e7eaf0;
+  border-radius: 0; box-shadow: none; padding: 0 0 0 32px;
+}
+html .workspace-shell.workspace-admin .ops-priority::before,
+html .workspace-shell.workspace-admin .ops-priority::after { content: none; }
+html .workspace-shell.workspace-admin .ops-priority-top { margin-bottom: 12px; }
+html .workspace-shell.workspace-admin .ops-priority > p { max-width: 340px; }
+html .workspace-shell.workspace-admin .ops-priority-foot { border-color: #edf0f4; margin-top: 20px; }
+html .workspace-shell.workspace-admin .ops-priority-waiting { margin-top: 16px; padding-top: 16px; border-color: #edf0f4; }
+html .workspace-shell.workspace-admin .ops-section-line { margin-bottom: 16px; }
+html .workspace-shell.workspace-admin .ops-section-line h2 { font-size: 20px; }
+html .workspace-shell.workspace-admin .ops-metrics { gap: 0; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: var(--ws-shadow); }
+html .workspace-shell.workspace-admin .ops-metric { border-radius: 0; border-right: 1px solid #edf0f4; box-shadow: none; }
+html .workspace-shell.workspace-admin .ops-metric:last-child { border-right: 0; }
+html .workspace-shell.workspace-admin .ops-metric:hover { background: #fafbfc; transform: none; }
+html .workspace-shell.workspace-admin .ops-metric-head svg { color: #8190ae; }
+html .workspace-shell.workspace-admin .ops-metric-foot { font-size: 13px; }
+html .workspace-shell.workspace-admin .ops-metric-foot > svg { display: none; }
+html .workspace-shell.workspace-admin :is(.ops-panel, .ops-briefing, .ops-shortcuts) { border: 0; box-shadow: var(--ws-shadow); }
+html .workspace-shell.workspace-admin .ops-panel-head { padding-bottom: 20px; }
+html .workspace-shell.workspace-admin .ops-panel-head h2 { font-size: 22px; }
+html .workspace-shell.workspace-admin .ops-pipeline-total { padding: 0 0 20px; border: 0; background: transparent; }
+html .workspace-shell.workspace-admin .ops-pipeline-total strong { font-size: 32px; }
+html .workspace-shell.workspace-admin .ops-pipeline-total span { max-width: 260px; font-size: 13px; }
+html .workspace-shell.workspace-admin .ops-stage { border-color: #f0f2f5; }
+html .workspace-shell.workspace-admin .ops-stage-dot { display: none; }
+html .workspace-shell.workspace-admin .ops-stage-track { height: 4px; background: #edf0f4; }
+html .workspace-shell.workspace-admin .ops-stage-fill { background: #8194bf; }
+html .workspace-shell.workspace-admin .ops-stage strong { color: #222; font-size: 15px; font-weight: 400; }
+html .workspace-shell.workspace-admin .ops-stage > svg { color: #a0a7b2; }
+html .workspace-shell.workspace-admin .ops-briefing-icon { width: 32px; height: 32px; background: transparent; color: #8190ae; }
+html .workspace-shell.workspace-admin .ops-briefing h2 { font-size: 22px; }
+html .workspace-shell.workspace-admin .ops-shortcuts-heading { font-size: 15px; letter-spacing: normal; text-transform: none; }
+html .workspace-shell.workspace-admin .ops-shortcuts-heading svg { color: #8190ae; }
+html .workspace-shell.workspace-admin .ops-activity-indicator { display: none; }
+html .workspace-shell.workspace-admin .ops-activity-symbol { background: #f3f5f9; color: #8190ae; border: 0; border-radius: 50%; }
+html .workspace-shell.workspace-admin .ops-activity-entry-title :is(a,strong) { color: #222; font-size: 15px; font-weight: 400; }
+html .workspace-shell.workspace-admin .ops-activity-footer { background: transparent; color: #656565; }
+html .workspace-shell.workspace-admin .ops-activity-footer-dot { background: #8190ae; box-shadow: none; }
+html .workspace-shell.workspace-admin .ops-placement-empty-icon { background: #f3f5f9; color: #8190ae; }
+html .workspace-shell.workspace-admin .ops-placement-empty h3 { font-size: 22px; font-weight: 400; }
+/* Lower overview: simple activity rows and a neutral placement empty state. */
+html .workspace-shell.workspace-admin .ops-bottom-grid { gap: 24px; align-items: start; }
+html .workspace-shell.workspace-admin .ops-activity-list { margin-top: 0; }
+html .workspace-shell.workspace-admin .ops-activity-list::before { content: none; }
+html .workspace-shell.workspace-admin .ops-activity-list .ops-activity-entry { padding: 20px 0; gap: 14px; border-color: #f0f2f5; }
+html .workspace-shell.workspace-admin .ops-activity-list .ops-activity-symbol {
+  width: 32px; height: 32px; flex: 0 0 32px; background: transparent; color: #8194bf;
+}
+html .workspace-shell.workspace-admin .ops-activity-entry-title { gap: 12px; }
+html .workspace-shell.workspace-admin .ops-activity-entry-title > :is(a,strong) {
+  font-size: 15px; font-weight: 400; line-height: 1.6; letter-spacing: normal; text-transform: none;
+}
+html .workspace-shell.workspace-admin .ops-activity-entry-title time { font-size: 13px; font-weight: 400; color: #656565; }
+html .workspace-shell.workspace-admin .ops-activity-details p { font-size: 13px; line-height: 1.6; color: #656565; }
+html .workspace-shell.workspace-admin .ops-activity-open { border: 0; background: transparent; color: #8194bf; border-radius: 6px; }
+html .workspace-shell.workspace-admin .ops-activity-open:hover { background: #eef1f8; color: #102568; }
+html .workspace-shell.workspace-admin .ops-activity-footer { padding-top: 18px; border: 0; font-size: 13px; font-weight: 400; }
+html .workspace-shell.workspace-admin .ops-activity-footer > span:last-child { display: none; }
+html .workspace-shell.workspace-admin .ops-placement-empty {
+  padding: 0; background: transparent; background-image: none; border: 0; border-radius: 0; box-shadow: none;
+}
+html .workspace-shell.workspace-admin .ops-placement-empty-top { margin: 0 0 20px; align-items: center; }
+html .workspace-shell.workspace-admin .ops-placement-graphic { display: block; width: 100px; height: 72px; flex: 0 0 100px; }
+html .workspace-shell.workspace-admin .ops-placement-empty-count {
+  background: #f5f7fa; border: 0; border-radius: 999px; padding: 6px 12px;
+  font-size: 13px; font-weight: 400; color: #656565; letter-spacing: normal;
+}
+html .workspace-shell.workspace-admin .ops-placement-empty-count::before { content: none; }
+html .workspace-shell.workspace-admin .ops-placement-empty h3 { margin: 0 0 12px; color: #111; font-size: 22px; line-height: 1.3; font-weight: 400; letter-spacing: -.025em; }
+html .workspace-shell.workspace-admin .ops-placement-empty > p { margin: 0 0 24px; color: #656565; font-size: 15px; line-height: 1.6; }
+html .workspace-shell.workspace-admin .ops-placement-summary .ops-placement-action {
+  width: fit-content; max-width: 100%; min-height: 44px; gap: 10px; padding: 11px 20px;
+  background: #102568; color: #fff; border: 0; border-radius: 999px;
+  font-size: 15px; font-weight: 400; line-height: 1.5; letter-spacing: normal;
+}
+html .workspace-shell.workspace-admin .ops-placement-summary .ops-placement-action:hover { background: #243966; }
+html .workspace-shell.workspace-admin .ops-placement-summary .ops-placement-action svg:last-child { display: none; }
+@media (max-width: 1100px) {
+  html .workspace-shell.workspace-admin .ops-metric { border-bottom: 1px solid #edf0f4; }
+  html .workspace-shell.workspace-admin .ops-metric:nth-child(even) { border-right: 0; }
+  html .workspace-shell.workspace-admin .ops-metric:nth-last-child(-n+2) { border-bottom: 0; }
+}
+@media (max-width: 767px) {
+  html .workspace-shell.workspace-admin .ops-overview { gap: 24px; }
+  html .workspace-shell.workspace-admin .ops-masthead { gap: 24px; }
+  html .workspace-shell.workspace-admin .ops-priority { padding: 24px 0 0; border-left: 0; border-top: 1px solid #e7eaf0; }
+  html .workspace-shell.workspace-admin .ops-metrics { gap: 0; }
+  html .workspace-shell.workspace-admin .ops-quiet-graphic { width: 150px; height: auto; margin: 16px 0; }
+}

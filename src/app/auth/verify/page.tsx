@@ -43,7 +43,7 @@ function VerifyForm() {
   }, [token, router]);
 
   return (
-    <div className="surface-card mx-auto max-w-md p-6 md:p-8" role="status">
+    <div className="auth-calm-form" role="status">
       <p className="eyebrow">Email verification</p>
       <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
         {state === "done" ? "Email verified" : state === "error" ? "Verification failed" : "Verifying…"}

@@ -170,7 +170,7 @@ export function ApplicationForm({ internshipId, existing, existingCv = null }: P
     <Reveal stagger={0.05} className="application-workbench">
     <nav className="application-index" aria-label="Application sections">
       {[["personal", "Your details"], ["education", "Education & dates"], ["documents", "Your CV"], ["notes", "Additional notes"], ["consent", "Consent & review"]].map(([id, label], index) => <a key={id} href={`#${id}`}><span>0{index + 1}</span>{label}</a>)}
-      <p>Take your time. Use Save draft to keep your progress, then return whenever you’re ready.</p>
+      <p>{locked ? "This application is read-only. Contact Jalanin if you need to request a change." : submittedExisting ? "Review your details before saving. Changes require admin re-review." : "Take your time. Use Save draft to keep your progress, then return whenever you’re ready."}</p>
     </nav>
     <form
       onSubmit={(e) => onAction("submit", e)}
@@ -280,7 +280,7 @@ export function ApplicationForm({ internshipId, existing, existingCv = null }: P
 
       {error && <p role="alert" className="alert alert-error">{error}</p>}
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row">
+      <div className="application-save-actions flex flex-col-reverse gap-3 sm:flex-row">
         {(!existing || existing.isDraft) && <button
           type="button"
           disabled={locked || busy !== null}
@@ -301,7 +301,7 @@ export function ApplicationForm({ internshipId, existing, existingCv = null }: P
         </button>
       </div>
       <p className="text-center text-xs leading-5 text-muted-foreground">
-        {existing && !existing.isDraft ? "Changes to a submitted application require admin re-review." : "Drafts save explicitly and resume after logout. Nothing is sent until you submit."}
+        {locked ? "Your submitted application is preserved. Editing is currently unavailable." : existing && !existing.isDraft ? "Changes to a submitted application require admin re-review." : "Drafts save explicitly and resume after logout. Nothing is sent until you submit."}
       </p>
     </form>
     </Reveal>

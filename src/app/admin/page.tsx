@@ -1,11 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Activity, ArrowRight, ArrowRightLeft, Bell, BriefcaseBusiness, CheckCircle2, ChevronRight, CircleDot, ClipboardList, Clock3, FileCheck2, FilePenLine, FileText, Plus, Users } from "lucide-react";
+import { Activity, ArrowRight, ArrowRightLeft, Bell, BriefcaseBusiness, CheckCircle2, ChevronRight, ClipboardList, Clock3, FileCheck2, FilePenLine, FileText, Plus, Users } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
 import { getAdminOverview, listAdminApplications, recentAudit } from "@/features/admin/service";
 import { waitingDays, waitingLabel } from "@/lib/workflow/waiting-time";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { adminActivityHref, describeAdminActivity } from "@/lib/ui/admin-activity";
+import "./overview-calm.css";
 
 export const metadata: Metadata = { title: "Admin overview", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -45,9 +46,17 @@ export default async function AdminOverviewPage() {
   return <div className="ops-overview">
     <section className="ops-masthead" aria-labelledby="overview-title">
       <div className="ops-heading">
-        <p className="ops-eyebrow">Operations</p>
         <h1 id="overview-title">Overview</h1>
         <p>Manage applications, opportunities and people.</p>
+        <svg className="ops-quiet-graphic" viewBox="0 0 180 64" fill="none" aria-hidden="true">
+          <path d="M16 32H164" stroke="currentColor" strokeOpacity=".18" />
+          <rect x="16" y="12" width="38" height="40" rx="7" fill="#f5f7fc" stroke="currentColor" strokeOpacity=".25" />
+          <path d="M27 25H43M27 32H43M27 39H36" stroke="currentColor" strokeOpacity=".55" strokeLinecap="round" />
+          <circle cx="90" cy="32" r="14" fill="white" stroke="currentColor" strokeOpacity=".25" />
+          <path d="M85 32H95M91 28L95 32L91 36" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+          <rect x="126" y="12" width="38" height="40" rx="7" fill="#f5f7fc" stroke="currentColor" strokeOpacity=".25" />
+          <path d="M138 32L143 37L153 27" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
         <div className="ops-heading-actions">
           <Link href="/admin/applications" className="ops-button-light">Open applications <ArrowRight size={17} aria-hidden="true" /></Link>
           <Link href="/admin/internships/new" className="ops-button-outline"><Plus size={16} aria-hidden="true" /> New internship</Link>
@@ -79,7 +88,7 @@ export default async function AdminOverviewPage() {
     </section>
 
     <section className="ops-metrics-section" aria-labelledby="ops-pulse-heading">
-      <div className="ops-section-line"><div><span className="ops-label">THE PLATFORM AT A GLANCE</span><h2 id="ops-pulse-heading">Platform pulse</h2></div><span className="ops-context">Live from your records</span></div>
+      <div className="ops-section-line"><div><h2 id="ops-pulse-heading">At a glance</h2></div></div>
       <div className="ops-metrics">
         {metrics.map(({ title, value, href, icon: Icon, detail }) => <Link href={href} key={title} className="ops-metric">
           <div className="ops-metric-head"><span>{title}</span><Icon size={18} strokeWidth={1.7} aria-hidden="true" /></div>
@@ -91,7 +100,7 @@ export default async function AdminOverviewPage() {
 
     <div className="ops-main-grid">
       <section className="ops-panel ops-pipeline" aria-labelledby="ops-pipeline-title">
-        <div className="ops-panel-head"><div><span className="ops-label">FROM SUBMISSION TO OUTCOME</span><h2 id="ops-pipeline-title">Application pipeline</h2></div><Link href="/admin/applications" className="ops-text-link">All records <ArrowRight size={16} aria-hidden="true" /></Link></div>
+        <div className="ops-panel-head"><div><h2 id="ops-pipeline-title">Application pipeline</h2></div><Link href="/admin/applications" className="ops-text-link">All records <ArrowRight size={16} aria-hidden="true" /></Link></div>
         <div className="ops-pipeline-total"><strong className="tnum">{totalApplications.toLocaleString("en-SG")}</strong><span>submitted applications across the six lifecycle stages</span></div>
         <div className="ops-stage-list">
           {stages.map(({ label, href, color }) => {
@@ -109,14 +118,13 @@ export default async function AdminOverviewPage() {
       <aside className="ops-side-stack">
         <section className="ops-briefing" aria-labelledby="ops-briefing-title">
           <div className="ops-briefing-icon"><Bell size={20} aria-hidden="true" /></div>
-          <span className="ops-label">STAY IN THE KNOW</span>
           <h2 id="ops-briefing-title">Your briefing</h2>
           <div className="ops-briefing-count"><strong className="tnum">{overview.unreadNotifications}</strong><span>unread {overview.unreadNotifications === 1 ? "notification" : "notifications"}</span></div>
           <p>{overview.unreadNotifications > 0 ? "There are new updates in your notification inbox." : "All caught up. New updates will appear as they arrive."}</p>
           <Link href="/admin/notifications?unread=1">Open notifications <ArrowRight size={16} aria-hidden="true" /></Link>
         </section>
         <section className="ops-shortcuts" aria-label="Common tasks">
-          <div className="ops-shortcuts-heading"><ClipboardList size={18} aria-hidden="true" /><span>QUICK PATHS</span></div>
+          <div className="ops-shortcuts-heading"><ClipboardList size={18} aria-hidden="true" /><span>Quick links</span></div>
           <Link href="/admin/applications?rereview=1">Applications needing re-review <ArrowRight size={16} aria-hidden="true" /></Link>
           <Link href="/admin/placements/new">Record a placement <ArrowRight size={16} aria-hidden="true" /></Link>
           <Link href="/admin/contacts">Open contact inbox <ArrowRight size={16} aria-hidden="true" /></Link>
@@ -125,7 +133,7 @@ export default async function AdminOverviewPage() {
     </div>
 
     <section className="ops-panel ops-submissions" aria-labelledby="ops-submissions-title">
-      <div className="ops-panel-head"><div><span className="ops-label">THE LATEST ARRIVALS</span><h2 id="ops-submissions-title">Recent submissions</h2></div><Link href="/admin/applications" className="ops-text-link">View applications <ArrowRight size={16} aria-hidden="true" /></Link></div>
+      <div className="ops-panel-head"><div><h2 id="ops-submissions-title">Recent submissions</h2></div><Link href="/admin/applications" className="ops-text-link">View applications <ArrowRight size={16} aria-hidden="true" /></Link></div>
       {recentApplications.rows.length > 0 ? <>
         <div className="ops-table-scroll">
           <table className="ops-table" aria-label="Recent application submissions">
@@ -157,10 +165,9 @@ export default async function AdminOverviewPage() {
     <div className="ops-bottom-grid">
       <section className="ops-panel ops-activity" aria-labelledby="ops-activity-title">
         <div className="ops-panel-head">
-          <div><span className="ops-label">RECENT CHANGES</span><h2 id="ops-activity-title">Recent activity</h2></div>
+          <div><h2 id="ops-activity-title">Recent activity</h2></div>
           <span className="ops-activity-indicator"><Activity size={15} aria-hidden="true" /> Activity log</span>
         </div>
-        <p className="ops-activity-intro">A clearer view of what has changed across your workspace.</p>
         {audit.length > 0
           ? <ol className="ops-activity-list">{audit.map(event => {
             const item = describeAdminActivity(event.entityType, event.action);
@@ -186,7 +193,7 @@ export default async function AdminOverviewPage() {
 
       <section className="ops-panel ops-placement-summary" aria-labelledby="ops-placements-title">
         <div className="ops-panel-head">
-          <div><span className="ops-label">PLACEMENT DESK</span><h2 id="ops-placements-title">Placements</h2></div>
+          <div><h2 id="ops-placements-title">Placements</h2></div>
           <Link href="/admin/placements" className="ops-text-link">View all <ArrowRight size={16} aria-hidden="true" /></Link>
         </div>
         {totalPlacements > 0 ? <>
@@ -194,11 +201,19 @@ export default async function AdminOverviewPage() {
           <ul className="ops-placement-statuses">{Object.entries(overview.placementCounts).map(([status, value]) => <li key={status}><StatusBadge status={status} /><strong className="tnum">{value}</strong></li>)}</ul>
           <Link href="/admin/placements/new" className="ops-placement-action"><Plus size={16} aria-hidden="true" /> New placement <ArrowRight size={16} aria-hidden="true" /></Link>
         </> : <div className="ops-placement-empty">
-          <div className="ops-placement-empty-top"><span className="ops-placement-empty-icon"><BriefcaseBusiness size={24} strokeWidth={1.7} aria-hidden="true" /></span><span className="ops-placement-empty-count tnum">0 on record</span></div>
-          <h3>Your first placement starts here.</h3>
-          <p>Once a placement is arranged, record the student, host organization and role to keep its details in one place.</p>
+          <div className="ops-placement-empty-top">
+            <svg className="ops-placement-graphic" viewBox="0 0 100 72" fill="none" aria-hidden="true">
+              <rect x="14" y="23" width="66" height="40" rx="7" fill="#f5f7fc" stroke="#8194bf" strokeWidth="1.5" />
+              <path d="M36 23V16C36 13.8 37.8 12 40 12H54C56.2 12 58 13.8 58 16V23M14 37C34 46 60 46 80 37" stroke="#8194bf" strokeWidth="1.5" />
+              <rect x="41" y="38" width="12" height="9" rx="2" fill="white" stroke="#8194bf" strokeWidth="1.5" />
+              <circle cx="79" cy="19" r="11" fill="white" stroke="#d9e0ee" />
+              <path d="M75 19H83M79 15V23" stroke="#102568" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+            <span className="ops-placement-empty-count tnum">0 on record</span>
+          </div>
+          <h3>No placements yet</h3>
+          <p>Record an arranged placement to keep the student, host and role together.</p>
           <Link href="/admin/placements/new" className="ops-placement-action"><Plus size={16} aria-hidden="true" /> Record a placement <ArrowRight size={16} aria-hidden="true" /></Link>
-          <div className="ops-placement-empty-footer"><CircleDot size={14} aria-hidden="true" /> Placement records appear here as they are added</div>
         </div>}
       </section>
     </div>

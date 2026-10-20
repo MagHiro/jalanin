@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/require";
 import { listCategories } from "@/features/admin/service";
 import { InternshipForm } from "@/components/admin/internship-form";
+import { InternshipEditorLayout } from "@/components/admin/internship-editor-layout";
 
 export const metadata = { title: "New internship", robots: "noindex" };
 
@@ -9,7 +10,7 @@ export default async function NewInternshipPage() {
   await requireAdmin();
   const categories = await listCategories();
   return (
-    <div className="workspace-editor-page">
+    <InternshipEditorLayout>
       <div className="workspace-editor-heading">
         <nav aria-label="Breadcrumb">
           <Link href="/admin/internships" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
@@ -28,7 +29,7 @@ export default async function NewInternshipPage() {
         <Link href="/admin/internships">View all internships →</Link>
       </aside>
       </div>
-    </div>
+    </InternshipEditorLayout>
   );
 }
 

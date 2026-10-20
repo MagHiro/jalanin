@@ -1,0 +1,71 @@
+/* Workspace-only visual system. Public discovery, hero and navigation are unchanged. */
+html .workspace-shell.workspace-confluence {
+  --ws-bg: #f5f6f8;
+  --ws-card: #ffffff;
+  --ws-border: #e7eaf0;
+  --ws-shadow: 0 2px 12px -6px rgb(19 35 78 / .12);
+  font-family: var(--font-google-sans-flex), sans-serif;
+  color: #222222;
+  background: var(--ws-bg);
+}
+html .workspace-shell.workspace-confluence .workspace-body { background: var(--ws-bg); }
+html .workspace-shell.workspace-confluence .workspace-content { width: 100%; max-width: 1328px; margin-inline: auto; padding: 48px clamp(24px, 3vw, 64px) 72px; }
+html .workspace-shell.workspace-confluence .workspace-footer { background: transparent; border: 0; font-size: 13px; letter-spacing: normal; }
+
+/* Match the supplied application's restrained heading and card hierarchy. */
+html .workspace-shell.workspace-admin :is(.page-heading, .ops-masthead) { margin: 0; padding: 32px; border: 0; border-radius: 16px; background: #fff; box-shadow: var(--ws-shadow); }
+html .workspace-shell.workspace-admin .workspace-content h1 { color: #111; font-size: 37.5px; font-weight: 400; line-height: 1.25; letter-spacing: -.025em; }
+html .workspace-shell.workspace-admin :is(.page-heading-description, .ops-heading > p:not(.ops-eyebrow)) { margin-top: 16px; color: #222; font-size: 17.5px; font-weight: 400; line-height: 1.6; letter-spacing: normal; }
+html .workspace-shell.workspace-admin :is(.eyebrow, .page-heading-overline, .ops-eyebrow, .ops-label, .ops-shortcuts-heading, .ops-priority-top) { color: #656565; font-size: 15px; font-weight: 400; line-height: 1.6; letter-spacing: normal; text-transform: none; }
+html .workspace-shell.workspace-admin :is(.surface-card, .quote-panel, .form-section, .workspace-record-section, .crm-records, .ops-panel, .ops-briefing, .ops-shortcuts) { background: #fff; border: 0; border-radius: 12px; box-shadow: var(--ws-shadow); }
+html .workspace-shell.workspace-admin :is(.surface-card, .quote-panel, .form-section, .workspace-record-section) { padding: 32px; }
+html .workspace-shell.workspace-admin :is(.surface-card, .quote-panel, .form-section, .workspace-record-section, .ops-panel-head, .ops-briefing, .ops-priority) h2 { color: #111; font-size: 24px; font-weight: 400; line-height: 1.3; letter-spacing: -.025em; }
+html .workspace-shell.workspace-admin :is(.surface-card, .quote-panel, .form-section) :is(p, dt, dd, label) { font-size: 15px; line-height: 1.6; letter-spacing: normal; }
+html .workspace-shell.workspace-admin :is(.surface-card, .quote-panel) dd { font-weight: 400; overflow-wrap: anywhere; }
+html .workspace-shell.workspace-admin .crm-list-page { display: flex; flex-direction: column; gap: 24px; }
+
+/* Existing server-driven queues remain links, not cosmetic tabs. */
+html .workspace-shell.workspace-admin .crm-views { gap: 8px; padding: 0; }
+html .workspace-shell.workspace-admin .crm-view { background: #fff; color: #656565; border-radius: 8px; font-size: 15px; font-weight: 400; line-height: 1.6; letter-spacing: normal; }
+html .workspace-shell.workspace-admin .crm-view[aria-current="page"] { background: #e9f0ff; color: #102568; }
+html .workspace-shell.workspace-admin .crm-view-count { background: #f3f5f8; color: #102568; font-size: 13px; font-weight: 400; }
+html .workspace-shell.workspace-admin :is(.crm-toolbar, .crm-table-meta) { padding: 24px 28px; }
+html .workspace-shell.workspace-admin :is(.crm-table, .ops-table) thead { background: #fafbfc; }
+html .workspace-shell.workspace-admin :is(.crm-table, .ops-table) th { padding: 16px 24px; color: #656565; font-size: 15px; font-weight: 400; line-height: 1.6; letter-spacing: normal; text-transform: none; }
+html .workspace-shell.workspace-admin :is(.crm-table, .ops-table) td { padding: 24px; color: #222; font-size: 15px; line-height: 1.6; border-color: #f0f2f5; }
+html .workspace-shell.workspace-admin :is(.crm-record-name, .crm-record-secondary, .ops-applicant a) { color: #111; font-size: 15px; font-weight: 400; line-height: 1.6; }
+html .workspace-shell.workspace-admin :is(.crm-record-sub, .crm-table-meta, .ops-applicant small) { color: #656565; font-size: 15px; line-height: 1.6; }
+html .workspace-shell.workspace-admin :is(.crm-row-link, .ops-text-link) { color: #102568; font-size: 15px; font-weight: 400; letter-spacing: normal; }
+
+/* Consistent actions, including forms, without changing validation or state. */
+html .workspace-shell.workspace-confluence :is(.btn, .ops-button-light, .ops-button-outline) { min-height: 44px; padding: 11px 22px; border-radius: 999px; font-size: 15px; font-weight: 400; line-height: 1.5; letter-spacing: normal; box-shadow: none; }
+html .workspace-shell.workspace-confluence :is(.btn-primary, .ops-button-light) { background: #102568; border-color: transparent; color: #fff; }
+html .workspace-shell.workspace-confluence :is(.btn-primary, .ops-button-light):hover { background: #243966; }
+html .workspace-shell.workspace-confluence :is(.btn-outline, .ops-button-outline) { background: #eef1f6; border-color: transparent; color: #102568; }
+html .workspace-shell.workspace-confluence .badge { font-weight: 400; letter-spacing: normal; }
+html .workspace-shell.workspace-confluence :is(a, button, summary, input, select, textarea):focus-visible { outline: 2px solid #102568; outline-offset: 3px; }
+
+/* Operations overview uses the same white surfaces, not a separate palette. */
+html .workspace-shell.workspace-admin .ops-metrics { gap: 16px; border: 0; background: transparent; border-radius: 0; overflow: visible; }
+html .workspace-shell.workspace-admin .ops-metric { background: #fff; border: 0; border-radius: 12px; box-shadow: var(--ws-shadow); padding: 24px; }
+html .workspace-shell.workspace-admin :is(.ops-metric-head, .ops-metric-foot, .ops-priority > p, .ops-priority-foot, .ops-priority-waiting, .ops-stage-name, .ops-briefing > p, .ops-briefing-count span, .ops-shortcuts a, .ops-context, .ops-pipeline-total span, .ops-activity-list strong, .ops-activity-list time) { color: #656565; font-size: 15px; font-weight: 400; line-height: 1.6; letter-spacing: normal; }
+html .workspace-shell.workspace-admin :is(.ops-priority-number, .ops-metric strong, .ops-pipeline-total strong, .ops-briefing-count strong) { color: #111; font-size: 37.5px; font-weight: 400; line-height: 1.25; letter-spacing: -.025em; }
+html .workspace-shell.workspace-admin :is(.ops-priority > a, .ops-priority-foot a, .ops-briefing > a) { color: #102568; font-size: 15px; font-weight: 400; line-height: 1.6; letter-spacing: normal; }
+html .workspace-shell.workspace-admin .ops-briefing-icon { background: #eef1f8; color: #102568; }
+html .workspace-shell.workspace-admin .ops-section-line h2 { color: #111; font-size: 24px; font-weight: 400; line-height: 1.3; letter-spacing: -.025em; }
+html .workspace-shell.workspace-admin .ops-applicant-avatar { background: #edf2fc; color: #102568; border-radius: 50%; font-weight: 400; }
+
+@media (max-width: 1100px) {
+  html .workspace-shell.workspace-admin .ops-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+  html .workspace-shell.workspace-confluence .workspace-content { padding: 24px 16px 40px; }
+  html .workspace-shell.workspace-admin :is(.page-heading, .ops-masthead, .surface-card, .quote-panel, .form-section, .workspace-record-section) { padding: 24px 20px; }
+  html .workspace-shell.workspace-admin .workspace-content h1 { font-size: 35px; }
+  html .workspace-shell.workspace-admin .ops-masthead { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  html .workspace-shell.workspace-admin .ops-priority { padding: 24px 0 0; border-left: 0; border-top: 1px solid #e7eaf0; }
+  html .workspace-shell.workspace-admin .ops-metrics { gap: 12px; }
+  html .workspace-shell.workspace-admin .ops-metric { padding: 20px 16px; }
+  html .workspace-shell.workspace-admin .crm-mobile-records .crm-record-name { font-size: 17.5px; }
+  html .workspace-shell.workspace-admin :is(.crm-toolbar, .crm-table-meta) { padding: 20px; }
+}

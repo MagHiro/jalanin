@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUp, Plus, Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
 import { listAdminInternships } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
+import { AdminRecords } from "@/components/admin/admin-records";
 import { EmptyState } from "@/components/ui/empty-state";
 import { WorkspaceSelect } from "@/components/ui/workspace-select";
 import { RecordActions } from "@/components/ui/record-actions";
@@ -32,8 +33,8 @@ export default async function AdminInternshipsPage({ searchParams }: {
     ...(searchParams.status ? [{ label: `Publication: ${searchParams.status}`, href: listHref(path, searchParams, { status: null }) }] : []),
   ];
 
-  return <div className="crm-list-page">
-    <PageHeader icon="▤" eyebrow="Catalogue / Listings" title="Internships" description="Manage published opportunities, drafts, and application dates." actions={<Link href="/admin/internships/new" className="btn btn-primary btn-sm"><Plus size={16} /> New internship</Link>} />
+  return <AdminRecords filters={searchParams}>
+    <PageHeader title="Internships" description="Manage published opportunities, drafts, and application dates." actions={<Link href="/admin/internships/new" className="btn btn-primary btn-sm"><Plus size={16} /> New internship</Link>} />
     <CrmViews label="Internship publication views" items={[
       { label: "All listings", href: listHref(path, searchParams, { status: null }), active: !searchParams.status },
       ...STATUSES.map(status => ({ label: status, href: listHref(path, searchParams, { status }), active: searchParams.status === status })),
@@ -76,5 +77,5 @@ export default async function AdminInternshipsPage({ searchParams }: {
       </> : <div className="crm-empty"><EmptyState icon="▤" title="No internships in this view" body="Change your filters or create a new internship listing." actionHref="/admin/internships/new" actionLabel="New internship" /></div>}
       <Pagination page={page} totalPages={Math.max(1,Math.ceil(total/pageSize))} pathname={path} searchParams={searchParams} total={total} pageSize={pageSize} />
     </section>
-  </div>;
+  </AdminRecords>;
 }

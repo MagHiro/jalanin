@@ -1,0 +1,39 @@
+html .workspace-shell.workspace-admin .student-profile-calm { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-heading { padding: 28px 32px; background: #fff; border-radius: 16px; box-shadow: var(--ws-shadow); }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-back-link { font-size: 15px; font-weight: 400; color: #656565; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-title { gap: 18px; margin: 24px 0; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-avatar { width: 56px; height: 56px; flex: 0 0 56px; border-radius: 50%; background: #edf2fc; color: #102568; font-size: 22px; font-weight: 400; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-kicker { font-size: 13px; font-weight: 400; line-height: 1.6; letter-spacing: normal; text-transform: none; color: #656565; }
+html .workspace-shell.workspace-admin .student-profile-calm .student-record-intro { color: #656565; font-size: 15px; line-height: 1.6; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-stats { gap: 0; background: transparent; border: 0; border-top: 1px solid #edf0f4; border-radius: 0; padding-top: 20px; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-stats a { padding: 8px 20px; border-right: 1px solid #edf0f4; background: transparent; border-radius: 0; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-stats a:first-child { padding-left: 0; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-stats a:last-child { border: 0; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-stats strong { color: #111; font-size: 32px; font-weight: 400; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-stats :is(span,small) { color: #656565; font-size: 13px; font-weight: 400; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-grid { grid-template-columns: minmax(0,1fr) minmax(280px,320px); gap: 24px; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-record-section { padding: 28px; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-record-section h2 { font-size: 22px; font-weight: 400; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-record-section-count { border-radius: 999px; background: #f5f7fa; color: #656565; font-size: 13px; font-weight: 400; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-record-rows > li { background: transparent; padding: 20px 0; border-bottom: 1px solid #edf0f4; border-radius: 0; }
+html .workspace-shell.workspace-admin .student-profile-calm .student-record-item-icon { background: transparent; color: #8194bf; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-record-row-title { font-size: 17.5px; font-weight: 400; color: #111; line-height: 1.6; }
+html .workspace-shell.workspace-admin .student-profile-calm :is(.student-application-context dt,.student-application-context dd,.workspace-student-facts dt,.workspace-student-facts dd) { font-size: 15px; line-height: 1.6; font-weight: 400; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-record-row-actions { border-color: #edf0f4; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-record-row-actions a { font-size: 15px; font-weight: 400; color: #102568; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-record-empty { padding: 24px 0 8px; background: transparent; border-radius: 0; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-record-empty h3 { margin: 16px 0 12px; color: #111; font-size: 22px; font-weight: 400; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-record-empty p { max-width: 440px; font-size: 15px; color: #656565; line-height: 1.6; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-record-empty > a { display: inline-flex; align-items: center; gap: 10px; padding: 11px 20px; border-radius: 999px; background: #102568; color: #fff; font-size: 15px; font-weight: 400; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-side .btn { white-space: normal; text-align: center; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-privacy { background: transparent; border-top: 1px solid #edf0f4; border-radius: 0; padding: 20px 0 0; color: #656565; font-size: 13px; }
+html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-links a { font-size: 15px; font-weight: 400; }
+@media (max-width: 1100px) {
+  html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-grid { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 767px) {
+  html .workspace-shell.workspace-admin .student-profile-calm :is(.workspace-student-record-heading,.workspace-record-section) { padding: 24px 20px; }
+  html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-stats { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-stats a { padding: 8px; }
+  html .workspace-shell.workspace-admin .student-profile-calm .workspace-student-record-stats small { display: none; }
+}

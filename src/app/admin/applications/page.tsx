@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth/require";
 import { getAdminOverview, listAdminApplications } from "@/features/admin/service";
 import { waitingDays, waitingLabel } from "@/lib/workflow/waiting-time";
 import { PageHeader } from "@/components/ui/page-header";
+import { AdminRecords } from "@/components/admin/admin-records";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { WorkspaceSelect } from "@/components/ui/workspace-select";
@@ -41,8 +42,8 @@ export default async function AdminApplicationsPage({ searchParams }: {
     ...(reReview ? [{ label: "Needs re-review", href: listHref(path, searchParams, { rereview: null }) }] : []),
   ];
 
-  return <div className="crm-list-page">
-    <PageHeader icon="☰" eyebrow="Applications / Review queue" title="Applications" description="Review submissions, track lifecycle stages, and acknowledge revised records." />
+  return <AdminRecords filters={searchParams}>
+    <PageHeader title="Applications" description="Review submissions, track lifecycle stages, and acknowledge revised records." />
     <CrmViews label="Application queues" items={[
       { label: "All applications", href: listHref(path, searchParams, { status: null, rereview: null }), active: !filterStatus && !reReview, count: allApplicationsCount },
       { label: "New", href: listHref(path, searchParams, { status: "New", rereview: null }), active: filterStatus === "New" && !reReview, count: overview.statusCounts["New"] ?? 0 },
@@ -102,5 +103,5 @@ export default async function AdminApplicationsPage({ searchParams }: {
       </> : <div className="crm-empty"><EmptyState icon="☰" title="No applications in this view" body="Adjust the search or filters to find an application." actionHref={path} actionLabel="Reset filters" /></div>}
       <Pagination page={page} totalPages={totalPages} pathname={path} searchParams={searchParams} total={total} pageSize={pageSize} />
     </section>
-  </div>;
+  </AdminRecords>;
 }

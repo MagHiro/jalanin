@@ -5,7 +5,10 @@ import { getApplicationForStudent } from "@/features/applications/service";
 import { ApplicationStatusGuidance } from "@/components/applications/status-guidance";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { StatusTimeline } from "@/components/ui/status-timeline";
-import { BriefcaseBusiness, MapPin, CalendarDays } from "lucide-react";
+import { MapPin, CalendarDays } from "lucide-react";
+import { StudentRecordsMotion } from "@/components/motion/student-records-motion";
+import "../../student-records.css";
+import "../../student-detail.css";
 
 // Student application detail: own record only (IDOR-safe: service returns
 // null for other students' ids → 404, never a leak).
@@ -26,7 +29,7 @@ export default async function StudentApplicationDetailPage({
     ["New", "In Review"].includes(application.lifecycleStatus);
 
   return (
-    <div className="workspace-mobbin-record workspace-student-application-detail mx-auto min-w-0 max-w-5xl space-y-6 [overflow-wrap:anywhere]">
+    <StudentRecordsMotion viewKey={application.id} className="workspace-student-application-detail student-detail-page">
       {searchParams.submitted && (
         <div role="status" className="alert alert-success">
           <p className="font-semibold">Application submitted.</p>
@@ -39,7 +42,7 @@ export default async function StudentApplicationDetailPage({
             <span aria-hidden="true">←</span> All applications
           </Link>
         </nav>
-        <div className="student-submission-identity"><span className="student-submission-mark" aria-hidden="true"><BriefcaseBusiness size={28}/></span><div><p className="eyebrow">Your internship application</p>
+        <div className="student-submission-identity"><div><p className="eyebrow">Your internship application</p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">{internship.title}</h1></div></div>
         <div className="student-submission-context"><span><MapPin size={16} aria-hidden="true"/>{internship.city}, {internship.countryCode}</span><span><CalendarDays size={16} aria-hidden="true"/>{internship.startDate} — {internship.endDate}</span><Link href={`/opportunities/${internship.slug}`}>View opportunity →</Link></div>
         <p className="mt-2 flex flex-wrap gap-1.5">
@@ -137,7 +140,7 @@ export default async function StudentApplicationDetailPage({
       )}
       </aside>
       </div>
-    </div>
+    </StudentRecordsMotion>
   );
 }
 

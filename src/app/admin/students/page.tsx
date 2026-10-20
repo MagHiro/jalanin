@@ -3,6 +3,7 @@ import { ArrowDown, Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require";
 import { listAdminStudents } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
+import { AdminRecords } from "@/components/admin/admin-records";
 import { EmptyState } from "@/components/ui/empty-state";
 import { WorkspaceSelect } from "@/components/ui/workspace-select";
 import { Pagination } from "@/components/ui/pagination";
@@ -24,8 +25,8 @@ export default async function AdminStudentsPage({ searchParams }: {
     q: searchParams.q, sort: searchParams.sort === "newest" ? "newest" : "name", page, pageSize,
   });
   const filters = searchParams.q ? [{ label: `Name: ${searchParams.q}`, href: listHref(path, searchParams, { q: null }) }] : [];
-  return <div className="crm-list-page">
-    <PageHeader icon="○" eyebrow="People / Directory" title="Students" description="Student profiles linked to submitted applications and placement records." />
+  return <AdminRecords filters={searchParams}>
+    <PageHeader title="Students" description="Student profiles linked to submitted applications and placement records." />
     <section className="crm-records" aria-label="Student records">
       <form method="get" aria-label="Search students" className="crm-toolbar">
         <label className="crm-search"><Search size={17} aria-hidden="true" /><span className="sr-only">Search display name</span><input type="search" name="q" defaultValue={searchParams.q ?? ""} placeholder="Search display name" /></label>
@@ -54,5 +55,5 @@ export default async function AdminStudentsPage({ searchParams }: {
       </> : <div className="crm-empty"><EmptyState icon="○" title="No students found" body="Adjust your search to find another student profile." actionHref={path} actionLabel="Clear search" /></div>}
       <Pagination page={page} totalPages={Math.max(1,Math.ceil(total/pageSize))} pathname={path} searchParams={searchParams} total={total} pageSize={pageSize} />
     </section>
-  </div>;
+  </AdminRecords>;
 }

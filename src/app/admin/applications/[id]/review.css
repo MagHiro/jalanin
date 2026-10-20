@@ -1,0 +1,71 @@
+/* Scoped application review: the same quiet hierarchy as the admin lists. */
+html .workspace-shell.workspace-admin .application-review-calm { display: flex; flex-direction: column; gap: 24px; width: 100%; min-width: 0; overflow-wrap: anywhere; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-header { padding: 28px 32px; border-radius: 16px; background: #fff; box-shadow: var(--ws-shadow); }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-header nav a { color: #656565; font-size: 15px; font-weight: 400; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-identity { gap: 18px; margin: 20px 0 24px; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-avatar { width: 56px; height: 56px; flex: 0 0 56px; border-radius: 50%; background: #edf2fc; color: #102568; font-size: 22px; font-weight: 400; }
+html .workspace-shell.workspace-admin .application-review-calm .eyebrow { color: #656565; font-size: 13px; font-weight: 400; text-transform: none; letter-spacing: normal; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-identity h1 { margin: 6px 0 8px; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-identity .tnum { color: #656565; font-size: 15px; line-height: 1.6; }
+html .workspace-shell.workspace-admin .application-review-calm [aria-label="Application lifecycle"] { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 20px 0 0; margin: 0; border-top: 1px solid #edf0f4; background: transparent; border-radius: 0; box-shadow: none; }
+html .workspace-shell.workspace-admin .application-review-calm [aria-label="Application lifecycle"] li { flex: 0 1 auto; }
+html .workspace-shell.workspace-admin .application-review-calm [aria-label="Application lifecycle"] li > span { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 6px 12px; background: #f7f8fa; color: #656565; border-radius: 999px; font-size: 13px; font-weight: 400; line-height: 1.5; }
+html .workspace-shell.workspace-admin .application-review-calm [aria-label="Application lifecycle"] li > span::before { content: ""; width: 5px; height: 5px; flex: 0 0 5px; border-radius: 50%; background: #bac1cd; }
+html .workspace-shell.workspace-admin .application-review-calm [aria-label="Application lifecycle"] [aria-current="step"] { background: #e9f0ff; color: #102568; }
+html .workspace-shell.workspace-admin .application-review-calm [aria-label="Application lifecycle"] [aria-current="step"]::before { background: #102568; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 320px); gap: 24px; align-items: start; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-highlights { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-highlights > div { padding: 22px; background: #fff; border: 0; border-radius: 12px; box-shadow: var(--ws-shadow); gap: 14px; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-highlights svg { color: #8194bf; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-highlights :is(span,small) { font-size: 13px; color: #656565; font-weight: 400; line-height: 1.6; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-highlights strong { margin: 6px 0; font-size: 17.5px; color: #222; font-weight: 400; line-height: 1.6; }
+html .workspace-shell.workspace-admin .application-review-calm :is(.surface-card,.revisions-panel,.application-review-actions > section) { padding: 28px; background: #fff; border: 0; border-radius: 12px; box-shadow: var(--ws-shadow); }
+html .workspace-shell.workspace-admin .application-review-calm section h2 { color: #111; font-size: 22px; font-weight: 400; line-height: 1.3; letter-spacing: -.025em; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-section-title > span { padding: 5px 10px; background: #f5f7fa; border-radius: 999px; color: #656565; font-size: 13px; }
+html .workspace-shell.workspace-admin .application-review-calm dl { gap: 0 24px; }
+html .workspace-shell.workspace-admin .application-review-calm dl > div { display: flex; flex-direction: column; align-items: start; gap: 6px; padding: 16px 0; border-color: #f0f2f5; }
+html .workspace-shell.workspace-admin .application-review-calm dt { color: #656565; }
+html .workspace-shell.workspace-admin .application-review-calm dd { color: #222; text-align: left; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-document { flex-wrap: wrap; gap: 14px; padding: 18px 0; background: transparent; border-bottom: 1px solid #f0f2f5; border-radius: 0; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-file-icon { background: #f5f7fc; color: #8194bf; border-radius: 8px; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-file-name { flex: 1 1 160px; font-size: 15px; font-weight: 400; line-height: 1.6; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-file-name > span { display: block; margin: 4px 0 0; font-size: 13px; color: #656565; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-action-hint { margin: 14px 0 20px; color: #656565; font-size: 15px; line-height: 1.6; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-action-hint strong { color: #222; font-weight: 400; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-actions :is(input,textarea) { min-height: 48px; padding: 12px; background: #fafbfc; border: 1px solid #e2e6ec; border-radius: 8px; font-size: 15px; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-actions .btn { justify-content: center; max-width: 100%; white-space: normal; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-actions section[aria-labelledby="context-h"] :is(p,a) { font-size: 15px; font-weight: 400; line-height: 1.6; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-actions section[aria-labelledby="context-h"] a { color: #102568; }
+/* Lower record sections: compact files, an unembellished audit list and clear dates. */
+html .workspace-shell.workspace-admin .application-review-calm .application-review-section-title { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-document:last-child { border-bottom: 0; padding-bottom: 0; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-file-icon { width: 36px; height: 40px; flex: 0 0 36px; background: transparent; }
+html .workspace-shell.workspace-admin .application-review-calm .application-review-document .btn { min-height: 40px; padding: 9px 16px; }
+html .workspace-shell.workspace-admin .application-review-calm .workspace-activity-timeline { margin: 0; padding: 0; }
+html .workspace-shell.workspace-admin .application-review-calm .workspace-activity-timeline::before { content: none; }
+html .workspace-shell.workspace-admin .application-review-calm .workspace-activity-timeline-item { display: flex; gap: 14px; padding: 20px 0; margin: 0; border-bottom: 1px solid #f0f2f5; }
+html .workspace-shell.workspace-admin .application-review-calm .workspace-activity-timeline-item::before,
+html .workspace-shell.workspace-admin .application-review-calm .workspace-activity-timeline-item::after { content: none; }
+html .workspace-shell.workspace-admin .application-review-calm .workspace-activity-timeline-item:last-child { border: 0; padding-bottom: 0; }
+html .workspace-shell.workspace-admin .application-review-calm .workspace-activity-timeline-marker { position: static; width: 28px; height: 28px; flex: 0 0 28px; background: transparent; color: #8194bf; border: 0; box-shadow: none; }
+html .workspace-shell.workspace-admin .application-review-calm .workspace-activity-timeline-content { min-width: 0; flex: 1; }
+html .workspace-shell.workspace-admin .application-review-calm .workspace-activity-timeline-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 15px; line-height: 1.6; }
+html .workspace-shell.workspace-admin .application-review-calm .workspace-activity-timeline-head strong { font-weight: 400; color: #222; }
+html .workspace-shell.workspace-admin .application-review-calm .workspace-activity-timeline-from { color: #656565; }
+html .workspace-shell.workspace-admin .application-review-calm .workspace-activity-timeline-content p { margin: 8px 0; color: #444; font-size: 15px; line-height: 1.6; white-space: pre-wrap; }
+html .workspace-shell.workspace-admin .application-review-calm .workspace-activity-timeline-content time { display: block; margin-top: 8px; color: #656565; font-size: 13px; font-weight: 400; line-height: 1.6; }
+html .workspace-shell.workspace-admin .application-review-calm .application-context-location { color: #656565; }
+html .workspace-shell.workspace-admin .application-review-calm .application-context-dates { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; margin: 16px 0 8px; }
+html .workspace-shell.workspace-admin .application-review-calm .application-context-dates > div { padding: 12px 0; border-top: 1px solid #edf0f4; border-bottom: 0; }
+html .workspace-shell.workspace-admin .application-review-calm .application-context-dates dt { font-size: 13px; }
+html .workspace-shell.workspace-admin .application-review-calm .application-context-dates dd { font-size: 15px; }
+@media (max-width: 1100px) {
+  html .workspace-shell.workspace-admin .application-review-calm .application-review-grid { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 767px) {
+  html .workspace-shell.workspace-admin .application-review-calm .application-review-header,
+  html .workspace-shell.workspace-admin .application-review-calm :is(.surface-card,.revisions-panel,.application-review-actions > section) { padding: 24px 20px; }
+  html .workspace-shell.workspace-admin .application-review-calm .application-review-identity { align-items: flex-start; gap: 12px; }
+  html .workspace-shell.workspace-admin .application-review-calm .application-review-avatar { width: 40px; height: 40px; flex-basis: 40px; font-size: 17px; }
+  html .workspace-shell.workspace-admin .application-review-calm .application-review-highlights { grid-template-columns: minmax(0,1fr); }
+}

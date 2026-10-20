@@ -12,6 +12,8 @@ import { TransitionControls } from "@/components/admin/transition-controls";
 import { ReopenControl } from "@/components/admin/reopen-control";
 import { cn } from "@/components/ui/cn";
 import { FileText, GraduationCap, CalendarDays, ArrowDownToLine } from "lucide-react";
+import { ApplicationReviewMotion } from "@/components/motion/application-review-motion";
+import "./review.css";
 
 export const metadata = { title: "Review application", robots: "noindex" };
 export const dynamic = "force-dynamic";
@@ -35,7 +37,7 @@ export default async function AdminApplicationDetailPage({
   ));
 
   return (
-    <div className="application-review workspace-record-detail workspace-mobbin-record min-w-0 space-y-6 [overflow-wrap:anywhere]">
+    <ApplicationReviewMotion revision={application.revision} status={application.lifecycleStatus}>
       <header className="application-review-header">
         <nav aria-label="Breadcrumb">
           <Link href="/admin/applications" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
@@ -50,7 +52,7 @@ export default async function AdminApplicationDetailPage({
           {application.firstName} {application.lastName}
         </h1>
         <p className="tnum mt-1 text-sm text-muted-foreground">
-          {application.email} · {internship.title} · r{application.revision}
+          {application.email} · {internship.title}
           {application.reviewedRevision < application.revision && ` (reviewed r${application.reviewedRevision})`}
         </p>
         <p className="mt-2 flex flex-wrap gap-1.5">
@@ -119,7 +121,7 @@ export default async function AdminApplicationDetailPage({
           </section>
 
           <section aria-labelledby="docs-h" className="surface-card p-5 md:p-6">
-            <h2 id="docs-h" className="text-base font-semibold tracking-tight text-foreground">Documents <span className="ml-1 text-xs font-normal text-muted-foreground">(private — admin only)</span></h2>
+            <div className="application-review-section-title"><h2 id="docs-h">Documents</h2><span>Private · Admin only</span></div>
             {documents.length === 0 ? (
               <p className="mt-2 text-sm text-muted-foreground">No CV attached.</p>
             ) : (
@@ -178,7 +180,7 @@ export default async function AdminApplicationDetailPage({
           )}
 
           <section aria-labelledby="audit-h" className="surface-card p-5 md:p-6">
-            <h2 id="audit-h" className="text-base font-semibold tracking-tight text-foreground">Audit & status history</h2>
+            <div className="application-review-section-title"><h2 id="audit-h">Audit & status history</h2><span>{events.length} {events.length === 1 ? "event" : "events"}</span></div>
             <div className="mt-4">
               <StatusTimeline
                 events={events.map((e) => ({
@@ -196,7 +198,6 @@ export default async function AdminApplicationDetailPage({
 
         <aside className="application-review-actions min-w-0 space-y-5" aria-label="Review controls and internship">
           <section aria-labelledby="actions-h" className="surface-card h-fit p-5 md:p-6">
-            <p className="eyebrow">Manage application</p>
             <h2 id="actions-h" className="text-base font-semibold tracking-tight text-foreground">Workflow actions</h2>
             <p className="application-review-action-hint">Current status: <strong>{application.isDraft ? "Draft" : application.lifecycleStatus}</strong>. Changes are recorded in the audit history.</p>
             <div className="mt-3">
@@ -218,13 +219,17 @@ export default async function AdminApplicationDetailPage({
           <section aria-labelledby="context-h" className="rounded-2xl border border-border bg-muted p-5 text-sm">
             <h2 id="context-h" className="font-semibold text-foreground">Internship context</h2>
             <p className="mt-1.5 font-medium text-foreground">{internship.title}</p>
-            <p className="tnum text-xs text-muted-foreground">{internship.city}, {internship.countryCode} · {internship.startDate} → {internship.endDate}</p>
+            <p className="application-context-location">{internship.city}, {internship.countryCode}</p>
+            <dl className="application-context-dates">
+              <div><dt>Starts</dt><dd><time dateTime={internship.startDate}>{new Date(`${internship.startDate}T00:00:00Z`).toLocaleDateString("en-SG", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}</time></dd></div>
+              <div><dt>Ends</dt><dd><time dateTime={internship.endDate}>{new Date(`${internship.endDate}T00:00:00Z`).toLocaleDateString("en-SG", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}</time></dd></div>
+            </dl>
             <Link href={`/opportunities/${internship.slug}`} className="mt-2 inline-flex min-h-9 items-center text-xs font-semibold text-primary hover:underline">
               View public listing →
             </Link>
           </section>
         </aside>
       </div>
-    </div>
+    </ApplicationReviewMotion>
   );
 }

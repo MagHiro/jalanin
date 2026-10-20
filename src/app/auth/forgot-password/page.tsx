@@ -29,10 +29,10 @@ export default function ForgotPasswordPage() {
 
   if (state === "sent") {
     return (
-      <div className="surface-card mx-auto max-w-md p-6 md:p-8" role="status">
+      <div className="auth-calm-form" role="status">
         <p aria-hidden="true" className="grid size-12 place-items-center rounded-2xl bg-secondary text-xl text-primary">✉</p>
         <h1 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">Check your email</h1>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        <p className="auth-calm-intro">
           If an account exists for that address, a time-limited reset link is on its way.
           The link expires — request a new one if it lapses.
         </p>
@@ -44,10 +44,9 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="surface-card mx-auto max-w-md p-6 md:p-8">
-      <p className="eyebrow">Account recovery</p>
+    <div className="auth-calm-form">
       <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">Forgot your password?</h1>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground">Enter your account email to receive a reset link.</p>
+      <p className="auth-calm-intro">No worries. Enter your account email and we’ll send you a reset link.</p>
       <form onSubmit={onSubmit} className="mt-5 space-y-4">
         <label className="field-label">
           <span>Email</span>

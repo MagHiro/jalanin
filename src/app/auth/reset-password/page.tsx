@@ -38,10 +38,9 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="surface-card mx-auto max-w-md p-6 md:p-8">
-      <p className="eyebrow">Account recovery</p>
+    <div className="auth-calm-form">
       <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">Set a new password</h1>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground">Choose a password of at least 8 characters.</p>
+      <p className="auth-calm-intro">Choose a password of at least 8 characters.</p>
       {!token && (
         <p role="alert" className="alert alert-error mt-4">
           This reset link is missing its token. Request a new link below.

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/require";
 import { listCategories } from "@/features/admin/service";
 import { InternshipForm } from "@/components/admin/internship-form";
+import { InternshipEditorLayout } from "@/components/admin/internship-editor-layout";
 import { db } from "@/lib/db/client";
 import { internships } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -24,7 +25,7 @@ export default async function EditInternshipPage({
   if (!row) notFound();
   const categories = await listCategories();
   return (
-    <div className="workspace-editor-page">
+    <InternshipEditorLayout>
       <div className="workspace-editor-heading">
         <nav aria-label="Breadcrumb">
           <Link href="/admin/internships" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
@@ -65,6 +66,6 @@ export default async function EditInternshipPage({
         <Link href="/admin/internships">View all internships →</Link>
       </aside>
       </div>
-    </div>
+    </InternshipEditorLayout>
   );
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Compass } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth/require";
 import { listStudentApplications } from "@/features/applications/service";
@@ -7,6 +7,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { CrmViews, CrmTableMeta, listHref } from "@/components/ui/crm-list";
+import { StudentRecordsMotion } from "@/components/motion/student-records-motion";
+import "../student-records.css";
 
 export const metadata = { title: "My applications" };
 export const dynamic = "force-dynamic";
@@ -21,9 +23,9 @@ export default async function StudentApplicationsPage({ searchParams }: { search
   const view = searchParams.view === "drafts" ? "drafts" : searchParams.view === "submitted" ? "submitted" : "all";
   const visible = view === "drafts" ? drafts : view === "submitted" ? submitted : apps;
 
-  return <div className="crm-list-page">
+  return <StudentRecordsMotion viewKey={view}>
     {searchParams.draft && <div role="status" className="alert alert-success"><strong>Draft saved.</strong> You can resume it any time. It has not been submitted.</div>}
-    <PageHeader icon="☰" eyebrow="My workspace / Applications" title="My applications" description="Track your submissions and continue drafts without losing your progress." actions={<Link href="/opportunities" className="btn btn-primary btn-sm"><Compass size={16} /> Browse internships</Link>} />
+    <PageHeader title="My applications" description="Track your submissions and continue drafts without losing your progress." actions={<Link href="/opportunities" className="btn btn-primary btn-sm">Browse internships <ArrowRight size={16} aria-hidden="true" /></Link>} />
     <CrmViews label="Application views" items={[
       { label: "All", href: listHref(path, searchParams, { view: null, draft: null }), active: view === "all", count: apps.length },
       { label: "Submitted", href: listHref(path, searchParams, { view: "submitted", draft: null }), active: view === "submitted", count: submitted.length },
@@ -51,5 +53,5 @@ export default async function StudentApplicationsPage({ searchParams }: { search
       </> : <div className="crm-empty"><EmptyState icon="☰" title={view === "drafts" ? "No saved drafts" : view === "submitted" ? "No submitted applications" : "No applications yet"} body={view === "drafts" ? "Drafts appear here after you save an application." : "Explore internships and apply when you find a good fit."} actionHref="/opportunities" actionLabel="Browse internships" /></div>}
       {visible.length > 0 && <div className="crm-student-help">Your application status updates here as the team reviews it. Quotation terms are sent by email. <Link href="/#contact">Need help? <ArrowRight size={13} /></Link></div>}
     </section>
-  </div>;
+  </StudentRecordsMotion>;
 }

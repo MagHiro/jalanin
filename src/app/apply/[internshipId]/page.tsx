@@ -9,6 +9,7 @@ import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import { PageHeader } from "@/components/ui/page-header";
 import { ArrowLeft } from "lucide-react";
+import "./application.css";
 
 export const metadata = { title: "Apply" };
 
@@ -96,11 +97,11 @@ export default async function ApplyPage({
   const state = existing[0]
     ? existing[0].isDraft
       ? "Resume your saved draft below — nothing is sent until you submit."
-      : `You have a ${existing[0].lifecycleStatus} application. Edits are allowed before a quotation is sent and will require admin re-review.`
-    : "Your progress saves as a draft. Nothing is sent until you submit.";
+      : `Your application status is ${existing[0].lifecycleStatus}. Review your submitted details below; editing availability is shown with the form.`
+    : "Save a draft to keep your progress. Nothing is sent until you submit.";
 
   return (
-    <div className="learn-application mx-auto max-w-3xl space-y-6">
+    <div className="learn-application application-page-calm">
       <div className="learn-application-heading">
         <Link href={`/opportunities/${internship.slug}`} className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary">
           <ArrowLeft size={16} aria-hidden="true" /> Back to {internship.title}

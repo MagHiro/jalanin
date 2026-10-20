@@ -1,0 +1,70 @@
+/* One clear next step. Scoped to the student overview, not its workspace shell. */
+.workspace-shell .next-overview { width: 100%; max-width: none; min-width: 0; margin: 0; color: #111111; }
+.next-overview *, .next-overview *::before, .next-overview *::after { box-sizing: border-box; }
+.workspace-shell .next-overview :is(h1,h2,h3,p) { margin: 0; }
+.workspace-shell .next-overview :is(h1,h2,h3,strong) { font-weight: 400; }
+.workspace-shell .next-overview a { text-decoration: none; }
+.next-overview a:focus-visible { outline: 3px solid #7892ed; outline-offset: 5px; }
+.next-overview a:not(.next-primary):hover { color: #102568; }
+.next-overview svg { flex-shrink: 0; }
+.next-overview :is(.next-focus, .next-metrics a, .next-record, .next-empty, .next-placement, .next-help) { box-shadow: 0 2px 12px -6px rgb(19 35 78 / .12); }
+.next-overview a:not(.next-record):not(.next-metrics a) { display: inline-flex; align-items: center; gap: 10px; }
+.next-section-heading a, .next-empty a, .next-placement a, .next-help a { color: #102568; font-size: 15px; line-height: 1.6; min-height: 44px; }
+.next-overview a:not(.next-primary):not(.next-record):not(.next-metrics a):hover { text-decoration: underline; text-underline-offset: 5px; }
+.next-focus { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 56px 32px; background: #ffffff; border-radius: 16px; }
+.next-eyebrow { color: #656565; font-size: 15px; line-height: 1.6; }
+.workspace-shell .next-focus h1 { max-width: 720px; margin-top: 16px; font-size: clamp(35px, 3.4vw, 44px); line-height: 1.2; letter-spacing: -.025em; text-wrap: balance; }
+.workspace-shell .next-focus p { max-width: 535px; margin: 18px 0 26px; color: #222222; font-size: 17.5px; line-height: 1.6; text-wrap: pretty; }
+.next-overview .next-primary { justify-content: center; min-height: 48px; border-radius: 999px; padding: 13px 23px; background: #102568; color: #ffffff; font-size: 15px; line-height: 1.5; }
+.next-overview .next-primary:hover { background: #243966; }
+.next-metrics { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin-top: 16px; }
+.next-metrics a { display: flex; align-items: center; gap: 16px; padding: 24px 28px; background: #ffffff; border-radius: 12px; color: #111111; min-width: 0; min-height: 88px; }
+.next-metrics a:hover { background: #fafbfe; }
+.next-metrics strong { font-size: 30px; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.next-metrics span { font-size: 15px; line-height: 1.6; color: #656565; }
+.next-metrics svg { display: none; }
+.next-applications { margin-top: 36px; }
+.next-section-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.workspace-shell .next-section-heading h2 { font-size: 37.5px; line-height: 1.25; letter-spacing: -.025em; }
+.next-records { display: grid; gap: 16px; list-style: none; padding: 0; margin: 24px 0 0; }
+.next-record { display: flex; align-items: center; gap: 24px; min-width: 0; padding: 28px; background: #ffffff; color: #111111; }
+.next-record:hover { background: #fafbfe; }
+.next-record-main { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 4px; }
+.next-record-main strong { font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.next-record-location { display: flex; align-items: center; gap: 5px; color: #656565; font-size: 15px; line-height: 1.6; }
+.next-record-guidance { color: #656565; font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.next-record-end { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.next-review-note { color: #80521f; font-size: 13px; }
+.next-record-arrow { color: #7b8495; }
+.next-empty { margin-top: 24px; padding: 32px; background: #ffffff; }
+.next-empty > svg { color: #64718c; margin-bottom: 16px; }
+.workspace-shell .next-empty h3 { font-size: 22px; line-height: 1.4; letter-spacing: -.025em; }
+.workspace-shell .next-empty p { max-width: 540px; margin: 10px 0 12px; color: #656565; font-size: 17.5px; line-height: 1.6; }
+.next-bottom { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,1fr); gap: 16px; margin-top: 24px; padding-bottom: 24px; }
+.next-placement { display: flex; align-items: flex-start; gap: 16px; min-width: 0; padding: 28px; background: #ffffff; border-radius: 12px; }
+.workspace-shell .next-placement h2 { font-size: 22px; line-height: 1.4; letter-spacing: -.025em; }
+.workspace-shell .next-placement p { color: #656565; font-size: 15px; line-height: 1.6; margin: 8px 0; max-width: 440px; }
+.next-placement-record { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 10px 0; font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.next-placement-record > span:not(.badge) { color: #656565; }
+.next-help { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-width: 0; padding: 28px; background: #eef1f6; border-radius: 12px; }
+.next-help > span { color: #656565; font-size: 15px; line-height: 1.6; }
+@media (max-width: 767px) {
+  .next-focus { padding: 32px 20px; border-radius: 12px; }
+  .next-eyebrow { max-width: 280px; }
+  .workspace-shell .next-focus h1 { font-size: 35px; }
+  .next-focus > div, .next-overview .next-primary { width: 100%; }
+  .next-metrics { gap: 8px; margin-top: 12px; }
+  .next-metrics a { flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px 12px; border-radius: 10px; }
+  .next-metrics strong { font-size: 27px; }
+  .next-metrics svg { display: none; }
+  .next-applications { margin-top: 32px; }
+  .workspace-shell .next-section-heading h2 { font-size: 35px; }
+  .next-record { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 14px; padding: 20px 16px; }
+  .next-record-main { grid-column: 1 / -1; }
+  .next-record-main strong { font-size: 17.5px; }
+  .next-record-end { align-items: flex-start; }
+  .next-record-arrow { justify-self: end; }
+  .next-empty { padding: 24px 20px; }
+  .next-bottom { grid-template-columns: minmax(0,1fr); gap: 12px; }
+  .next-placement, .next-help { padding: 24px 20px; }
+}

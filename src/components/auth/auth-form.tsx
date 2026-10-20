@@ -4,9 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { safeNext } from "@/lib/auth/safe-next";
-import { AuthStory } from "./auth-story";
 
-// Centered auth card (PayPal/Krea-inspired, email+password per PRD AUTH-*).
+// Email/password authentication per PRD AUTH-* in the shared auth shell.
 // E2E asserts: heading "Log in", labelled email/password inputs, submit
 // button named "Log in" — preserved verbatim.
 export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
@@ -54,13 +53,12 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
   }
 
   return (
-    <div className="auth-layout mx-auto max-w-5xl">
-        <AuthStory />
-      <div className="px-2 py-6 md:px-8">
-        <p className="eyebrow">Jalanin student account</p>
+    <div className="auth-calm-form">
+      <div>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
           {mode === "login" ? "Log in" : "Create your account"}
         </h1>
+        <p className="auth-calm-intro">{mode === "login" ? "Welcome back. Pick up where you left off." : "Take the first step towards your next chapter."}</p>
         <p className="mt-2 text-sm text-muted-foreground">
           {mode === "login" ? (
             <>New to Jalanin? <Link href={next !== "/dashboard" ? `/auth/sign-up?next=${encodeURIComponent(next)}` : "/auth/sign-up"} className="font-semibold text-primary hover:underline">Sign up</Link></>
@@ -69,7 +67,7 @@ export function AuthForm({ mode }: { mode: "login" | "sign-up" }) {
           )}
         </p>
         {confirmationEmail ? (
-          <div className="mt-6 rounded-xl border border-border bg-secondary p-6" role="status">
+          <div className="auth-calm-confirmation" role="status">
             <h2 className="text-lg font-semibold text-foreground">Check your email</h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               We sent a verification link to <strong className="break-all text-foreground">{confirmationEmail}</strong>.
