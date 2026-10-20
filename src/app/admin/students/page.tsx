@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/auth/require";
 import { listAdminStudents } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
 import { AdminRecords } from "@/components/admin/admin-records";
-import { EmptyState } from "@/components/ui/empty-state";
+import { DiscoveryEmptyState } from "@/components/ui/discovery-empty-state";
 import { WorkspaceSelect } from "@/components/ui/workspace-select";
 import { Pagination } from "@/components/ui/pagination";
 import { CrmFilterChips, CrmTableMeta, listHref } from "@/components/ui/crm-list";
@@ -52,7 +52,13 @@ export default async function AdminStudentsPage({ searchParams }: {
           </tr>)}</tbody>
         </table></div>
         <ul className="crm-mobile-records md:hidden">{rows.map(student => <li key={student.userId}><div className="crm-mobile-top"><div className="crm-person"><span className="crm-person-avatar" aria-hidden="true">{(student.displayName?.trim()?.[0] || "S").toUpperCase()}</span><Link className="crm-record-name" href={`/admin/students/${student.userId}`}>{student.displayName || "Unnamed student"}</Link></div></div><p>Joined {new Date(student.createdAt).toLocaleDateString("en-SG")}</p><div className="crm-mobile-bottom"><span className="crm-record-sub tnum">ID {student.userId.slice(0,8)}</span><Link className="crm-row-link" href={`/admin/students/${student.userId}`}>View profile</Link></div></li>)}</ul>
-      </> : <div className="crm-empty"><EmptyState icon="○" title="No students found" body="Adjust your search to find another student profile." actionHref={path} actionLabel="Clear search" /></div>}
+      </> : <DiscoveryEmptyState
+        title={filters.length ? "No matching students" : "No student profiles yet"}
+        description={filters.length ? "Try a different name or clear your search to see other profiles." : "Registered student profiles will appear here, with their linked applications and placements."}
+        href={filters.length ? path : "/admin"}
+        action={filters.length ? "Clear search" : "Back to overview"}
+        variant={filters.length ? "search" : "application"}
+      />}
       <Pagination page={page} totalPages={Math.max(1,Math.ceil(total/pageSize))} pathname={path} searchParams={searchParams} total={total} pageSize={pageSize} />
     </section>
   </AdminRecords>;

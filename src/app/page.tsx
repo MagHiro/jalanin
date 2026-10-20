@@ -3,7 +3,7 @@ import Image from "next/image";
 import { ArrowRight, BriefcaseBusiness, MapPin } from "lucide-react";
 import { listFeaturedInternships, COUNTRY_NAMES } from "@/features/internships/service";
 import { ContactForm } from "@/components/contact/contact-form";
-import { EmptyState } from "@/components/ui/empty-state";
+import { DiscoveryEmptyState } from "@/components/ui/discovery-empty-state";
 import { PublicMotion } from "@/components/motion/public-motion";
 import { ProcessCarousel } from "@/components/motion/process-carousel";
 import { FaqSection } from "@/components/faq/faq-section";
@@ -40,7 +40,7 @@ export default async function LandingPage() {
           <Link href="/opportunities" className="featured-internships-browse">View all internships</Link>
         </div>
         {featured.length === 0
-          ? <EmptyState title="No featured internships right now" body="Please check back soon or browse all openings." actionHref="/opportunities" actionLabel="Browse internships" />
+          ? <DiscoveryEmptyState title="No featured internships right now" description="Explore all openings to find an internship that interests you." href="/opportunities" action="Browse internships" variant="application" />
           : <ul className="learn-opportunity-grid">{featured.map(({ internship, categoryName }) =>
               <li key={internship.id} data-reveal className="featured-role-row">
                 <h3><span className="featured-role-icon" aria-hidden="true"><BriefcaseBusiness size={19} strokeWidth={1.5} /></span><Link href={`/opportunities/${internship.slug}`}>{internship.title}</Link></h3>

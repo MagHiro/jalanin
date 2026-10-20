@@ -6,7 +6,7 @@ import { waitingDays, waitingLabel } from "@/lib/workflow/waiting-time";
 import { PageHeader } from "@/components/ui/page-header";
 import { AdminRecords } from "@/components/admin/admin-records";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { EmptyState } from "@/components/ui/empty-state";
+import { DiscoveryEmptyState } from "@/components/ui/discovery-empty-state";
 import { WorkspaceSelect } from "@/components/ui/workspace-select";
 import { Pagination } from "@/components/ui/pagination";
 import { RecordActions } from "@/components/ui/record-actions";
@@ -100,7 +100,13 @@ export default async function AdminApplicationsPage({ searchParams }: {
           <p>{internshipTitle}</p><p className="crm-record-sub">{application.email} · r{application.revision}{label ? ` · waiting ${label.toLowerCase()}` : ""}</p>
           <div className="crm-mobile-bottom">{application.needsReReview && <span className="badge badge-rereview">Re-review</span>}<Link href={`/admin/applications/${application.id}`} className="crm-row-link">Review record</Link></div>
         </li>;})}</ul>
-      </> : <div className="crm-empty"><EmptyState icon="☰" title="No applications in this view" body="Adjust the search or filters to find an application." actionHref={path} actionLabel="Reset filters" /></div>}
+      </> : <DiscoveryEmptyState
+        title={filters.length ? "No applications in this view" : "No applications yet"}
+        description={filters.length ? "Try another search or clear your filters to see other submissions." : "Student submissions will appear here when they’re ready for review."}
+        href={filters.length ? path : "/admin/internships"}
+        action={filters.length ? "Clear filters" : "Manage internships"}
+        variant={filters.length ? "search" : "application"}
+      />}
       <Pagination page={page} totalPages={totalPages} pathname={path} searchParams={searchParams} total={total} pageSize={pageSize} />
     </section>
   </AdminRecords>;

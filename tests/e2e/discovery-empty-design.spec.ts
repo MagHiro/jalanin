@@ -1,5 +1,28 @@
 import { expect, test } from "@playwright/test";
 
+for (const [route, title, action] of [
+  ["internships", "No matching internships", "Clear filters"],
+  ["applications", "No applications in this view", "Clear filters"],
+  ["students", "No matching students", "Clear search"],
+] as const) {
+  test(`admin ${route} has a focused no-match state`, async ({ page }) => {
+    const session = await page.request.post("/api/dev/session", {
+      data: { userId: process.env.QA_ADMIN_ID ?? "00000000-0000-0000-0000-00000000ad01" },
+    });
+    expect(session.ok()).toBeTruthy();
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    for (const width of [1440, 375]) {
+      await page.setViewportSize({ width, height: 960 });
+      await page.goto(`/admin/${route}?q=zz-no-matching-record-zz`);
+      const empty = page.locator(".discovery-empty");
+      await expect(empty.getByRole("heading", { name: title })).toBeVisible();
+      await expect(empty.getByRole("link", { name: action })).toHaveAttribute("href", `/admin/${route}`);
+      await expect(empty.locator("h2")).toHaveCSS("font-weight", "400");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+    }
+  });
+}
+
 test("opportunities no-match state is compact and can reset filters", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   for (const width of [1440, 375]) {

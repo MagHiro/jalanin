@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/auth/require";
 import { listAdminInternships } from "@/features/admin/service";
 import { PageHeader } from "@/components/ui/page-header";
 import { AdminRecords } from "@/components/admin/admin-records";
-import { EmptyState } from "@/components/ui/empty-state";
+import { DiscoveryEmptyState } from "@/components/ui/discovery-empty-state";
 import { WorkspaceSelect } from "@/components/ui/workspace-select";
 import { RecordActions } from "@/components/ui/record-actions";
 import { Pagination } from "@/components/ui/pagination";
@@ -74,7 +74,13 @@ export default async function AdminInternshipsPage({ searchParams }: {
           <p>{row.city}, {row.countryCode}</p><p className="crm-record-sub">Starts {row.startDate ?? "to be confirmed"}</p>
           <div className="crm-mobile-bottom">{row.featured && <span className="crm-featured-label">Featured</span>}<Link className="crm-row-link" href={`/admin/internships/${row.id}/edit`}>Edit listing</Link></div>
         </li>)}</ul>
-      </> : <div className="crm-empty"><EmptyState icon="▤" title="No internships in this view" body="Change your filters or create a new internship listing." actionHref="/admin/internships/new" actionLabel="New internship" /></div>}
+      </> : <DiscoveryEmptyState
+        title={filters.length ? "No matching internships" : "No internships yet"}
+        description={filters.length ? "Try a broader search or clear your filters to see other listings." : "Create your first listing. Save it as a draft until it’s ready to publish."}
+        href={filters.length ? path : "/admin/internships/new"}
+        action={filters.length ? "Clear filters" : "New internship"}
+        variant={filters.length ? "search" : "application"}
+      />}
       <Pagination page={page} totalPages={Math.max(1,Math.ceil(total/pageSize))} pathname={path} searchParams={searchParams} total={total} pageSize={pageSize} />
     </section>
   </AdminRecords>;
