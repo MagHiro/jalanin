@@ -39,13 +39,28 @@ test("editorial shell keeps centered hero copy and inset Coda-inspired navigatio
   expect(header!.y + header!.height).toBeLessThan(hero!.y + hero!.height);
   const heading = await page.locator("#hero-heading").boundingBox();
   expect(Math.abs(heading!.x + heading!.width / 2 - 960)).toBeLessThanOrEqual(1);
-  await expect(page.locator("#hero-heading")).toHaveCSS("font-weight", "600");
+  await expect(page.locator("#hero-heading")).toHaveCSS("font-weight", "400");
   await expect(page.locator("#hero-heading em")).toHaveCSS("font-weight", "400");
   await expect(page.locator(".origin-hero-description")).toHaveText("New places. Real experience. Your next chapter.");
   await expect(page.locator(".origin-hero-proof")).toHaveCount(0);
   await page.goto("/missing-public-page");
   await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
   await expect(page.locator(".public-state")).toHaveCSS("border-radius", "12px");
+});
+
+test("footer uses the approved type scale and preserves navigation", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const width of [375, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const footer = page.getByRole("contentinfo");
+    await footer.scrollIntoViewIfNeeded();
+    await expect(footer.getByRole("heading", { name: "Go further. Learn by doing." })).toHaveCSS("font-size", width === 375 ? "35px" : "37.5px");
+    await expect(footer.getByRole("img", { name: "Jalanin Internship Program" })).toBeVisible();
+    await expect(footer.getByRole("link", { name: "Privacy policy" })).toHaveAttribute("href", "/privacy");
+    await expect(footer.getByRole("link", { name: "Terms of service" })).toHaveAttribute("href", "/terms");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  }
 });
 
 test("public motion survives navigation and respects live reduced-motion changes", async ({ page }) => {
@@ -60,6 +75,68 @@ test("public motion survives navigation and respects live reduced-motion changes
   await page.locator("#how-it-works").scrollIntoViewIfNeeded();
   await expect(page.locator(".learn-process-step").first()).toHaveCSS("opacity", "1");
   expect(errors).toEqual([]);
+});
+
+test("navbar uses regular compact typography on desktop and mobile", async ({ page }) => {
+  for (const width of [375, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const header = page.locator(".origin-nav");
+    if (width < 1024) {
+      await header.getByRole("button", { name: "Menu" }).click();
+      await expect(header.getByRole("navigation", { name: "Mobile" })).toBeVisible();
+    }
+    const labels = header.locator(width < 1024
+      ? ".public-menu-toggle, .public-mobile-link .flex-1 > span, .public-mobile-panel .public-account-link, .public-mobile-panel .public-header-cta"
+      : ".public-nav-link, .public-account .public-account-link, .public-account .public-header-cta");
+    for (const label of await labels.all()) {
+      await expect(label).toHaveCSS("font-size", "15px");
+      await expect(label).toHaveCSS("font-weight", "400");
+      await expect(label).toHaveCSS("letter-spacing", "normal");
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  }
+});
+
+test("hero typography follows the approved responsive scale on desktop and mobile", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const width of [375, 767, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const hero = page.locator(".origin-hero");
+    const heading = hero.getByRole("heading", { level: 1 });
+    await expect(heading).toHaveCSS("font-size", width < 880 ? "44px" : "72px");
+    await expect(heading).toHaveCSS("font-weight", "400");
+    await expect(heading.locator("em")).toHaveCSS("font-style", "normal");
+    await expect(hero.locator(".origin-kicker")).toHaveCSS("text-transform", "none");
+    await expect(hero.locator(".origin-hero-description")).toHaveCSS("font-size", width <= 767 ? "17.5px" : "18px");
+    await expect(hero.locator(".origin-hero-description")).toHaveCSS("letter-spacing", "normal");
+    const action = hero.locator(".origin-hero-action");
+    await expect(action).toHaveCSS("font-size", "15px");
+    await expect(action).toHaveCSS("font-weight", "400");
+    await expect(action).toHaveAttribute("href", "/opportunities");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  }
+});
+
+test("featured internships use compact responsive rows and preserve discovery links", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const width of [375, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const section = page.locator(".featured-internships");
+    await expect(section.getByRole("heading", { name: "Featured internships" })).toBeVisible();
+    await expect(section.getByRole("link", { name: "View all internships" })).toHaveAttribute("href", "/opportunities");
+    await expect(section.locator(".learn-opportunity-grid")).toHaveCSS("grid-template-columns", /\d/);
+    for (const card of await section.locator(".featured-role-row").all()) {
+      await expect(card.locator(".featured-role-action")).toHaveAttribute("href", /^\/opportunities\//);
+      await expect(card).toHaveCSS("border-radius", "0px");
+      const box = await card.boundingBox();
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  }
 });
 
 test("public content and hero action remain available without JavaScript", async ({ browser }) => {
@@ -89,7 +166,7 @@ test("mobile navigation dismisses with Escape and landing sections render", asyn
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const menu = page.locator('button[aria-controls="public-mobile-navigation"]');
-  await expect(page.locator(".origin-hero-description")).toHaveCSS("font-size", "16px");
+  await expect(page.locator(".origin-hero-description")).toHaveCSS("font-size", "17.5px");
   await menu.click();
   await expect(menu).toHaveAttribute("aria-expanded", "true");
   await page.keyboard.press("Escape");

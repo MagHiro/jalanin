@@ -1,27 +1,26 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
 export function SiteFooter() {
   return (
-    <footer className="learn-footer">
+    <footer className="learn-footer refined-footer">
       <div className="learn-footer-heading">
         <div className="learn-footer-invitation">
-          <p className="learn-footer-kicker">The next chapter is yours</p>
-          <p>Make room for<br /><span>what&apos;s possible.</span></p>
+           <p className="learn-footer-kicker">Your next chapter</p>
+           <h2>Go further.<br />Learn by doing.</h2>
         </div>
         <Link href="/opportunities" className="btn btn-primary">Browse internships <ArrowRight size={19} aria-hidden="true" /></Link>
       </div>
       <div className="learn-footer-content mx-auto grid gap-10 px-5 py-16 md:grid-cols-[2fr_1fr_1fr] md:px-10">
         <div className="learn-footer-brand">
-          <p className="flex items-center gap-2 text-lg font-bold tracking-tight text-primary">
-
-            <span className="text-3xl tracking-[-.06em]">jalanin.</span>
-          </p>
+          <Link href="/" aria-label="Jalanin Internship Program — home" className="learn-footer-logo">
+            <Image src="/logo.png" alt="Jalanin Internship Program" width={2996} height={688} sizes="220px" />
+          </Link>
           <p className="mt-4 max-w-sm text-sm leading-7 text-muted-foreground">
             Internship placements across Southeast Asia with personal guidance
             and custom quotations by email.
           </p>
-          <p className="learn-footer-signoff">Go further. Learn by doing.</p>
         </div>
         <nav aria-label="Explore">
           <p className="text-sm font-semibold text-foreground">Explore</p>

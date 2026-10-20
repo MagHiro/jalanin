@@ -1,9 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Mail, MapPin } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
 import { listFeaturedInternships, COUNTRY_NAMES } from "@/features/internships/service";
 import { ContactForm } from "@/components/contact/contact-form";
-import { InternshipCard } from "@/components/ui/internship-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PublicMotion } from "@/components/motion/public-motion";
 
@@ -39,58 +38,60 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section aria-labelledby="featured-heading" className="learn-section">
-        <div data-scroll-reveal className="learn-section-heading">
-          <div><p className="eyebrow">01 / Opportunities</p><h2 id="featured-heading" className="section-title mt-4">The next move<br />is yours.</h2></div>
-          <div><p className="mb-6 leading-7 text-muted-foreground">Explore published internships and choose the experience that feels right for your next chapter.</p>
-            <Link href="/opportunities" className="learn-text-link">View all internships <ArrowRight size={17} aria-hidden="true" /></Link></div>
+      <section aria-labelledby="featured-heading" className="learn-section featured-internships">
+        <div data-scroll-reveal className="featured-internships-heading">
+          <h2 id="featured-heading">Featured internships</h2>
+          <p>Discover your next opportunity across Southeast Asia.</p>
+          <Link href="/opportunities" className="featured-internships-browse">View all internships</Link>
         </div>
         {featured.length === 0
           ? <EmptyState title="No featured internships right now" body="Please check back soon or browse all openings." actionHref="/opportunities" actionLabel="Browse internships" />
           : <ul className="learn-opportunity-grid">{featured.map(({ internship, categoryName }) =>
-              <InternshipCard key={internship.id} title={internship.title} city={internship.city}
-                country={COUNTRY_NAMES[internship.countryCode] ?? internship.countryCode}
-                categoryName={categoryName} startDate={internship.startDate}
-                endDate={internship.endDate} href={`/opportunities/${internship.slug}`} />
+              <li key={internship.id} data-reveal className="featured-role-row">
+                <h3><Link href={`/opportunities/${internship.slug}`}>{internship.title}</Link></h3>
+                <p className="featured-role-category">{categoryName ?? "Internship"}</p>
+                <p className="featured-role-location">{internship.city}, {COUNTRY_NAMES[internship.countryCode] ?? internship.countryCode}</p>
+                <Link href={`/opportunities/${internship.slug}`} aria-label={`View details for ${internship.title}`} className="featured-role-action">View details <span aria-hidden="true">›</span></Link>
+              </li>
             )}</ul>}
       </section>
 
       <section id="how-it-works" aria-labelledby="hiw-heading" className="learn-section learn-process scroll-mt-28">
-        <div data-scroll-reveal>
-          <p className="eyebrow">02 / A clear way forward</p>
-          <h2 id="hiw-heading" className="section-title mt-4">One step<br />at a time.</h2>
+        <div data-scroll-reveal className="learn-process-heading">
+          <h2 id="hiw-heading">One step at a time.</h2>
           <p className="learn-process-intro">From your first search to a personal quotation, know what to expect at each step.</p>
-          <Link href="/opportunities" className="btn btn-primary mt-7">Find your opportunity <ArrowRight size={17} aria-hidden="true" /></Link>
         </div>
-        <ol>{steps.map(([title, body], i) =>
-          <li data-scroll-reveal key={title} className="learn-process-step">
-            <span className="tnum" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
-            <div><h3>{title}</h3><p>{body}</p></div>
-          </li>)}
-        </ol>
+        <div className="learn-process-panel">
+          <ol>{steps.map(([title, body], i) =>
+            <li data-scroll-reveal key={title} className="learn-process-step">
+              <span className="learn-process-number tnum" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+              <div><h3>{title}</h3><p>{body}</p></div>
+            </li>)}
+          </ol>
+          <div className="learn-process-footer">
+            <Link href="/opportunities" className="learn-process-action">Find your opportunity <ArrowRight size={17} aria-hidden="true" /></Link>
+          </div>
+        </div>
       </section>
 
-      <section id="about" aria-labelledby="about-heading" className="learn-about scroll-mt-28">
-        <div data-scroll-reveal className="learn-about-copy">
-          <p className="learn-kicker">03 / A human way to grow</p>
-          <h2 id="about-heading" className="section-title mt-6">Your journey is personal.<br />So is our approach.</h2>
-          <p className="mt-6 leading-8 text-jalanin-100">We connect students with internship experiences across Southeast Asia. Our team reads every application and prepares a custom quotation because the right next step looks different for everyone.</p>
-          <Link href="#contact" className="learn-hero-action mt-8">Let’s talk <ArrowRight size={18} aria-hidden="true" /></Link>
-        </div>
-        <figure className="learn-about-photo">
-          <Image src="/images/singapore.jpg" alt="Singapore’s waterfront and skyline at dusk" fill sizes="(min-width: 1024px) 760px, 100vw" className="object-cover" />
+      <section id="about" aria-labelledby="about-heading" className="personal-contact scroll-mt-28">
+        <header data-scroll-reveal className="personal-contact-heading">
+          <p>A human way to grow</p>
+          <h2 id="about-heading">Your journey is personal. So is our approach.</h2>
+        </header>
+        <figure className="personal-contact-photo">
+          <Image src="/images/singapore.jpg" alt="Singapore’s waterfront and skyline at dusk" fill sizes="(min-width: 1536px) 1440px, 100vw" className="object-cover" />
           <figcaption><MapPin size={15} aria-hidden="true" /> Singapore · Southeast Asia</figcaption>
         </figure>
-      </section>
-
-      <section id="contact" aria-labelledby="contact-heading" className="learn-section learn-contact scroll-mt-28">
-        <div data-scroll-reveal className="learn-contact-note">
-          <p className="eyebrow">04 / Contact</p>
-          <h3 className="mt-7 flex items-center gap-3 text-base font-medium"><Mail size={20} strokeWidth={1.5} aria-hidden="true" /> A real conversation.</h3>
-          <p className="mt-3 max-w-xs text-sm leading-7 text-muted-foreground">Our team replies by email. See our <Link href="/privacy" className="underline underline-offset-4">privacy policy</Link>.</p>
-          <Link href="/opportunities" className="learn-text-link mt-8">Explore internships first <ArrowRight size={17} aria-hidden="true" /></Link>
+        <div id="contact" className="personal-contact-panel scroll-mt-28" role="region" aria-labelledby="contact-heading">
+          <div className="personal-contact-intro">
+            <h3 id="contact-heading">Good things start with a conversation.</h3>
+            <p>We connect students with internship experiences across Southeast Asia. Our team reads every application and prepares a custom quotation because the right next step looks different for everyone.</p>
+          </div>
+          <ContactForm />
+          <p className="personal-contact-privacy">Our team replies by email. See our <Link href="/privacy">privacy policy</Link>.</p>
+          <Link href="/opportunities" className="personal-contact-explore">Explore internships first <ArrowRight size={17} aria-hidden="true" /></Link>
         </div>
-        <div className="learn-contact-form"><h2 id="contact-heading" className="section-title mb-10">Good things<br />start with a<br />conversation.</h2><ContactForm /></div>
       </section>
     </PublicMotion>
   );

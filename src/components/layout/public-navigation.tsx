@@ -91,12 +91,12 @@ export function PublicNavigation({ signedIn }: { signedIn: boolean; admin: boole
       </div>
       <div id="public-mobile-navigation" hidden={!open} className="public-mobile-panel lg:hidden">
         <div className="mx-auto max-w-[1280px] px-5 pb-6 pt-3 md:px-10">
-          <p className="mb-2 text-xs tracking-[.12em] text-muted-foreground uppercase">Explore Jalanin</p>
+          <p className="mb-2 text-[15px] font-normal leading-[1.6] tracking-normal text-muted-foreground">Explore Jalanin</p>
           <nav aria-label="Mobile">
             {links.map(({ href, label, description, icon: Icon }) => (
               <Link key={href} href={href} className="public-mobile-link" aria-current={active(href) ? (href.includes("#") ? "location" : "page") : undefined} onClick={() => { setOpen(false); setHash(href.includes("#") ? href.slice(1) : ""); }}>
                 <Icon size={21} strokeWidth={1.6} aria-hidden="true" />
-                <span className="flex-1"><span className="block text-lg font-medium tracking-[-.025em]">{label}</span><span className="block text-xs text-muted-foreground">{description}</span></span>
+                <span className="flex-1"><span className="block text-[15px] font-normal leading-[1.6] tracking-normal">{label}</span><span className="block text-[15px] font-normal leading-[1.6] tracking-normal text-muted-foreground">{description}</span></span>
                 <ArrowRight size={18} strokeWidth={1.6} aria-hidden="true" />
               </Link>
             ))}
